@@ -4,16 +4,16 @@
 
 <head>
 
-<script id="wdp-polyfill">
-/* WordPress & LiteSpeed runtime polyfill */
-window.wp = window.wp || { i18n: { setLocaleData: function() {}, __: function(s) { return s; } } };
-window._ = window._ || {};
-window.ElementorProFrontendConfig = window.ElementorProFrontendConfig || {};
-window.settingAutoplay = true;
-</script>
+	<script id="wdp-polyfill">
+		/* WordPress & LiteSpeed runtime polyfill */
+		window.wp = window.wp || { i18n: { setLocaleData: function () { }, __: function (s) { return s; } } };
+		window._ = window._ || {};
+		window.ElementorProFrontendConfig = window.ElementorProFrontendConfig || {};
+		window.settingAutoplay = true;
+	</script>
 
 	<script
-		data-no-optimize="1">var litespeed_docref = sessionStorage.getItem("litespeed_docref"); litespeed_docref && (Object.defineProperty(document, "referrer", {get: function () {return litespeed_docref}}), sessionStorage.removeItem("litespeed_docref"));</script>
+		data-no-optimize="1">var litespeed_docref = sessionStorage.getItem("litespeed_docref"); litespeed_docref && (Object.defineProperty(document, "referrer", { get: function () { return litespeed_docref } }), sessionStorage.removeItem("litespeed_docref"));</script>
 	<meta charset="UTF-8">
 	<title>Website Invitation Premium</title>
 	<style>
@@ -1200,7 +1200,8 @@ window.settingAutoplay = true;
 	<script id="jquery-migrate-js" data-cfasync="false"
 		src="/template-assets/webinvite.id/wp-includes/js/jquery/jquery-migrate.min.js"></script>
 	<link rel="https://api.w.org/" href="/template-assets/webinvite.id/wp-json/" />
-	<link rel="alternate" title="JSON" type="application/json" href="/template-assets/webinvite.id/wp-json/wp/v2/posts/62777" />
+	<link rel="alternate" title="JSON" type="application/json"
+		href="/template-assets/webinvite.id/wp-json/wp/v2/posts/62777" />
 	<link rel="EditURI" type="application/rsd+xml" title="RSD" href="/template-assets/webinvite.id/xmlrpc.php?rsd" />
 	<meta name="generator" content="WordPress 7.1.2" />
 	<link rel='shortlink' href='/template-assets/webinvite.id/?p=62777' />
@@ -1243,34 +1244,55 @@ window.settingAutoplay = true;
 			pointer-events: auto !important;
 		}
 	</style>
-	<script
-	>(function(){function stop(e){e.preventDefault();e.stopPropagation();return!1}
-document.addEventListener('contextmenu',e=>stop(e),!0);document.addEventListener('selectstart',e=>stop(e),!0);document.addEventListener('dragstart',e=>stop(e),!0);document.addEventListener('keydown',e=>{let k=(e.key||'').toLowerCase(),ctrl=e.ctrlKey||e.metaKey,shift=e.shiftKey;let devtools=(e.keyCode===123)||(ctrl&&shift&&(k==='i'||k==='c'||k==='j'))||(ctrl&&k==='u');let forbidden=(ctrl&&(k==='c'||k==='x'||k==='a'||k==='s'));if(devtools||forbidden)stop(e);},!0)})()</script>
-	<script id="wpcp_disable_selection">var image_save_msg='You are not allowed to save images!';var no_menu_msg='Context Menu disabled!';var smessage="";function disableEnterKey(e){var elemtype=e.target.tagName;elemtype=elemtype.toUpperCase();if(elemtype=="TEXT"||elemtype=="TEXTAREA"||elemtype=="INPUT"||elemtype=="PASSWORD"||elemtype=="SELECT"||elemtype=="OPTION"||elemtype=="EMBED"){elemtype='TEXT'}
-if(e.ctrlKey){var key;if(window.event)
-key=window.event.keyCode;else key=e.which;if(elemtype!='TEXT'&&(key==97||key==65||key==67||key==99||key==88||key==120||key==26||key==85||key==86||key==83||key==43||key==73)){if(wccp_free_iscontenteditable(e))return!0;show_wpcp_message('You are not allowed to copy content or view source');return!1}else return!0}}
-function wccp_free_iscontenteditable(e){var e=e||window.event;var target=e.target||e.srcElement;var elemtype=e.target.nodeName;elemtype=elemtype.toUpperCase();var iscontenteditable="false";if(typeof target.getAttribute!="undefined")iscontenteditable=target.getAttribute("contenteditable");var iscontenteditable2=!1;if(typeof target.isContentEditable!="undefined")iscontenteditable2=target.isContentEditable;if(target.parentElement.isContentEditable)iscontenteditable2=!0;if(iscontenteditable=="true"||iscontenteditable2==!0){if(typeof target.style!="undefined")target.style.cursor="text";return!0}}
-function disable_copy(e){var e=e||window.event;var elemtype=e.target.tagName;elemtype=elemtype.toUpperCase();if(elemtype=="TEXT"||elemtype=="TEXTAREA"||elemtype=="INPUT"||elemtype=="PASSWORD"||elemtype=="SELECT"||elemtype=="OPTION"||elemtype=="EMBED"){elemtype='TEXT'}
-if(wccp_free_iscontenteditable(e))return!0;var isSafari=/Safari/.test(navigator.userAgent)&&/Apple Computer/.test(navigator.vendor);var checker_IMG='';if(elemtype=="IMG"&&checker_IMG=='checked'&&e.detail>=2){show_wpcp_message(alertMsg_IMG);return!1}
-if(elemtype!="TEXT"){if(smessage!==""&&e.detail==2)
-show_wpcp_message(smessage);if(isSafari)
-return!0;else return!1}}
-function disable_copy_ie(){var e=e||window.event;var elemtype=window.event.srcElement.nodeName;elemtype=elemtype.toUpperCase();if(wccp_free_iscontenteditable(e))return!0;if(elemtype=="IMG"){show_wpcp_message(alertMsg_IMG);return!1}
-if(elemtype!="TEXT"&&elemtype!="TEXTAREA"&&elemtype!="INPUT"&&elemtype!="PASSWORD"&&elemtype!="SELECT"&&elemtype!="OPTION"&&elemtype!="EMBED"){return!1}}
-function reEnable(){return!0}
-document.onkeydown=disableEnterKey;document.onselectstart=disable_copy_ie;if(navigator.userAgent.indexOf('MSIE')==-1){document.onmousedown=disable_copy;document.onclick=reEnable}
-function disableSelection(target){if(typeof target.onselectstart!="undefined")
-target.onselectstart=disable_copy_ie;else if(typeof target.style.MozUserSelect!="undefined"){target.style.MozUserSelect="none"}else target.onmousedown=function(){return!1}
-target.style.cursor="default"}
-window.onload=function(){disableSelection(document.body)};var onlongtouch;var timer;var touchduration=1000;var elemtype="";function touchstart(e){var e=e||window.event;var target=e.target||e.srcElement;elemtype=window.event.srcElement.nodeName;elemtype=elemtype.toUpperCase();if(!wccp_pro_is_passive())e.preventDefault();if(!timer){timer=setTimeout(onlongtouch,touchduration)}}
-function touchend(){if(timer){clearTimeout(timer);timer=null}
-onlongtouch()}
-onlongtouch=function(e){if(elemtype!="TEXT"&&elemtype!="TEXTAREA"&&elemtype!="INPUT"&&elemtype!="PASSWORD"&&elemtype!="SELECT"&&elemtype!="EMBED"&&elemtype!="OPTION"){if(window.getSelection){if(window.getSelection().empty){window.getSelection().empty()}else if(window.getSelection().removeAllRanges){window.getSelection().removeAllRanges()}}else if(document.selection){document.selection.empty()}
-return!1}};document.addEventListener("DOMContentLiteSpeedLoaded",function(event){window.addEventListener("touchstart",touchstart,!1);window.addEventListener("touchend",touchend,!1)});function wccp_pro_is_passive(){var cold=!1,hike=function(){};try{const object1={};var aid=Object.defineProperty(object1,'passive',{get(){cold=!0}});window.addEventListener('test',hike,aid);window.removeEventListener('test',hike,aid)}catch(e){}
-return cold}</script>
-	<script id="wpcp_disable_Right_Click">document.ondragstart=function(){return!1}
-function nocontext(e){return!1}
-document.oncontextmenu=nocontext</script>
+	<script>(function () {
+			function stop(e) { e.preventDefault(); e.stopPropagation(); return !1 }
+			document.addEventListener('contextmenu', e => stop(e), !0); document.addEventListener('selectstart', e => stop(e), !0); document.addEventListener('dragstart', e => stop(e), !0); document.addEventListener('keydown', e => { let k = (e.key || '').toLowerCase(), ctrl = e.ctrlKey || e.metaKey, shift = e.shiftKey; let devtools = (e.keyCode === 123) || (ctrl && shift && (k === 'i' || k === 'c' || k === 'j')) || (ctrl && k === 'u'); let forbidden = (ctrl && (k === 'c' || k === 'x' || k === 'a' || k === 's')); if (devtools || forbidden) stop(e); }, !0)
+		})()</script>
+	<script id="wpcp_disable_selection">var image_save_msg = 'You are not allowed to save images!'; var no_menu_msg = 'Context Menu disabled!'; var smessage = ""; function disableEnterKey(e) {
+			var elemtype = e.target.tagName; elemtype = elemtype.toUpperCase(); if (elemtype == "TEXT" || elemtype == "TEXTAREA" || elemtype == "INPUT" || elemtype == "PASSWORD" || elemtype == "SELECT" || elemtype == "OPTION" || elemtype == "EMBED") { elemtype = 'TEXT' }
+			if (e.ctrlKey) {
+				var key; if (window.event)
+					key = window.event.keyCode; else key = e.which; if (elemtype != 'TEXT' && (key == 97 || key == 65 || key == 67 || key == 99 || key == 88 || key == 120 || key == 26 || key == 85 || key == 86 || key == 83 || key == 43 || key == 73)) { if (wccp_free_iscontenteditable(e)) return !0; show_wpcp_message('You are not allowed to copy content or view source'); return !1 } else return !0
+			}
+		}
+		function wccp_free_iscontenteditable(e) { var e = e || window.event; var target = e.target || e.srcElement; var elemtype = e.target.nodeName; elemtype = elemtype.toUpperCase(); var iscontenteditable = "false"; if (typeof target.getAttribute != "undefined") iscontenteditable = target.getAttribute("contenteditable"); var iscontenteditable2 = !1; if (typeof target.isContentEditable != "undefined") iscontenteditable2 = target.isContentEditable; if (target.parentElement.isContentEditable) iscontenteditable2 = !0; if (iscontenteditable == "true" || iscontenteditable2 == !0) { if (typeof target.style != "undefined") target.style.cursor = "text"; return !0 } }
+		function disable_copy(e) {
+			var e = e || window.event; var elemtype = e.target.tagName; elemtype = elemtype.toUpperCase(); if (elemtype == "TEXT" || elemtype == "TEXTAREA" || elemtype == "INPUT" || elemtype == "PASSWORD" || elemtype == "SELECT" || elemtype == "OPTION" || elemtype == "EMBED") { elemtype = 'TEXT' }
+			if (wccp_free_iscontenteditable(e)) return !0; var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor); var checker_IMG = ''; if (elemtype == "IMG" && checker_IMG == 'checked' && e.detail >= 2) { show_wpcp_message(alertMsg_IMG); return !1 }
+			if (elemtype != "TEXT") {
+				if (smessage !== "" && e.detail == 2)
+					show_wpcp_message(smessage); if (isSafari)
+					return !0; else return !1
+			}
+		}
+		function disable_copy_ie() {
+			var e = e || window.event; var elemtype = window.event.srcElement.nodeName; elemtype = elemtype.toUpperCase(); if (wccp_free_iscontenteditable(e)) return !0; if (elemtype == "IMG") { show_wpcp_message(alertMsg_IMG); return !1 }
+			if (elemtype != "TEXT" && elemtype != "TEXTAREA" && elemtype != "INPUT" && elemtype != "PASSWORD" && elemtype != "SELECT" && elemtype != "OPTION" && elemtype != "EMBED") { return !1 }
+		}
+		function reEnable() { return !0 }
+		document.onkeydown = disableEnterKey; document.onselectstart = disable_copy_ie; if (navigator.userAgent.indexOf('MSIE') == -1) { document.onmousedown = disable_copy; document.onclick = reEnable }
+		function disableSelection(target) {
+			if (typeof target.onselectstart != "undefined")
+				target.onselectstart = disable_copy_ie; else if (typeof target.style.MozUserSelect != "undefined") { target.style.MozUserSelect = "none" } else target.onmousedown = function () { return !1 }
+			target.style.cursor = "default"
+		}
+		window.onload = function () { disableSelection(document.body) }; var onlongtouch; var timer; var touchduration = 1000; var elemtype = ""; function touchstart(e) { var e = e || window.event; var target = e.target || e.srcElement; elemtype = window.event.srcElement.nodeName; elemtype = elemtype.toUpperCase(); if (!wccp_pro_is_passive()) e.preventDefault(); if (!timer) { timer = setTimeout(onlongtouch, touchduration) } }
+		function touchend() {
+			if (timer) { clearTimeout(timer); timer = null }
+			onlongtouch()
+		}
+		onlongtouch = function (e) {
+			if (elemtype != "TEXT" && elemtype != "TEXTAREA" && elemtype != "INPUT" && elemtype != "PASSWORD" && elemtype != "SELECT" && elemtype != "EMBED" && elemtype != "OPTION") {
+				if (window.getSelection) { if (window.getSelection().empty) { window.getSelection().empty() } else if (window.getSelection().removeAllRanges) { window.getSelection().removeAllRanges() } } else if (document.selection) { document.selection.empty() }
+				return !1
+			}
+		}; document.addEventListener("DOMContentLiteSpeedLoaded", function (event) { window.addEventListener("touchstart", touchstart, !1); window.addEventListener("touchend", touchend, !1) }); function wccp_pro_is_passive() {
+			var cold = !1, hike = function () { }; try { const object1 = {}; var aid = Object.defineProperty(object1, 'passive', { get() { cold = !0 } }); window.addEventListener('test', hike, aid); window.removeEventListener('test', hike, aid) } catch (e) { }
+			return cold
+		}</script>
+	<script id="wpcp_disable_Right_Click">document.ondragstart = function () { return !1 }
+		function nocontext(e) { return !1 }
+		document.oncontextmenu = nocontext</script>
 	<style>
 		.unselectable {
 			-moz-user-select: none;
@@ -1288,10 +1310,9 @@ document.oncontextmenu=nocontext</script>
 			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 		}
 	</style>
-	<script id="wpcp_css_disable_selection"
-	>var e=document.getElementsByTagName('body')[0];if(e){e.setAttribute('unselectable',"on")}</script>
 	<script
-	>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296598390029657');fbq('track','PageView');fbq('track','ViewContent')</script>
+		id="wpcp_css_disable_selection">var e = document.getElementsByTagName('body')[0]; if (e) { e.setAttribute('unselectable', "on") }</script>
+	<script>!function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s) }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js'); fbq('init', '296598390029657'); fbq('track', 'PageView'); fbq('track', 'ViewContent')</script>
 	<meta name="generator"
 		content="Elementor 4.1.4; features: e_font_icon_svg, additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-swap">
 	<style>
@@ -1492,8 +1513,7 @@ document.oncontextmenu=nocontext</script>
 										</div>
 									</div>
 								</div>
-								<script
-								>document.addEventListener('DOMContentLiteSpeedLoaded',()=>{document.querySelector('.motionText').style.display="none"})</script>
+								<script>document.addEventListener('DOMContentLiteSpeedLoaded', () => { document.querySelector('.motionText').style.display = "none" })</script>
 							</div>
 						</section>
 					</div>
@@ -2469,7 +2489,8 @@ document.oncontextmenu=nocontext</script>
 						<div class="elementor-background-overlay"></div>
 						<section
 							class="wpr-jarallax elementor-section elementor-inner-section elementor-element elementor-element-d497f2b elementor-section-height-min-height wpr-jarallax-yes elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
-							speed-data="0.4" bg-image="/template-assets/webinvite.id/wp-content/uploads/2025/10/Raden-5.jpg"
+							speed-data="0.4"
+							bg-image="/template-assets/webinvite.id/wp-content/uploads/2025/10/Raden-5.jpg"
 							bg-image-mobile="" scroll-effect="scroll" data-id="d497f2b" data-element_type="section"
 							data-e-type="section"
 							data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
@@ -2629,10 +2650,9 @@ document.oncontextmenu=nocontext</script>
 															class='cui-holder-62777 cui-holder'></div>
 													</div>
 												</div>
-												<script
-												>var txt=document.getElementById('cui-link-62777').innerHTML;var pos=txt.replace(/Comments/g,"Comments");document.getElementById('cui-link-62777').innerHTML=pos;var txt1=document.getElementById('invitation-count-62777').innerHTML;var pos1=txt1
-.replace(/Hadir/g,"Hadir").replace(/Tidak hadir/g,"Tidak Hadir").replace(/Masih Ragu/g,"Masih Ragu");document.getElementById('invitation-count-62777').innerHTML=pos1;var txt2=document.getElementById('commentform-62777').innerHTML;var pos2=txt2
-.replace(/Nama/g,"Nama").replace(/Ucapan/g,"Ucapan").replace(/Konfirmasi Kehadiran/g,"Konfirmasi Kehadiran").replace(/Datang/g,"Hadir").replace(/Absen/g,"Tidak Hadir").replace(/Mungkin/g,"Masih Ragu").replace(/Kirim/g,"Kirim");document.getElementById('commentform-62777').innerHTML=pos2</script>
+												<script>var txt = document.getElementById('cui-link-62777').innerHTML; var pos = txt.replace(/Comments/g, "Comments"); document.getElementById('cui-link-62777').innerHTML = pos; var txt1 = document.getElementById('invitation-count-62777').innerHTML; var pos1 = txt1
+														.replace(/Hadir/g, "Hadir").replace(/Tidak hadir/g, "Tidak Hadir").replace(/Masih Ragu/g, "Masih Ragu"); document.getElementById('invitation-count-62777').innerHTML = pos1; var txt2 = document.getElementById('commentform-62777').innerHTML; var pos2 = txt2
+															.replace(/Nama/g, "Nama").replace(/Ucapan/g, "Ucapan").replace(/Konfirmasi Kehadiran/g, "Konfirmasi Kehadiran").replace(/Datang/g, "Hadir").replace(/Absen/g, "Tidak Hadir").replace(/Mungkin/g, "Masih Ragu").replace(/Kirim/g, "Kirim"); document.getElementById('commentform-62777').innerHTML = pos2</script>
 											</div>
 										</div>
 									</div>
@@ -3219,8 +3239,7 @@ document.oncontextmenu=nocontext</script>
 															data-id="48bb8d2" data-element_type="widget"
 															data-e-type="widget" data-widget_type="html.default">
 															<div class="elementor-widget-container">
-																<script
-																>var btnAmplop=document.getElementById("btnAmplop");var amplop=document.getElementById("amplop");btnAmplop.onclick=function(){if(amplop.style.display==="block"){amplop.style.display="none"}else{amplop.style.display="block"}}</script>
+																<script>var btnAmplop = document.getElementById("btnAmplop"); var amplop = document.getElementById("amplop"); btnAmplop.onclick = function () { if (amplop.style.display === "block") { amplop.style.display = "none" } else { amplop.style.display = "block" } }</script>
 															</div>
 														</div>
 													</div>
@@ -3364,7 +3383,7 @@ document.oncontextmenu=nocontext</script>
 											data-settings="{&quot;_animation_mobile&quot;:&quot;none&quot;}"
 											data-widget_type="weddingpress-audio.default">
 											<div class="elementor-widget-container">
-												<script>window.settingAutoplay=!0</script>
+												<script>window.settingAutoplay = !0</script>
 												<div id="audio-container" class="audio-box"><audio id="song">
 														<source
 															src="/template-assets/webinvite.id/wp-content/uploads/2025/07/Kabagyan-Sadewok-Official-Music-Video-mp3cut.net_.mp3">
@@ -3395,15 +3414,21 @@ document.oncontextmenu=nocontext</script>
 														</div>
 													</div>
 												</div>
-												<script
-												>(function($){var audioEl=document.getElementById("song");var hasWelcomeWidget=document.getElementById("wdp-button-wrapper")!==null;var isEditor=typeof elementorFrontend!=='undefined'&&elementorFrontend.isEditMode();if(window.settingAutoplay&&!hasWelcomeWidget&&!isEditor){if(audioEl){audioEl.play().catch(function(err){})}}
-if(audioEl&&!audioEl.paused){$("#unmute-sound").hide();$("#mute-sound").show()}else{$("#mute-sound").hide();$("#unmute-sound").show()}
-if(audioEl){audioEl.addEventListener('play',function(){$("#unmute-sound").hide();$("#mute-sound").show()});audioEl.addEventListener('pause',function(){$("#mute-sound").hide();$("#unmute-sound").show()})}
-$("#audio-container").click(function(u){var currentAudio=document.getElementById("song");if(currentAudio){if(!currentAudio.paused){window.userPaused=!0;currentAudio.pause()}else{window.userPaused=!1;currentAudio.play().catch(function(e){console.log(e)})}}})})(jQuery)</script>
-												<script
-												>const audioElement=document.getElementById("song");document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(audioElement&&!audioElement.paused){audioElement.pause()}
-if(typeof player!=="undefined"&&player.getPlayerState){if(player.getPlayerState()===YT.PlayerState.PLAYING||player.getPlayerState()===YT.PlayerState.BUFFERING){player.pauseVideo()}}}else if(document.visibilityState==="visible"&&window.userPaused!==!0){if(audioElement&&audioElement.paused){audioElement.play().catch((err)=>{console.log("Error saat mencoba memutar audio:",err)})}
-if(typeof player!=="undefined"&&player.getPlayerState){if(player.getPlayerState()!==YT.PlayerState.PLAYING){player.playVideo()}}}})</script>
+												<script>(function ($) {
+							var audioEl = document.getElementById("song"); var hasWelcomeWidget = document.getElementById("wdp-button-wrapper") !== null; var isEditor = typeof elementorFrontend !== 'undefined' && elementorFrontend.isEditMode(); if (window.settingAutoplay && !hasWelcomeWidget && !isEditor) { if (audioEl) { audioEl.play().catch(function (err) { }) } }
+							if (audioEl && !audioEl.paused) { $("#unmute-sound").hide(); $("#mute-sound").show() } else { $("#mute-sound").hide(); $("#unmute-sound").show() }
+							if (audioEl) { audioEl.addEventListener('play', function () { $("#unmute-sound").hide(); $("#mute-sound").show() }); audioEl.addEventListener('pause', function () { $("#mute-sound").hide(); $("#unmute-sound").show() }) }
+							$("#audio-container").click(function (u) { var currentAudio = document.getElementById("song"); if (currentAudio) { if (!currentAudio.paused) { window.userPaused = !0; currentAudio.pause() } else { window.userPaused = !1; currentAudio.play().catch(function (e) { console.log(e) }) } } })
+						})(jQuery)</script>
+												<script>const audioElement = document.getElementById("song"); document.addEventListener("visibilitychange", () => {
+														if (document.visibilityState === "hidden") {
+															if (audioElement && !audioElement.paused) { audioElement.pause() }
+															if (typeof player !== "undefined" && player.getPlayerState) { if (player.getPlayerState() === YT.PlayerState.PLAYING || player.getPlayerState() === YT.PlayerState.BUFFERING) { player.pauseVideo() } }
+														} else if (document.visibilityState === "visible" && window.userPaused !== !0) {
+															if (audioElement && audioElement.paused) { audioElement.play().catch((err) => { console.log("Error saat mencoba memutar audio:", err) }) }
+															if (typeof player !== "undefined" && player.getPlayerState) { if (player.getPlayerState() !== YT.PlayerState.PLAYING) { player.playVideo() } }
+														}
+													})</script>
 											</div>
 										</div>
 										<div class="elementor-element elementor-element-e2ef6a0 tombol-buka elementor-widget elementor-widget-weddingpress-wellcome"
@@ -3455,13 +3480,13 @@ if(typeof player!=="undefined"&&player.getPlayerState){if(player.getPlayerState(
 														</div>
 													</div>
 												</div>
-												<script
-												>var sampulbg=jQuery('.modalx').data('sampul');jQuery('.modalx').attr('style','background-image: url('+sampulbg+') !important;');jQuery('body').css('overflow','hidden');jQuery('.wdp-button-wrapper button').on('click',function(){jQuery('.modalx').addClass('removeModals');jQuery('body').css('overflow','auto')})</script>
-												<script
-												>var isYT=!1;jQuery("#wdp-button-wrapper").on("click","button",function(){var shouldAutoplay=(typeof window.settingAutoplay!=='undefined')?window.settingAutoplay:!0;if(shouldAutoplay){if(document.body.contains(document.getElementById("song"))){document.getElementById("song").play().catch(function(err){console.log("Audio play blocked:",err)});isYT=!1}else if(typeof player!=='undefined'&&player.playVideo){player.playVideo();isYT=!0}}})</script>
-												<script>if(jQuery('.namatamu').length>=1){let tmpHtmlNamatamu=document.querySelectorAll('.namatamu')
-tmpHtmlNamatamu.forEach((tamuTexts)=>{tamuTexts.innerHTML=cleanIts(tamuTexts.innerHTML)})}
-function cleanIts(str){return jQuery("<textarea></textarea>").html(str.replace(/\\/g,"")).text()}</script>
+												<script>var sampulbg = jQuery('.modalx').data('sampul'); jQuery('.modalx').attr('style', 'background-image: url(' + sampulbg + ') !important;'); jQuery('body').css('overflow', 'hidden'); jQuery('.wdp-button-wrapper button').on('click', function () { jQuery('.modalx').addClass('removeModals'); jQuery('body').css('overflow', 'auto') })</script>
+												<script>var isYT = !1; jQuery("#wdp-button-wrapper").on("click", "button", function () { var shouldAutoplay = (typeof window.settingAutoplay !== 'undefined') ? window.settingAutoplay : !0; if (shouldAutoplay) { if (document.body.contains(document.getElementById("song"))) { document.getElementById("song").play().catch(function (err) { console.log("Audio play blocked:", err) }); isYT = !1 } else if (typeof player !== 'undefined' && player.playVideo) { player.playVideo(); isYT = !0 } } })</script>
+												<script>if (jQuery('.namatamu').length >= 1) {
+														let tmpHtmlNamatamu = document.querySelectorAll('.namatamu')
+														tmpHtmlNamatamu.forEach((tamuTexts) => { tamuTexts.innerHTML = cleanIts(tamuTexts.innerHTML) })
+													}
+													function cleanIts(str) { return jQuery("<textarea></textarea>").html(str.replace(/\\/g, "")).text() }</script>
 												<style type="text/css">
 													.wdp-button-wrapper button.elementor-button,
 													.wdp-button-qr button.elementor-button-qr {
@@ -3537,8 +3562,7 @@ function cleanIts(str){return jQuery("<textarea></textarea>").html(str.replace(/
 														transform: translate3d(0, 0, 0) scale(1);
 													}
 												</style>
-												<script
-												>document.addEventListener("DOMContentLiteSpeedLoaded",()=>{const items=document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom");const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("active")}else{entry.target.classList.remove("active")}})},{threshold:0.3});items.forEach(el=>observer.observe(el));if(document.body.classList.contains("elementor-editor-active")){setInterval(()=>{items.forEach(el=>{const r=el.getBoundingClientRect();const vh=window.innerHeight;if(r.top<vh-120&&r.bottom>120){el.classList.add("active")}else{el.classList.remove("active")}})},100)}})</script>
+												<script>document.addEventListener("DOMContentLiteSpeedLoaded", () => { const items = document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom"); const observer = new IntersectionObserver(entries => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("active") } else { entry.target.classList.remove("active") } }) }, { threshold: 0.3 }); items.forEach(el => observer.observe(el)); if (document.body.classList.contains("elementor-editor-active")) { setInterval(() => { items.forEach(el => { const r = el.getBoundingClientRect(); const vh = window.innerHeight; if (r.top < vh - 120 && r.bottom > 120) { el.classList.add("active") } else { el.classList.remove("active") } }) }, 100) } })</script>
 											</div>
 										</div>
 									</div>
@@ -3553,9 +3577,8 @@ function cleanIts(str){return jQuery("<textarea></textarea>").html(str.replace(/
 	<script
 		type="speculationrules">{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/hello-elementor/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}</script>
 	<div id="wpcp-error-message" class="msgmsg-box-wpcp hideme"><span>error: </span></div>
-	<script
-	>var timeout_result;function show_wpcp_message(smessage){if(smessage!==""){var smessage_text='<span>Alert: </span>'+smessage;document.getElementById("wpcp-error-message").innerHTML=smessage_text;document.getElementById("wpcp-error-message").className="msgmsg-box-wpcp warning-wpcp showme";clearTimeout(timeout_result);timeout_result=setTimeout(hide_message,3000)}}
-function hide_message(){document.getElementById("wpcp-error-message").className="msgmsg-box-wpcp warning-wpcp hideme"}</script>
+	<script>var timeout_result; function show_wpcp_message(smessage) { if (smessage !== "") { var smessage_text = '<span>Alert: </span>' + smessage; document.getElementById("wpcp-error-message").innerHTML = smessage_text; document.getElementById("wpcp-error-message").className = "msgmsg-box-wpcp warning-wpcp showme"; clearTimeout(timeout_result); timeout_result = setTimeout(hide_message, 3000) } }
+		function hide_message() { document.getElementById("wpcp-error-message").className = "msgmsg-box-wpcp warning-wpcp hideme" }</script>
 	<style type="text/css">
 		#wpcp-error-message {
 			direction: ltr;
@@ -3604,26 +3627,38 @@ function hide_message(){document.getElementById("wpcp-error-message").className=
 	</style>
 	<script type="application/ld+json"
 		id="slim-seo-schema">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"/template-assets/webinvite.id/#website","url":"/template-assets/webinvite.id/","name":"Web Invite","inLanguage":"en-US","potentialAction":{"@id":"/template-assets/webinvite.id/#searchaction"},"publisher":{"@id":"/template-assets/webinvite.id/#organization"}},{"@type":"SearchAction","@id":"/template-assets/webinvite.id/#searchaction","target":"/template-assets/webinvite.id/?s={search_term_string}","query-input":"required name=search_term_string"},{"@type":"BreadcrumbList","name":"Breadcrumbs","@id":"/template-assets/webinvite.id/raden-motion/#breadcrumblist","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"/template-assets/webinvite.id/"},{"@type":"ListItem","position":2,"name":"Uncategorized","item":"/template-assets/webinvite.id/category/uncategorized/"},{"@type":"ListItem","position":3,"name":"Raden Motion"}]},{"@type":"WebPage","@id":"/template-assets/webinvite.id/raden-motion/#webpage","url":"/template-assets/webinvite.id/raden-motion/","inLanguage":"en-US","name":"Website Invitation Premium","description":"Menikah sekali Jangan Sampai Salah Pilih Undangannya","datePublished":"2025-11-10T16:08:28+07:00","dateModified":"2026-07-02T14:41:53+07:00","isPartOf":{"@id":"/template-assets/webinvite.id/#website"},"breadcrumb":{"@id":"/template-assets/webinvite.id/raden-motion/#breadcrumblist"},"potentialAction":{"@id":"/template-assets/webinvite.id/raden-motion/#readaction"},"primaryImageOfPage":{"@id":"/template-assets/webinvite.id/raden-motion/#thumbnail"},"image":{"@id":"/template-assets/webinvite.id/raden-motion/#thumbnail"}},{"@type":"ReadAction","@id":"/template-assets/webinvite.id/raden-motion/#readaction","target":"/template-assets/webinvite.id/raden-motion/"},{"@type":"Organization","@id":"/template-assets/webinvite.id/#organization","url":"/template-assets/webinvite.id/","name":"Web Invite"},{"@type":"ImageObject","@id":"/template-assets/webinvite.id/raden-motion/#thumbnail","url":"/template-assets/webinvite.id/wp-content/uploads/2025/11/Mockup-Raden-link.jpg","contentUrl":"/template-assets/webinvite.id/wp-content/uploads/2025/11/Mockup-Raden-link.jpg","width":706,"height":705},{"@type":"Article","@id":"/template-assets/webinvite.id/raden-motion/#article","url":"/template-assets/webinvite.id/raden-motion/","headline":"Raden Motion","datePublished":"2025-11-10T16:08:28+07:00","dateModified":"2026-07-02T14:41:53+07:00","commentCount":4,"wordCount":378,"articleSection":["Uncategorized"],"isPartOf":{"@id":"/template-assets/webinvite.id/raden-motion/#webpage"},"mainEntityOfPage":{"@id":"/template-assets/webinvite.id/raden-motion/#webpage"},"image":{"@id":"/template-assets/webinvite.id/raden-motion/#thumbnail"},"publisher":{"@id":"/template-assets/webinvite.id/#organization"},"author":{"@id":"/template-assets/webinvite.id/#/schema/person/0b28a5799a32c687dad2c5183718ceac"}},{"@type":"Person","@id":"/template-assets/webinvite.id/#/schema/person/0b28a5799a32c687dad2c5183718ceac","url":"https://webinvite.id","name":"SuperAdmin","image":"/template-assets/webinvite.id/wp-content/litespeed/avatar/07ca3b3c736c189fa65beb38a65f85c2.jpg?ver=1790294736"}]}</script>
-	<script
-	>const lazyloadRunObserver=()=>{const lazyloadBackgrounds=document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`);const lazyloadBackgroundObserver=new IntersectionObserver((entries)=>{entries.forEach((entry)=>{if(entry.isIntersecting){let lazyloadBackground=entry.target;if(lazyloadBackground){lazyloadBackground.classList.add('e-lazyloaded')}
-lazyloadBackgroundObserver.unobserve(entry.target)}})},{rootMargin:'200px 0px 200px 0px'});lazyloadBackgrounds.forEach((lazyloadBackground)=>{lazyloadBackgroundObserver.observe(lazyloadBackground)})};const events=['DOMContentLiteSpeedLoaded','elementor/lazyload/observe',];events.forEach((event)=>{document.addEventListener(event,lazyloadRunObserver)})</script>
+	<script>const lazyloadRunObserver = () => {
+			const lazyloadBackgrounds = document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`); const lazyloadBackgroundObserver = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						let lazyloadBackground = entry.target; if (lazyloadBackground) { lazyloadBackground.classList.add('e-lazyloaded') }
+						lazyloadBackgroundObserver.unobserve(entry.target)
+					}
+				})
+			}, { rootMargin: '200px 0px 200px 0px' }); lazyloadBackgrounds.forEach((lazyloadBackground) => { lazyloadBackgroundObserver.observe(lazyloadBackground) })
+		}; const events = ['DOMContentLiteSpeedLoaded', 'elementor/lazyload/observe',]; events.forEach((event) => { document.addEventListener(event, lazyloadRunObserver) })</script>
 	<style>
 		.motionSection video {
 			-webkit-object-fit: cover !important;
 			object-fit: cover !important;
 		}
 	</style>
-	<script>const tombolBukaUndangan=document.querySelector('.wdp-button-wrapper');const selectedDataVid="/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
-let iframeOrVideoLoaded=!1</script>
-	<script
-	>document.addEventListener('DOMContentLiteSpeedLoaded',()=>{const elHostedVideo=document.querySelector('.motionSection .elementor-background-video-container video');if(selectedDataVid!=="no"&&selectedDataVid!==""){const isYoutubeVideos=isYoutubeVideoLink(selectedDataVid);setTimeout(()=>{if(!iframeOrVideoLoaded){tombolBukaUndangan.classList.add("btnVisibleAfterLoad");console.log("Slow Network!!! Video Buffered, Force Button Visible After 15 Second")}},15000)
-if(isYoutubeVideos){}else{elHostedVideo.removeAttribute('autoplay');setTimeout(()=>{tombolBukaUndangan.classList.add("btnVisibleAfterLoad");iframeOrVideoLoaded=!0;console.log("Video Loaded")},200)}}
-function isYoutubeVideoLink(url){var regExp=/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;var match=url.match(regExp);if(match&&match[7].length==11){return match[7]}else{return!1}}})</script>
-	<script>let lockSection=(""==="yes")?true:!1;if(lockSection)document.body.classList.add('locked-section');document.querySelector('.motionSection .elementor-background-video-container video').onended=(event)=>{removeOverflow()}
-document.querySelector('.motionSection .elementor-background-video-container video').onpause=(event)=>{removeOverflow()}
-function removeOverflow(){if(lockSection)document.body.classList.remove('locked-section');}
-const secMotionExist="exist";document.querySelector('.wdp-button-wrapper').addEventListener('click',()=>{if(secMotionExist==="exist"){setTimeout(()=>{if(selectedDataVid!=="no"&&selectedDataVid!==""){document.querySelector('.motionSection .elementor-background-video-container video').play()}},100)}
-setTimeout(()=>{document.querySelector('.motionText').style.display="flex"},5087)})</script>
+	<script>const tombolBukaUndangan = document.querySelector('.wdp-button-wrapper'); const selectedDataVid = "/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
+		let iframeOrVideoLoaded = !1</script>
+	<script>document.addEventListener('DOMContentLiteSpeedLoaded', () => {
+			const elHostedVideo = document.querySelector('.motionSection .elementor-background-video-container video'); if (selectedDataVid !== "no" && selectedDataVid !== "") {
+				const isYoutubeVideos = isYoutubeVideoLink(selectedDataVid); setTimeout(() => { if (!iframeOrVideoLoaded) { tombolBukaUndangan.classList.add("btnVisibleAfterLoad"); console.log("Slow Network!!! Video Buffered, Force Button Visible After 15 Second") } }, 15000)
+				if (isYoutubeVideos) { } else { elHostedVideo.removeAttribute('autoplay'); setTimeout(() => { tombolBukaUndangan.classList.add("btnVisibleAfterLoad"); iframeOrVideoLoaded = !0; console.log("Video Loaded") }, 200) }
+			}
+			function isYoutubeVideoLink(url) { var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/; var match = url.match(regExp); if (match && match[7].length == 11) { return match[7] } else { return !1 } }
+		})</script>
+	<script>let lockSection = ("" === "yes") ? true : !1; if (lockSection) document.body.classList.add('locked-section'); document.querySelector('.motionSection .elementor-background-video-container video').onended = (event) => { removeOverflow() }
+		document.querySelector('.motionSection .elementor-background-video-container video').onpause = (event) => { removeOverflow() }
+		function removeOverflow() { if (lockSection) document.body.classList.remove('locked-section'); }
+		const secMotionExist = "exist"; document.querySelector('.wdp-button-wrapper').addEventListener('click', () => {
+			if (secMotionExist === "exist") { setTimeout(() => { if (selectedDataVid !== "no" && selectedDataVid !== "") { document.querySelector('.motionSection .elementor-background-video-container video').play() } }, 100) }
+			setTimeout(() => { document.querySelector('.motionText').style.display = "flex" }, 5087)
+		})</script>
 	<style>
 		.removeCover {
 			opacity: 0;
@@ -3635,431 +3670,439 @@ setTimeout(()=>{document.querySelector('.motionText').style.display="flex"},5087
 			transition-property: filter, opacity, z-index !important;
 		}
 	</style>
-	<script
-	>const is_custom_anim=1;const isEditorActive=document.body.classList.contains('elementor-editor-active');document.addEventListener('DOMContentLiteSpeedLoaded',()=>{document.querySelector('.wdp-button-wrapper button').classList.add('openInvi');document.querySelector('.openInvi').onclick=function(e){e.preventDefault()
-if(is_custom_anim)document.querySelector('.modalx').classList.remove('removeModals');if(is_custom_anim)document.querySelector('.modalx').classList.add('removeCover');}})</script>
+	<script>const is_custom_anim = 1; const isEditorActive = document.body.classList.contains('elementor-editor-active'); document.addEventListener('DOMContentLiteSpeedLoaded', () => {
+			document.querySelector('.wdp-button-wrapper button').classList.add('openInvi'); document.querySelector('.openInvi').onclick = function (e) {
+				e.preventDefault()
+				if (is_custom_anim) document.querySelector('.modalx').classList.remove('removeModals'); if (is_custom_anim) document.querySelector('.modalx').classList.add('removeCover');
+			}
+		})</script>
 	<script id="qr-code-styling-js"
 		data-src="/template-assets/unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 	<script id="kirimkit-js"
 		data-src="/template-assets/cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-	<script id="cui_js_script-js-extra"
-	>var CUI_WP={"ajaxurl":"/template-assets/webinvite.id/wp-admin/admin-ajax.php","cuiNonce":"7e2a656351","jpages":"true","jPagesNum":"10","textCounter":"true","textCounterNum":"500","widthWrap":"","autoLoad":"true","thanksComment":"Thanks for your comment!","thanksReplyComment":"Thanks for answering the comment!","duplicateComment":"You might have left one of the fields blank, or duplicate comments","accept":"Accept","cancel":"Cancel","reply":"Reply","textWriteComment":"Ucapan","classPopularComment":"cui-popular-comment","textToDisplay":"Text to display","textCharacteresMin":"2 characters minimum","textNavNext":"Next","textNavPrev":"Previous","textMsgDeleteComment":"Do you want delete this comment?","textLoadMore":"Load more"}</script>
-	<script id="wp-i18n-js-after"
-	>wp.i18n.setLocaleData({'text direction\u0004ltr':['ltr']})</script>
-	<script id="wdp-script-js-extra"
-	>var _wdpobject={"ajaxurl":"/template-assets/webinvite.id/wp-admin/admin-ajax.php","home_url":"https://webinvite.id","site_url":"https://webinvite.id","site_title":"Web Invite","code_nonce":"b61028f3e1","member_area":"https://akses.weddingpress.net/","nonce_key":"_wdp_nonce","_wdp_nonce":"62bceaa074","is_admin":""}</script>
-	<script id="eael-general-js-extra"
-	>var localize={"ajaxurl":"/template-assets/webinvite.id/wp-admin/admin-ajax.php","nonce":"94fca692e1","i18n":{"added":"Added ","compare":"Compare","loading":"Loading..."},"eael_translate_text":{"required_text":"is a required field","invalid_text":"Invalid","billing_text":"Billing","shipping_text":"Shipping","fg_mfp_counter_text":"of"},"page_permalink":"/template-assets/webinvite.id/raden-motion/","cart_redirectition":"","cart_page_url":"","el_breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":!0},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":!1},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":!0},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":!1},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":!1},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":!1}}}</script>
-	<script id="jquery-ui-core-js-before">jQuery.uiBackCompat=!0</script>
-	<script id="elementor-frontend-js-extra"
-	>var EAELImageMaskingConfig={"svg_dir_url":"/template-assets/webinvite.id/wp-content/plugins/essential-addons-for-elementor-lite/assets/front-end/img/image-masking/svg-shapes/"}</script>
-	<script id="elementor-frontend-js-before"
-	>var elementorFrontendConfig={"environmentMode":{"edit":!1,"wpPreview":!1,"isScriptDebug":!1},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close","a11yCarouselPrevSlideMessage":"Previous slide","a11yCarouselNextSlideMessage":"Next slide","a11yCarouselFirstSlideMessage":"This is the first slide","a11yCarouselLastSlideMessage":"This is the last slide","a11yCarouselPaginationBulletMessage":"Go to slide"},"is_rtl":!1,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":!0},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":!1},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":!0},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":!1},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":!1},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":!1}},"hasCustomBreakpoints":!1},"version":"4.1.4","is_static":!1,"experimentalFeatures":{"e_font_icon_svg":!0,"additional_custom_breakpoints":!0,"container":!0,"e_panel_promotions":!0,"theme_builder_v2":!0,"hello-theme-header-footer":!0,"nested-elements":!0,"global_classes_should_enforce_capabilities":!0,"e_variables":!0,"e_opt_in_v4_page":!0,"e_components":!0,"e_interactions":!0,"e_widget_creation":!0,"import-export-customization":!0,"e_pro_atomic_form":!0,"e_pro_variables":!0,"e_pro_interactions":!0},"urls":{"assets":"https:\/\/webinvite.id\/wp-content\/plugins\/elementor\/assets\/","ajaxurl":"https:\/\/webinvite.id\/wp-admin\/admin-ajax.php","uploadUrl":"https:\/\/webinvite.id\/wp-content\/uploads"},"nonces":{"floatingButtonsClickTracking":"963066c2a5","atomicFormsSendForm":"bd7f58f963"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description","hello_header_logo_type":"logo","hello_footer_logo_type":"logo"},"post":{"id":62777,"title":"Website%20Invitation%20Premium","excerpt":"","featuredImage":"https:\/\/webinvite.id\/wp-content\/uploads\/2025\/11\/Mockup-Raden-link.jpg"}}</script>
-	<script id="elementor-pro-frontend-js-before"
-	>var ElementorProFrontendConfig={"ajaxurl":"https:\/\/webinvite.id\/wp-admin\/admin-ajax.php","nonce":"de668e7fbc","urls":{"assets":"https:\/\/webinvite.id\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/webinvite.id\/wp-json\/"},"settings":{"lazy_load_background_images":!0},"popup":{"hasPopUps":!1},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":!0},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":!0},"pinterest":{"title":"Pinterest","has_counter":!0},"reddit":{"title":"Reddit","has_counter":!0},"vk":{"title":"VK","has_counter":!0},"odnoklassniki":{"title":"OK","has_counter":!0},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":!0},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":!0},"xing":{"title":"XING","has_counter":!0},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"},"x-twitter":{"title":"X"},"threads":{"title":"Threads"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/webinvite.id\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}}</script>
-	<script id="wpr-addons-js-js-extra"
-	>var WprConfig={"ajaxurl":"/template-assets/webinvite.id/wp-admin/admin-ajax.php","resturl":"/template-assets/webinvite.id/wp-json/wpraddons/v1","nonce":"34831ab04a","addedToCartText":"was added to cart","viewCart":"View Cart","comparePageID":"","comparePageURL":"/template-assets/webinvite.id/raden-motion/","wishlistPageID":"","wishlistPageURL":"/template-assets/webinvite.id/raden-motion/","chooseQuantityText":"Please select the required number of items.","site_key":"","site_key_v2":"","is_admin":"","input_empty":"Please fill out this field","select_empty":"Nothing selected","file_empty":"Please upload a file","recaptcha_error":"Recaptcha Error","woo_shop_ppp":"9","woo_shop_cat_ppp":"9","woo_shop_tag_ppp":"9","is_product_category":"","is_product_tag":"","sticky_section":"on"}</script>
+	<script
+		id="cui_js_script-js-extra">var CUI_WP = { "ajaxurl": "/template-assets/webinvite.id/wp-admin/admin-ajax.php", "cuiNonce": "7e2a656351", "jpages": "true", "jPagesNum": "10", "textCounter": "true", "textCounterNum": "500", "widthWrap": "", "autoLoad": "true", "thanksComment": "Thanks for your comment!", "thanksReplyComment": "Thanks for answering the comment!", "duplicateComment": "You might have left one of the fields blank, or duplicate comments", "accept": "Accept", "cancel": "Cancel", "reply": "Reply", "textWriteComment": "Ucapan", "classPopularComment": "cui-popular-comment", "textToDisplay": "Text to display", "textCharacteresMin": "2 characters minimum", "textNavNext": "Next", "textNavPrev": "Previous", "textMsgDeleteComment": "Do you want delete this comment?", "textLoadMore": "Load more" }</script>
+	<script id="wp-i18n-js-after">wp.i18n.setLocaleData({ 'text direction\u0004ltr': ['ltr'] })</script>
+	<script
+		id="wdp-script-js-extra">var _wdpobject = { "ajaxurl": "/template-assets/webinvite.id/wp-admin/admin-ajax.php", "home_url": "https://webinvite.id", "site_url": "https://webinvite.id", "site_title": "Web Invite", "code_nonce": "b61028f3e1", "member_area": "https://akses.weddingpress.net/", "nonce_key": "_wdp_nonce", "_wdp_nonce": "62bceaa074", "is_admin": "" }</script>
+	<script
+		id="eael-general-js-extra">var localize = { "ajaxurl": "/template-assets/webinvite.id/wp-admin/admin-ajax.php", "nonce": "94fca692e1", "i18n": { "added": "Added ", "compare": "Compare", "loading": "Loading..." }, "eael_translate_text": { "required_text": "is a required field", "invalid_text": "Invalid", "billing_text": "Billing", "shipping_text": "Shipping", "fg_mfp_counter_text": "of" }, "page_permalink": "/template-assets/webinvite.id/raden-motion/", "cart_redirectition": "", "cart_page_url": "", "el_breakpoints": { "mobile": { "label": "Mobile Portrait", "value": 767, "default_value": 767, "direction": "max", "is_enabled": !0 }, "mobile_extra": { "label": "Mobile Landscape", "value": 880, "default_value": 880, "direction": "max", "is_enabled": !1 }, "tablet": { "label": "Tablet Portrait", "value": 1024, "default_value": 1024, "direction": "max", "is_enabled": !0 }, "tablet_extra": { "label": "Tablet Landscape", "value": 1200, "default_value": 1200, "direction": "max", "is_enabled": !1 }, "laptop": { "label": "Laptop", "value": 1366, "default_value": 1366, "direction": "max", "is_enabled": !1 }, "widescreen": { "label": "Widescreen", "value": 2400, "default_value": 2400, "direction": "min", "is_enabled": !1 } } }</script>
+	<script id="jquery-ui-core-js-before">jQuery.uiBackCompat = !0</script>
+	<script
+		id="elementor-frontend-js-extra">var EAELImageMaskingConfig = { "svg_dir_url": "/template-assets/webinvite.id/wp-content/plugins/essential-addons-for-elementor-lite/assets/front-end/img/image-masking/svg-shapes/" }</script>
+	<script
+		id="elementor-frontend-js-before">var elementorFrontendConfig = { "environmentMode": { "edit": !1, "wpPreview": !1, "isScriptDebug": !1 }, "i18n": { "shareOnFacebook": "Share on Facebook", "shareOnTwitter": "Share on Twitter", "pinIt": "Pin it", "download": "Download", "downloadImage": "Download image", "fullscreen": "Fullscreen", "zoom": "Zoom", "share": "Share", "playVideo": "Play Video", "previous": "Previous", "next": "Next", "close": "Close", "a11yCarouselPrevSlideMessage": "Previous slide", "a11yCarouselNextSlideMessage": "Next slide", "a11yCarouselFirstSlideMessage": "This is the first slide", "a11yCarouselLastSlideMessage": "This is the last slide", "a11yCarouselPaginationBulletMessage": "Go to slide" }, "is_rtl": !1, "breakpoints": { "xs": 0, "sm": 480, "md": 768, "lg": 1025, "xl": 1440, "xxl": 1600 }, "responsive": { "breakpoints": { "mobile": { "label": "Mobile Portrait", "value": 767, "default_value": 767, "direction": "max", "is_enabled": !0 }, "mobile_extra": { "label": "Mobile Landscape", "value": 880, "default_value": 880, "direction": "max", "is_enabled": !1 }, "tablet": { "label": "Tablet Portrait", "value": 1024, "default_value": 1024, "direction": "max", "is_enabled": !0 }, "tablet_extra": { "label": "Tablet Landscape", "value": 1200, "default_value": 1200, "direction": "max", "is_enabled": !1 }, "laptop": { "label": "Laptop", "value": 1366, "default_value": 1366, "direction": "max", "is_enabled": !1 }, "widescreen": { "label": "Widescreen", "value": 2400, "default_value": 2400, "direction": "min", "is_enabled": !1 } }, "hasCustomBreakpoints": !1 }, "version": "4.1.4", "is_static": !1, "experimentalFeatures": { "e_font_icon_svg": !0, "additional_custom_breakpoints": !0, "container": !0, "e_panel_promotions": !0, "theme_builder_v2": !0, "hello-theme-header-footer": !0, "nested-elements": !0, "global_classes_should_enforce_capabilities": !0, "e_variables": !0, "e_opt_in_v4_page": !0, "e_components": !0, "e_interactions": !0, "e_widget_creation": !0, "import-export-customization": !0, "e_pro_atomic_form": !0, "e_pro_variables": !0, "e_pro_interactions": !0 }, "urls": { "assets": "https:\/\/webinvite.id\/wp-content\/plugins\/elementor\/assets\/", "ajaxurl": "https:\/\/webinvite.id\/wp-admin\/admin-ajax.php", "uploadUrl": "https:\/\/webinvite.id\/wp-content\/uploads" }, "nonces": { "floatingButtonsClickTracking": "963066c2a5", "atomicFormsSendForm": "bd7f58f963" }, "swiperClass": "swiper", "settings": { "page": [], "editorPreferences": [] }, "kit": { "active_breakpoints": ["viewport_mobile", "viewport_tablet"], "global_image_lightbox": "yes", "lightbox_enable_counter": "yes", "lightbox_enable_fullscreen": "yes", "lightbox_enable_zoom": "yes", "lightbox_enable_share": "yes", "lightbox_title_src": "title", "lightbox_description_src": "description", "hello_header_logo_type": "logo", "hello_footer_logo_type": "logo" }, "post": { "id": 62777, "title": "Website%20Invitation%20Premium", "excerpt": "", "featuredImage": "https:\/\/webinvite.id\/wp-content\/uploads\/2025\/11\/Mockup-Raden-link.jpg" } }</script>
+	<script
+		id="elementor-pro-frontend-js-before">var ElementorProFrontendConfig = { "ajaxurl": "https:\/\/webinvite.id\/wp-admin\/admin-ajax.php", "nonce": "de668e7fbc", "urls": { "assets": "https:\/\/webinvite.id\/wp-content\/plugins\/elementor-pro\/assets\/", "rest": "https:\/\/webinvite.id\/wp-json\/" }, "settings": { "lazy_load_background_images": !0 }, "popup": { "hasPopUps": !1 }, "shareButtonsNetworks": { "facebook": { "title": "Facebook", "has_counter": !0 }, "twitter": { "title": "Twitter" }, "linkedin": { "title": "LinkedIn", "has_counter": !0 }, "pinterest": { "title": "Pinterest", "has_counter": !0 }, "reddit": { "title": "Reddit", "has_counter": !0 }, "vk": { "title": "VK", "has_counter": !0 }, "odnoklassniki": { "title": "OK", "has_counter": !0 }, "tumblr": { "title": "Tumblr" }, "digg": { "title": "Digg" }, "skype": { "title": "Skype" }, "stumbleupon": { "title": "StumbleUpon", "has_counter": !0 }, "mix": { "title": "Mix" }, "telegram": { "title": "Telegram" }, "pocket": { "title": "Pocket", "has_counter": !0 }, "xing": { "title": "XING", "has_counter": !0 }, "whatsapp": { "title": "WhatsApp" }, "email": { "title": "Email" }, "print": { "title": "Print" }, "x-twitter": { "title": "X" }, "threads": { "title": "Threads" } }, "facebook_sdk": { "lang": "en_US", "app_id": "" }, "lottie": { "defaultAnimationUrl": "https:\/\/webinvite.id\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json" } }</script>
+	<script
+		id="wpr-addons-js-js-extra">var WprConfig = { "ajaxurl": "/template-assets/webinvite.id/wp-admin/admin-ajax.php", "resturl": "/template-assets/webinvite.id/wp-json/wpraddons/v1", "nonce": "34831ab04a", "addedToCartText": "was added to cart", "viewCart": "View Cart", "comparePageID": "", "comparePageURL": "/template-assets/webinvite.id/raden-motion/", "wishlistPageID": "", "wishlistPageURL": "/template-assets/webinvite.id/raden-motion/", "chooseQuantityText": "Please select the required number of items.", "site_key": "", "site_key_v2": "", "is_admin": "", "input_empty": "Please fill out this field", "select_empty": "Nothing selected", "file_empty": "Please upload a file", "recaptcha_error": "Recaptcha Error", "woo_shop_ppp": "9", "woo_shop_cat_ppp": "9", "woo_shop_tag_ppp": "9", "is_product_category": "", "is_product_tag": "", "sticky_section": "on" }</script>
 	<script id="wpr-addons-js-js" data-cfasync="false"
 		src="/template-assets/webinvite.id/wp-content/plugins/royal-elementor-addons/assets/js/frontend.min.js"></script>
-	<script id="weddingpress-wdp-js-extra"
-	>var cevar={"ajax_url":"/template-assets/webinvite.id/wp-admin/admin-ajax.php","plugin_url":"/template-assets/webinvite.id/wp-content/plugins/weddingpress/"}</script>
-	<script id="weddingpress-wdp-js-after"
-	>/*!
-WeddingPress Custom Nama Tamu (WDPCNT) & URL Normalizer
-============================================
-
-Description: 
-WeddingPress Custom Nama Tamu (WDPCNT) adalah script JavaScript yang digunakan untuk mengganti teks "Tamu Undangan" pada elemen dengan class `namatamu` berdasarkan parameter yang ada di URL. 
-Script ini mendukung beberapa parameter seperti `to`, `dear`, dan `kepada` untuk menyesuaikan nama penerima undangan. Serta dilengkapi dengan engine URL Normalizer untuk memperbaiki karakter khusus (&) secara otomatis.
-
-Author: Andy dari WeddingPress
-Website: https://weddingpress.net
-Version: 1.1 (2025/03/01)
-License: Anda diizinkan menggunakan script ini pada website Anda dan proyek klien. Tidak diperbolehkan menjual, membagikan, menempatkan codenya ditemplate yang dijual atau mendistribusikan ulang tanpa izin.
-Copyright: © 2025 WeddingPress. All rights reserved.
-
-Note:
-Pastikan untuk teks 'Tamu Undangan' css classesnya sudah terisi: 'namatamu'
- */
-(function(){'use strict';const config={selector:'.namatamu',urlParams:['to','dear','kepada'],defaultText:'Tamu Undangan'};var rawSearch=location.search;if(rawSearch.indexOf('?')!==-1){var params=new URLSearchParams(rawSearch);var needsRedirect=!1;for(const key of config.urlParams){if(rawSearch.indexOf('?'+key+'=')!==-1||rawSearch.indexOf('&'+key+'=')!==-1){var rawName=params.get(key);if(rawName!==null){var decoded=rawName.replace(/&amp;/gi,'&').replace(/&#38;/gi,'&').replace(/&#x26;/gi,'&').replace(/&apos;/gi,"'").replace(/&#39;/gi,"'").replace(/&quot;/gi,'"').replace(/&#34;/gi,'"');if(rawName!==decoded||rawSearch.indexOf('&'+key+'=')!==-1){params.set(key,decoded);needsRedirect=!0}}}}
-if(needsRedirect){var newSearch='?'+params.toString();if(newSearch!==rawSearch){/* wdp: redirect disabled for static hosting */;return}}}
-function getRecipientName(params,keys){for(const key of keys){const value=params.get(key);if(value&&value.trim()){return value.trim()}}
-return''}
-function escapeRegExp(string){return string.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
-function replaceTextInNode(node,searchValue,replaceValue){if(node.nodeType===1||node.nodeType===11){node.childNodes.forEach(child=>{if(child.nodeType===3){const safeSearchValue=escapeRegExp(searchValue);const regex=new RegExp(safeSearchValue,'gi');var txt=document.createElement('textarea');txt.innerHTML=replaceValue;var decodedReplaceValue=txt.value;child.textContent=child.textContent.replace(regex,decodedReplaceValue)}else{replaceTextInNode(child,searchValue,replaceValue)}})}}
-function wdpDisplayGuestName(){const params=new URLSearchParams(window.location.search);const recipient=getRecipientName(params,config.urlParams);const targets=document.querySelectorAll(config.selector);if(targets.length===0)return;targets.forEach(element=>{if(recipient){replaceTextInNode(element,config.defaultText,recipient)}else{if(!element.textContent.trim()){element.textContent=config.defaultText}}})}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLiteSpeedLoaded',wdpDisplayGuestName)}else{wdpDisplayGuestName()}})()</script>
-	<script id="kirim-kit-js-extra"
-	>var sendkit_ajax={"ajax_url":"/template-assets/webinvite.id/wp-admin/admin-ajax.php"}</script>
 	<script
-		data-no-optimize="1">window.lazyLoadOptions = Object.assign({}, {threshold: 300}, window.lazyLoadOptions || {}); !function (t, e) {"object" == typeof exports && "undefined" != typeof module ? module.exports = e() : "function" == typeof define && define.amd ? define(e) : (t = "undefined" != typeof globalThis ? globalThis : t || self).LazyLoad = e()}(this, function () {"use strict"; function e() {return (e = Object.assign || function (t) {for (var e = 1; e < arguments.length; e++) {var n, a = arguments[e]; for (n in a) Object.prototype.hasOwnProperty.call(a, n) && (t[n] = a[n])} return t}).apply(this, arguments)} function o(t) {return e({}, at, t)} function l(t, e) {return t.getAttribute(gt + e)} function c(t) {return l(t, vt)} function s(t, e) {return function (t, e, n) {e = gt + e; null !== n ? t.setAttribute(e, n) : t.removeAttribute(e)}(t, vt, e)} function i(t) {return s(t, null), 0} function r(t) {return null === c(t)} function u(t) {return c(t) === _t} function d(t, e, n, a) {t && (void 0 === a ? void 0 === n ? t(e) : t(e, n) : t(e, n, a))} function f(t, e) {et ? t.classList.add(e) : t.className += (t.className ? " " : "") + e} function _(t, e) {et ? t.classList.remove(e) : t.className = t.className.replace(new RegExp("(^|\\s+)" + e + "(\\s+|$)"), " ").replace(/^\s+/, "").replace(/\s+$/, "")} function g(t) {return t.llTempImage} function v(t, e) {!e || (e = e._observer) && e.unobserve(t)} function b(t, e) {t && (t.loadingCount += e)} function p(t, e) {t && (t.toLoadCount = e)} function n(t) {for (var e, n = [], a = 0; e = t.children[a]; a += 1)"SOURCE" === e.tagName && n.push(e); return n} function h(t, e) {(t = t.parentNode) && "PICTURE" === t.tagName && n(t).forEach(e)} function a(t, e) {n(t).forEach(e)} function m(t) {return !!t[lt]} function E(t) {return t[lt]} function I(t) {return delete t[lt]} function y(e, t) {var n; m(e) || (n = {}, t.forEach(function (t) {n[t] = e.getAttribute(t)}), e[lt] = n)} function L(a, t) {var o; m(a) && (o = E(a), t.forEach(function (t) {var e, n; e = a, (t = o[n = t]) ? e.setAttribute(n, t) : e.removeAttribute(n)}))} function k(t, e, n) {f(t, e.class_loading), s(t, st), n && (b(n, 1), d(e.callback_loading, t, n))} function A(t, e, n) {n && t.setAttribute(e, n)} function O(t, e) {A(t, rt, l(t, e.data_sizes)), A(t, it, l(t, e.data_srcset)), A(t, ot, l(t, e.data_src))} function w(t, e, n) {var a = l(t, e.data_bg_multi), o = l(t, e.data_bg_multi_hidpi); (a = nt && o ? o : a) && (t.style.backgroundImage = a, n = n, f(t = t, (e = e).class_applied), s(t, dt), n && (e.unobserve_completed && v(t, e), d(e.callback_applied, t, n)))} function x(t, e) {!e || 0 < e.loadingCount || 0 < e.toLoadCount || d(t.callback_finish, e)} function M(t, e, n) {t.addEventListener(e, n), t.llEvLisnrs[e] = n} function N(t) {return !!t.llEvLisnrs} function z(t) {if (N(t)) {var e, n, a = t.llEvLisnrs; for (e in a) {var o = a[e]; n = e, o = o, t.removeEventListener(n, o)} delete t.llEvLisnrs} } function C(t, e, n) {var a; delete t.llTempImage, b(n, -1), (a = n) && --a.toLoadCount, _(t, e.class_loading), e.unobserve_completed && v(t, n)} function R(i, r, c) {var l = g(i) || i; N(l) || function (t, e, n) {N(t) || (t.llEvLisnrs = {}); var a = "VIDEO" === t.tagName ? "loadeddata" : "load"; M(t, a, e), M(t, "error", n)}(l, function (t) {var e, n, a, o; n = r, a = c, o = u(e = i), C(e, n, a), f(e, n.class_loaded), s(e, ut), d(n.callback_loaded, e, a), o || x(n, a), z(l)}, function (t) {var e, n, a, o; n = r, a = c, o = u(e = i), C(e, n, a), f(e, n.class_error), s(e, ft), d(n.callback_error, e, a), o || x(n, a), z(l)})} function T(t, e, n) {var a, o, i, r, c; t.llTempImage = document.createElement("IMG"), R(t, e, n), m(c = t) || (c[lt] = {backgroundImage: c.style.backgroundImage}), i = n, r = l(a = t, (o = e).data_bg), c = l(a, o.data_bg_hidpi), (r = nt && c ? c : r) && (a.style.backgroundImage = 'url("'.concat(r, '")'), g(a).setAttribute(ot, r), k(a, o, i)), w(t, e, n)} function G(t, e, n) {var a; R(t, e, n), a = e, e = n, (t = Et[(n = t).tagName]) && (t(n, a), k(n, a, e))} function D(t, e, n) {var a; a = t, (-1 < It.indexOf(a.tagName) ? G : T)(t, e, n)} function S(t, e, n) {var a; t.setAttribute("loading", "lazy"), R(t, e, n), a = e, (e = Et[(n = t).tagName]) && e(n, a), s(t, _t)} function V(t) {t.removeAttribute(ot), t.removeAttribute(it), t.removeAttribute(rt)} function j(t) {h(t, function (t) {L(t, mt)}), L(t, mt)} function F(t) {var e; (e = yt[t.tagName]) ? e(t) : m(e = t) && (t = E(e), e.style.backgroundImage = t.backgroundImage)} function P(t, e) {var n; F(t), n = e, r(e = t) || u(e) || (_(e, n.class_entered), _(e, n.class_exited), _(e, n.class_applied), _(e, n.class_loading), _(e, n.class_loaded), _(e, n.class_error)), i(t), I(t)} function U(t, e, n, a) {var o; n.cancel_on_exit && (c(t) !== st || "IMG" === t.tagName && (z(t), h(o = t, function (t) {V(t)}), V(o), j(t), _(t, n.class_loading), b(a, -1), i(t), d(n.callback_cancel, t, e, a)))} function $(t, e, n, a) {var o, i, r = (i = t, 0 <= bt.indexOf(c(i))); s(t, "entered"), f(t, n.class_entered), _(t, n.class_exited), o = t, i = a, n.unobserve_entered && v(o, i), d(n.callback_enter, t, e, a), r || D(t, n, a)} function q(t) {return t.use_native && "loading" in HTMLImageElement.prototype} function H(t, o, i) {t.forEach(function (t) {return (a = t).isIntersecting || 0 < a.intersectionRatio ? $(t.target, t, o, i) : (e = t.target, n = t, a = o, t = i, void (r(e) || (f(e, a.class_exited), U(e, n, a, t), d(a.callback_exit, e, n, t)))); var e, n, a})} function B(e, n) {var t; tt && !q(e) && (n._observer = new IntersectionObserver(function (t) {H(t, e, n)}, {root: (t = e).container === document ? null : t.container, rootMargin: t.thresholds || t.threshold + "px"}))} function J(t) {return Array.prototype.slice.call(t)} function K(t) {return t.container.querySelectorAll(t.elements_selector)} function Q(t) {return c(t) === ft} function W(t, e) {return e = t || K(e), J(e).filter(r)} function X(e, t) {var n; (n = K(e), J(n).filter(Q)).forEach(function (t) {_(t, e.class_error), i(t)}), t.update()} function t(t, e) {var n, a, t = o(t); this._settings = t, this.loadingCount = 0, B(t, this), n = t, a = this, Y && window.addEventListener("online", function () {X(n, a)}), this.update(e)} var Y = "undefined" != typeof window, Z = Y && !("onscroll" in window) || "undefined" != typeof navigator && /(gle|ing|ro)bot|crawl|spider/i.test(navigator.userAgent), tt = Y && "IntersectionObserver" in window, et = Y && "classList" in document.createElement("p"), nt = Y && 1 < window.devicePixelRatio, at = {elements_selector: ".lazy", container: Z || Y ? document : null, threshold: 300, thresholds: null, data_src: "src", data_srcset: "srcset", data_sizes: "sizes", data_bg: "bg", data_bg_hidpi: "bg-hidpi", data_bg_multi: "bg-multi", data_bg_multi_hidpi: "bg-multi-hidpi", data_poster: "poster", class_applied: "applied", class_loading: "litespeed-loading", class_loaded: "litespeed-loaded", class_error: "error", class_entered: "entered", class_exited: "exited", unobserve_completed: !0, unobserve_entered: !1, cancel_on_exit: !0, callback_enter: null, callback_exit: null, callback_applied: null, callback_loading: null, callback_loaded: null, callback_error: null, callback_finish: null, callback_cancel: null, use_native: !1}, ot = "src", it = "srcset", rt = "sizes", ct = "poster", lt = "llOriginalAttrs", st = "loading", ut = "loaded", dt = "applied", ft = "error", _t = "native", gt = "data-", vt = "ll-status", bt = [st, ut, dt, ft], pt = [ot], ht = [ot, ct], mt = [ot, it, rt], Et = {IMG: function (t, e) {h(t, function (t) {y(t, mt), O(t, e)}), y(t, mt), O(t, e)}, IFRAME: function (t, e) {y(t, pt), A(t, ot, l(t, e.data_src))}, VIDEO: function (t, e) {a(t, function (t) {y(t, pt), A(t, ot, l(t, e.data_src))}), y(t, ht), A(t, ct, l(t, e.data_poster)), A(t, ot, l(t, e.data_src)), t.load()}}, It = ["IMG", "IFRAME", "VIDEO"], yt = {IMG: j, IFRAME: function (t) {L(t, pt)}, VIDEO: function (t) {a(t, function (t) {L(t, pt)}), L(t, ht), t.load()}}, Lt = ["IMG", "IFRAME", "VIDEO"]; return t.prototype = {update: function (t) {var e, n, a, o = this._settings, i = W(t, o); {if (p(this, i.length), !Z && tt) return q(o) ? (e = o, n = this, i.forEach(function (t) {-1 !== Lt.indexOf(t.tagName) && S(t, e, n)}), void p(n, 0)) : (t = this._observer, o = i, t.disconnect(), a = t, void o.forEach(function (t) {a.observe(t)})); this.loadAll(i)} }, destroy: function () {this._observer && this._observer.disconnect(), K(this._settings).forEach(function (t) {I(t)}), delete this._observer, delete this._settings, delete this.loadingCount, delete this.toLoadCount}, loadAll: function (t) {var e = this, n = this._settings; W(t, n).forEach(function (t) {v(t, e), D(t, n, e)})}, restoreAll: function () {var e = this._settings; K(e).forEach(function (t) {P(t, e)})}}, t.load = function (t, e) {e = o(e); D(t, e)}, t.resetStatus = function (t) {i(t)}, t}), function (t, e) {"use strict"; function n() {e.body.classList.add("litespeed_lazyloaded")} function a() {console.log("[LiteSpeed] Start Lazy Load"), o = new LazyLoad(Object.assign({}, t.lazyLoadOptions || {}, {elements_selector: "[data-lazyloaded]", callback_finish: n})), i = function () {o.update()}, t.MutationObserver && new MutationObserver(i).observe(e.documentElement, {childList: !0, subtree: !0, attributes: !0})} var o, i; t.addEventListener ? t.addEventListener("load", a, !1) : t.attachEvent("onload", a)}(window, document);</script>
+		id="weddingpress-wdp-js-extra">var cevar = { "ajax_url": "/template-assets/webinvite.id/wp-admin/admin-ajax.php", "plugin_url": "/template-assets/webinvite.id/wp-content/plugins/weddingpress/" }</script>
 	<script
-		data-no-optimize="1">window.litespeed_ui_events = window.litespeed_ui_events || ["mouseover", "click", "keydown", "wheel", "touchmove", "touchstart"]; var urlCreator = window.URL || window.webkitURL; function litespeed_load_delayed_js_force() {console.log("[LiteSpeed] Start Load JS Delayed"), litespeed_ui_events.forEach(e => {window.removeEventListener(e, litespeed_load_delayed_js_force, {passive: !0})}), document.querySelectorAll("iframe[data-litespeed-src]").forEach(e => {e.setAttribute("src", e.getAttribute("data-litespeed-src"))}), "loading" == document.readyState ? window.addEventListener("DOMContentLoaded", litespeed_load_delayed_js) : litespeed_load_delayed_js()} litespeed_ui_events.forEach(e => {window.addEventListener(e, litespeed_load_delayed_js_force, {passive: !0})}); async function litespeed_load_delayed_js() {let t = []; for (var d in document.querySelectorAll('script[type="litespeed/javascript"]').forEach(e => {t.push(e)}), t) await new Promise(e => litespeed_load_one(t[d], e)); document.dispatchEvent(new Event("DOMContentLiteSpeedLoaded")), window.dispatchEvent(new Event("DOMContentLiteSpeedLoaded"))} function litespeed_load_one(t, e) {console.log("[LiteSpeed] Load ", t); var d = document.createElement("script"); d.addEventListener("load", e), d.addEventListener("error", e), t.getAttributeNames().forEach(e => {"type" != e && d.setAttribute("data-src" == e ? "src" : e, t.getAttribute(e))}); let a = !(d.type = "text/javascript"); !d.src && t.textContent && (d.src = litespeed_inline2src(t.textContent), a = !0), t.after(d), t.remove(), a && e()} function litespeed_inline2src(t) {try {var d = urlCreator.createObjectURL(new Blob([t.replace(/^(?:< !-- ) ?(.*?)(?:- ->)?$/gm, "$1")], {type: "text/javascript"}))} catch (e) {d = "data:text/javascript;base64, " + btoa(t.replace(/^(?: <!- - )?(.*?)(?: -->)?$/gm, "$1"))} return d}</script>
+		id="weddingpress-wdp-js-after">/*!
+	WeddingPress Custom Nama Tamu (WDPCNT) & URL Normalizer
+	============================================
+	
+	Description: 
+	WeddingPress Custom Nama Tamu (WDPCNT) adalah script JavaScript yang digunakan untuk mengganti teks "Tamu Undangan" pada elemen dengan class `namatamu` berdasarkan parameter yang ada di URL. 
+	Script ini mendukung beberapa parameter seperti `to`, `dear`, dan `kepada` untuk menyesuaikan nama penerima undangan. Serta dilengkapi dengan engine URL Normalizer untuk memperbaiki karakter khusus (&) secara otomatis.
+	
+	Author: Andy dari WeddingPress
+	Website: https://weddingpress.net
+	Version: 1.1 (2025/03/01)
+	License: Anda diizinkan menggunakan script ini pada website Anda dan proyek klien. Tidak diperbolehkan menjual, membagikan, menempatkan codenya ditemplate yang dijual atau mendistribusikan ulang tanpa izin.
+	Copyright: © 2025 WeddingPress. All rights reserved.
+	
+	Note:
+	Pastikan untuk teks 'Tamu Undangan' css classesnya sudah terisi: 'namatamu'
+	 */
+									 (function () {
+										 'use strict'; const config = { selector: '.namatamu', urlParams: ['to', 'dear', 'kepada'], defaultText: 'Tamu Undangan' }; var rawSearch = location.search; if (rawSearch.indexOf('?') !== -1) {
+											 var params = new URLSearchParams(rawSearch); var needsRedirect = !1; for (const key of config.urlParams) { if (rawSearch.indexOf('?' + key + '=') !== -1 || rawSearch.indexOf('&' + key + '=') !== -1) { var rawName = params.get(key); if (rawName !== null) { var decoded = rawName.replace(/&amp;/gi, '&').replace(/&#38;/gi, '&').replace(/&#x26;/gi, '&').replace(/&apos;/gi, "'").replace(/&#39;/gi, "'").replace(/&quot;/gi, '"').replace(/&#34;/gi, '"'); if (rawName !== decoded || rawSearch.indexOf('&' + key + '=') !== -1) { params.set(key, decoded); needsRedirect = !0 } } } }
+											 if (needsRedirect) { var newSearch = '?' + params.toString(); if (newSearch !== rawSearch) {/* wdp: redirect disabled for static hosting */; return } }
+										 }
+										 function getRecipientName(params, keys) {
+											 for (const key of keys) { const value = params.get(key); if (value && value.trim()) { return value.trim() } }
+											 return ''
+										 }
+										 function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }
+										 function replaceTextInNode(node, searchValue, replaceValue) { if (node.nodeType === 1 || node.nodeType === 11) { node.childNodes.forEach(child => { if (child.nodeType === 3) { const safeSearchValue = escapeRegExp(searchValue); const regex = new RegExp(safeSearchValue, 'gi'); var txt = document.createElement('textarea'); txt.innerHTML = replaceValue; var decodedReplaceValue = txt.value; child.textContent = child.textContent.replace(regex, decodedReplaceValue) } else { replaceTextInNode(child, searchValue, replaceValue) } }) } }
+										 function wdpDisplayGuestName() { const params = new URLSearchParams(window.location.search); const recipient = getRecipientName(params, config.urlParams); const targets = document.querySelectorAll(config.selector); if (targets.length === 0) return; targets.forEach(element => { if (recipient) { replaceTextInNode(element, config.defaultText, recipient) } else { if (!element.textContent.trim()) { element.textContent = config.defaultText } } }) }
+										 if (document.readyState === 'loading') { document.addEventListener('DOMContentLiteSpeedLoaded', wdpDisplayGuestName) } else { wdpDisplayGuestName() }
+									 })()</script>
 	<script
-		data-no-optimize="1">var litespeed_vary = document.cookie.replace(/(?:(?:^|.*;\s*)_lscache_vary\s*\=\s*([^;]*).*$)|^.*$/, ""); litespeed_vary || (sessionStorage.getItem("litespeed_reloaded") ? console.log("LiteSpeed: skipping guest vary reload (already reloaded this session)") : fetch("/template-assets/webinvite.id/wp-content/plugins/litespeed-cache/guest.vary.php", {method: "POST", cache: "no-cache", redirect: "follow"}).then(e => e.json()).then(e => {console.log(e), e.hasOwnProperty("reload") && "yes" == e.reload && (sessionStorage.setItem("litespeed_docref", document.referrer), sessionStorage.setItem("litespeed_reloaded", "1"), window.location.reload(!0))}));</script>
+		id="kirim-kit-js-extra">var sendkit_ajax = { "ajax_url": "/template-assets/webinvite.id/wp-admin/admin-ajax.php" }</script>
+	<script
+		data-no-optimize="1">window.lazyLoadOptions = Object.assign({}, { threshold: 300 }, window.lazyLoadOptions || {}); !function (t, e) { "object" == typeof exports && "undefined" != typeof module ? module.exports = e() : "function" == typeof define && define.amd ? define(e) : (t = "undefined" != typeof globalThis ? globalThis : t || self).LazyLoad = e() }(this, function () { "use strict"; function e() { return (e = Object.assign || function (t) { for (var e = 1; e < arguments.length; e++) { var n, a = arguments[e]; for (n in a) Object.prototype.hasOwnProperty.call(a, n) && (t[n] = a[n]) } return t }).apply(this, arguments) } function o(t) { return e({}, at, t) } function l(t, e) { return t.getAttribute(gt + e) } function c(t) { return l(t, vt) } function s(t, e) { return function (t, e, n) { e = gt + e; null !== n ? t.setAttribute(e, n) : t.removeAttribute(e) }(t, vt, e) } function i(t) { return s(t, null), 0 } function r(t) { return null === c(t) } function u(t) { return c(t) === _t } function d(t, e, n, a) { t && (void 0 === a ? void 0 === n ? t(e) : t(e, n) : t(e, n, a)) } function f(t, e) { et ? t.classList.add(e) : t.className += (t.className ? " " : "") + e } function _(t, e) { et ? t.classList.remove(e) : t.className = t.className.replace(new RegExp("(^|\\s+)" + e + "(\\s+|$)"), " ").replace(/^\s+/, "").replace(/\s+$/, "") } function g(t) { return t.llTempImage } function v(t, e) { !e || (e = e._observer) && e.unobserve(t) } function b(t, e) { t && (t.loadingCount += e) } function p(t, e) { t && (t.toLoadCount = e) } function n(t) { for (var e, n = [], a = 0; e = t.children[a]; a += 1)"SOURCE" === e.tagName && n.push(e); return n } function h(t, e) { (t = t.parentNode) && "PICTURE" === t.tagName && n(t).forEach(e) } function a(t, e) { n(t).forEach(e) } function m(t) { return !!t[lt] } function E(t) { return t[lt] } function I(t) { return delete t[lt] } function y(e, t) { var n; m(e) || (n = {}, t.forEach(function (t) { n[t] = e.getAttribute(t) }), e[lt] = n) } function L(a, t) { var o; m(a) && (o = E(a), t.forEach(function (t) { var e, n; e = a, (t = o[n = t]) ? e.setAttribute(n, t) : e.removeAttribute(n) })) } function k(t, e, n) { f(t, e.class_loading), s(t, st), n && (b(n, 1), d(e.callback_loading, t, n)) } function A(t, e, n) { n && t.setAttribute(e, n) } function O(t, e) { A(t, rt, l(t, e.data_sizes)), A(t, it, l(t, e.data_srcset)), A(t, ot, l(t, e.data_src)) } function w(t, e, n) { var a = l(t, e.data_bg_multi), o = l(t, e.data_bg_multi_hidpi); (a = nt && o ? o : a) && (t.style.backgroundImage = a, n = n, f(t = t, (e = e).class_applied), s(t, dt), n && (e.unobserve_completed && v(t, e), d(e.callback_applied, t, n))) } function x(t, e) { !e || 0 < e.loadingCount || 0 < e.toLoadCount || d(t.callback_finish, e) } function M(t, e, n) { t.addEventListener(e, n), t.llEvLisnrs[e] = n } function N(t) { return !!t.llEvLisnrs } function z(t) { if (N(t)) { var e, n, a = t.llEvLisnrs; for (e in a) { var o = a[e]; n = e, o = o, t.removeEventListener(n, o) } delete t.llEvLisnrs } } function C(t, e, n) { var a; delete t.llTempImage, b(n, -1), (a = n) && --a.toLoadCount, _(t, e.class_loading), e.unobserve_completed && v(t, n) } function R(i, r, c) { var l = g(i) || i; N(l) || function (t, e, n) { N(t) || (t.llEvLisnrs = {}); var a = "VIDEO" === t.tagName ? "loadeddata" : "load"; M(t, a, e), M(t, "error", n) }(l, function (t) { var e, n, a, o; n = r, a = c, o = u(e = i), C(e, n, a), f(e, n.class_loaded), s(e, ut), d(n.callback_loaded, e, a), o || x(n, a), z(l) }, function (t) { var e, n, a, o; n = r, a = c, o = u(e = i), C(e, n, a), f(e, n.class_error), s(e, ft), d(n.callback_error, e, a), o || x(n, a), z(l) }) } function T(t, e, n) { var a, o, i, r, c; t.llTempImage = document.createElement("IMG"), R(t, e, n), m(c = t) || (c[lt] = { backgroundImage: c.style.backgroundImage }), i = n, r = l(a = t, (o = e).data_bg), c = l(a, o.data_bg_hidpi), (r = nt && c ? c : r) && (a.style.backgroundImage = 'url("'.concat(r, '")'), g(a).setAttribute(ot, r), k(a, o, i)), w(t, e, n) } function G(t, e, n) { var a; R(t, e, n), a = e, e = n, (t = Et[(n = t).tagName]) && (t(n, a), k(n, a, e)) } function D(t, e, n) { var a; a = t, (-1 < It.indexOf(a.tagName) ? G : T)(t, e, n) } function S(t, e, n) { var a; t.setAttribute("loading", "lazy"), R(t, e, n), a = e, (e = Et[(n = t).tagName]) && e(n, a), s(t, _t) } function V(t) { t.removeAttribute(ot), t.removeAttribute(it), t.removeAttribute(rt) } function j(t) { h(t, function (t) { L(t, mt) }), L(t, mt) } function F(t) { var e; (e = yt[t.tagName]) ? e(t) : m(e = t) && (t = E(e), e.style.backgroundImage = t.backgroundImage) } function P(t, e) { var n; F(t), n = e, r(e = t) || u(e) || (_(e, n.class_entered), _(e, n.class_exited), _(e, n.class_applied), _(e, n.class_loading), _(e, n.class_loaded), _(e, n.class_error)), i(t), I(t) } function U(t, e, n, a) { var o; n.cancel_on_exit && (c(t) !== st || "IMG" === t.tagName && (z(t), h(o = t, function (t) { V(t) }), V(o), j(t), _(t, n.class_loading), b(a, -1), i(t), d(n.callback_cancel, t, e, a))) } function $(t, e, n, a) { var o, i, r = (i = t, 0 <= bt.indexOf(c(i))); s(t, "entered"), f(t, n.class_entered), _(t, n.class_exited), o = t, i = a, n.unobserve_entered && v(o, i), d(n.callback_enter, t, e, a), r || D(t, n, a) } function q(t) { return t.use_native && "loading" in HTMLImageElement.prototype } function H(t, o, i) { t.forEach(function (t) { return (a = t).isIntersecting || 0 < a.intersectionRatio ? $(t.target, t, o, i) : (e = t.target, n = t, a = o, t = i, void (r(e) || (f(e, a.class_exited), U(e, n, a, t), d(a.callback_exit, e, n, t)))); var e, n, a }) } function B(e, n) { var t; tt && !q(e) && (n._observer = new IntersectionObserver(function (t) { H(t, e, n) }, { root: (t = e).container === document ? null : t.container, rootMargin: t.thresholds || t.threshold + "px" })) } function J(t) { return Array.prototype.slice.call(t) } function K(t) { return t.container.querySelectorAll(t.elements_selector) } function Q(t) { return c(t) === ft } function W(t, e) { return e = t || K(e), J(e).filter(r) } function X(e, t) { var n; (n = K(e), J(n).filter(Q)).forEach(function (t) { _(t, e.class_error), i(t) }), t.update() } function t(t, e) { var n, a, t = o(t); this._settings = t, this.loadingCount = 0, B(t, this), n = t, a = this, Y && window.addEventListener("online", function () { X(n, a) }), this.update(e) } var Y = "undefined" != typeof window, Z = Y && !("onscroll" in window) || "undefined" != typeof navigator && /(gle|ing|ro)bot|crawl|spider/i.test(navigator.userAgent), tt = Y && "IntersectionObserver" in window, et = Y && "classList" in document.createElement("p"), nt = Y && 1 < window.devicePixelRatio, at = { elements_selector: ".lazy", container: Z || Y ? document : null, threshold: 300, thresholds: null, data_src: "src", data_srcset: "srcset", data_sizes: "sizes", data_bg: "bg", data_bg_hidpi: "bg-hidpi", data_bg_multi: "bg-multi", data_bg_multi_hidpi: "bg-multi-hidpi", data_poster: "poster", class_applied: "applied", class_loading: "litespeed-loading", class_loaded: "litespeed-loaded", class_error: "error", class_entered: "entered", class_exited: "exited", unobserve_completed: !0, unobserve_entered: !1, cancel_on_exit: !0, callback_enter: null, callback_exit: null, callback_applied: null, callback_loading: null, callback_loaded: null, callback_error: null, callback_finish: null, callback_cancel: null, use_native: !1 }, ot = "src", it = "srcset", rt = "sizes", ct = "poster", lt = "llOriginalAttrs", st = "loading", ut = "loaded", dt = "applied", ft = "error", _t = "native", gt = "data-", vt = "ll-status", bt = [st, ut, dt, ft], pt = [ot], ht = [ot, ct], mt = [ot, it, rt], Et = { IMG: function (t, e) { h(t, function (t) { y(t, mt), O(t, e) }), y(t, mt), O(t, e) }, IFRAME: function (t, e) { y(t, pt), A(t, ot, l(t, e.data_src)) }, VIDEO: function (t, e) { a(t, function (t) { y(t, pt), A(t, ot, l(t, e.data_src)) }), y(t, ht), A(t, ct, l(t, e.data_poster)), A(t, ot, l(t, e.data_src)), t.load() } }, It = ["IMG", "IFRAME", "VIDEO"], yt = { IMG: j, IFRAME: function (t) { L(t, pt) }, VIDEO: function (t) { a(t, function (t) { L(t, pt) }), L(t, ht), t.load() } }, Lt = ["IMG", "IFRAME", "VIDEO"]; return t.prototype = { update: function (t) { var e, n, a, o = this._settings, i = W(t, o); { if (p(this, i.length), !Z && tt) return q(o) ? (e = o, n = this, i.forEach(function (t) { -1 !== Lt.indexOf(t.tagName) && S(t, e, n) }), void p(n, 0)) : (t = this._observer, o = i, t.disconnect(), a = t, void o.forEach(function (t) { a.observe(t) })); this.loadAll(i) } }, destroy: function () { this._observer && this._observer.disconnect(), K(this._settings).forEach(function (t) { I(t) }), delete this._observer, delete this._settings, delete this.loadingCount, delete this.toLoadCount }, loadAll: function (t) { var e = this, n = this._settings; W(t, n).forEach(function (t) { v(t, e), D(t, n, e) }) }, restoreAll: function () { var e = this._settings; K(e).forEach(function (t) { P(t, e) }) } }, t.load = function (t, e) { e = o(e); D(t, e) }, t.resetStatus = function (t) { i(t) }, t }), function (t, e) { "use strict"; function n() { e.body.classList.add("litespeed_lazyloaded") } function a() { console.log("[LiteSpeed] Start Lazy Load"), o = new LazyLoad(Object.assign({}, t.lazyLoadOptions || {}, { elements_selector: "[data-lazyloaded]", callback_finish: n })), i = function () { o.update() }, t.MutationObserver && new MutationObserver(i).observe(e.documentElement, { childList: !0, subtree: !0, attributes: !0 }) } var o, i; t.addEventListener ? t.addEventListener("load", a, !1) : t.attachEvent("onload", a) }(window, document);</script>
+	<script
+		data-no-optimize="1">window.litespeed_ui_events = window.litespeed_ui_events || ["mouseover", "click", "keydown", "wheel", "touchmove", "touchstart"]; var urlCreator = window.URL || window.webkitURL; function litespeed_load_delayed_js_force() { console.log("[LiteSpeed] Start Load JS Delayed"), litespeed_ui_events.forEach(e => { window.removeEventListener(e, litespeed_load_delayed_js_force, { passive: !0 }) }), document.querySelectorAll("iframe[data-litespeed-src]").forEach(e => { e.setAttribute("src", e.getAttribute("data-litespeed-src")) }), "loading" == document.readyState ? window.addEventListener("DOMContentLoaded", litespeed_load_delayed_js) : litespeed_load_delayed_js() } litespeed_ui_events.forEach(e => { window.addEventListener(e, litespeed_load_delayed_js_force, { passive: !0 }) }); async function litespeed_load_delayed_js() { let t = []; for (var d in document.querySelectorAll('script[type="litespeed/javascript"]').forEach(e => { t.push(e) }), t) await new Promise(e => litespeed_load_one(t[d], e)); document.dispatchEvent(new Event("DOMContentLiteSpeedLoaded")), window.dispatchEvent(new Event("DOMContentLiteSpeedLoaded")) } function litespeed_load_one(t, e) { console.log("[LiteSpeed] Load ", t); var d = document.createElement("script"); d.addEventListener("load", e), d.addEventListener("error", e), t.getAttributeNames().forEach(e => { "type" != e && d.setAttribute("data-src" == e ? "src" : e, t.getAttribute(e)) }); let a = !(d.type = "text/javascript"); !d.src && t.textContent && (d.src = litespeed_inline2src(t.textContent), a = !0), t.after(d), t.remove(), a && e() } function litespeed_inline2src(t) { try { var d = urlCreator.createObjectURL(new Blob([t.replace(/^(?:< !-- ) ?(.*?)(?:- ->)?$/gm, "$1")], { type: "text/javascript" })) } catch (e) { d = "data:text/javascript;base64, " + btoa(t.replace(/^(?: <!- - )?(.*?)(?: -->)?$/gm, "$1")) } return d }</script>
+	<script
+		data-no-optimize="1">var litespeed_vary = document.cookie.replace(/(?:(?:^|.*;\s*)_lscache_vary\s*\=\s*([^;]*).*$)|^.*$/, ""); litespeed_vary || (sessionStorage.getItem("litespeed_reloaded") ? console.log("LiteSpeed: skipping guest vary reload (already reloaded this session)") : fetch("/template-assets/webinvite.id/wp-content/plugins/litespeed-cache/guest.vary.php", { method: "POST", cache: "no-cache", redirect: "follow" }).then(e => e.json()).then(e => { console.log(e), e.hasOwnProperty("reload") && "yes" == e.reload && (sessionStorage.setItem("litespeed_docref", document.referrer), sessionStorage.setItem("litespeed_reloaded", "1"), window.location.reload(!0)) }));</script>
 	<script data-optimized="1"
 		data-src="/template-assets/webinvite.id/wp-content/litespeed/js/e45d004d452844bc4d95553a190146fd.js?ver=1b8e8"></script>
 
-<script id="wdp-hydrate">
-/* You Are Invited — Data Hydration & Animation Engine */
-(function () {
-  var SLUG = "raden-motion";
-  var API = '/api/invitations/' + SLUG;
+	<script id="wdp-hydrate">
+		/* You Are Invited — Data Hydration & Animation Engine */
+		(function () {
+			var SLUG = "raden-motion";
+			var API = '/api/invitations/' + SLUG;
 
-  function text(sel, val) {
-    if (val === undefined || val === null || String(val).trim() === '') return;
-    var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
-    if (el) el.textContent = String(val);
-  }
-  function html(sel, val) {
-    if (val === undefined || val === null || String(val).trim() === '') return;
-    var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
-    if (el) el.innerHTML = String(val);
-  }
-  function attr(sel, a, val) {
-    if (!val) return;
-    var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
-    if (el) el.setAttribute(a, String(val));
-  }
-  function each(sel, fn) {
-    Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
-  }
+			function text(sel, val) {
+				if (val === undefined || val === null || String(val).trim() === '') return;
+				var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+				if (el) el.textContent = String(val);
+			}
+			function html(sel, val) {
+				if (val === undefined || val === null || String(val).trim() === '') return;
+				var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+				if (el) el.innerHTML = String(val);
+			}
+			function attr(sel, a, val) {
+				if (!val) return;
+				var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+				if (el) el.setAttribute(a, String(val));
+			}
+			function each(sel, fn) {
+				Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
+			}
 
-  // --- Animation triggers ---
-  function triggerAnimations() {
-    // 1. Dispatch LiteSpeed events
-    document.dispatchEvent(new Event("DOMContentLiteSpeedLoaded"));
-    window.dispatchEvent(new Event("DOMContentLiteSpeedLoaded"));
+			// --- Animation triggers ---
+			function triggerAnimations() {
+				// 1. Dispatch LiteSpeed events
+				document.dispatchEvent(new Event("DOMContentLiteSpeedLoaded"));
+				window.dispatchEvent(new Event("DOMContentLiteSpeedLoaded"));
 
-    // 2. Trigger IntersectionObserver for entrance animations (.muncul, .zoom)
-    var animItems = document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom");
-    if (window.IntersectionObserver) {
-      var obs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      }, { rootMargin: "60px 0px 60px 0px" });
-      animItems.forEach(function(it) { obs.observe(it); });
-    } else {
-      animItems.forEach(function(it) { it.classList.add("active"); });
-    }
+				// 2. Trigger IntersectionObserver for entrance animations (.muncul, .zoom)
+				var animItems = document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom");
+				if (window.IntersectionObserver) {
+					var obs = new IntersectionObserver(function (entries) {
+						entries.forEach(function (entry) {
+							if (entry.isIntersecting) {
+								entry.target.classList.add("active");
+							}
+						});
+					}, { rootMargin: "60px 0px 60px 0px" });
+					animItems.forEach(function (it) { obs.observe(it); });
+				} else {
+					animItems.forEach(function (it) { it.classList.add("active"); });
+				}
 
-    // 3. Remove elementor-invisible and trigger entrance animations
-    each(".elementor-invisible", function(el) {
-      el.classList.remove("elementor-invisible");
-      var st = el.getAttribute("data-settings");
-      if (st) {
-        try {
-          var parsed = JSON.parse(st.replace(/&quot;/g, '"'));
-          var a = parsed._animation || parsed._animation_mobile;
-          if (a && a !== 'none') {
-            el.classList.add("animated", a);
-          }
-        } catch(e) {}
-      }
-    });
+				// 3. Remove elementor-invisible and trigger entrance animations
+				each(".elementor-invisible", function (el) {
+					el.classList.remove("elementor-invisible");
+					var st = el.getAttribute("data-settings");
+					if (st) {
+						try {
+							var parsed = JSON.parse(st.replace(/&quot;/g, '"'));
+							var a = parsed._animation || parsed._animation_mobile;
+							if (a && a !== 'none') {
+								el.classList.add("animated", a);
+							}
+						} catch (e) { }
+					}
+				});
 
-    // 4. Ensure button has openInvi
-    var openBtn = document.querySelector('.wdp-button-wrapper button');
-    if (openBtn) openBtn.classList.add('openInvi');
-  }
+				// 4. Ensure button has openInvi
+				var openBtn = document.querySelector('.wdp-button-wrapper button');
+				if (openBtn) openBtn.classList.add('openInvi');
+			}
 
-  // Run animation triggers on DOM ready & load
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", triggerAnimations);
-  } else {
-    triggerAnimations();
-  }
-  window.addEventListener("load", triggerAnimations);
+			// Run animation triggers on DOM ready & load
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", triggerAnimations);
+			} else {
+				triggerAnimations();
+			}
+			window.addEventListener("load", triggerAnimations);
 
-  // Re-trigger animations when Buka Undangan is clicked
-  document.addEventListener('click', function(e) {
-    if (e.target && (e.target.closest('.wdp-button-wrapper button') || e.target.closest('.openInvi'))) {
-      setTimeout(triggerAnimations, 300);
-      setTimeout(triggerAnimations, 1000);
-    }
-  });
+			// Re-trigger animations when Buka Undangan is clicked
+			document.addEventListener('click', function (e) {
+				if (e.target && (e.target.closest('.wdp-button-wrapper button') || e.target.closest('.openInvi'))) {
+					setTimeout(triggerAnimations, 300);
+					setTimeout(triggerAnimations, 1000);
+				}
+			});
 
-  // --- Guest name injection ---
-  function applyGuestName(defaultLabel) {
-    var p = new URLSearchParams(location.search);
-    var raw = p.get('to') || p.get('dear') || p.get('kepada');
-    var name = raw && raw.trim() ? raw.trim() : (defaultLabel || 'Tamu Undangan');
-    each('.namatamu', function(el) { el.textContent = name; });
-    return name;
-  }
+			// --- Guest name injection ---
+			function applyGuestName(defaultLabel) {
+				var p = new URLSearchParams(location.search);
+				var raw = p.get('to') || p.get('dear') || p.get('kepada');
+				var name = raw && raw.trim() ? raw.trim() : (defaultLabel || 'Tamu Undangan');
+				each('.namatamu', function (el) { el.textContent = name; });
+				return name;
+			}
 
-  // --- Fetch invitation data ---
-  fetch(API)
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(payload) {
-      var inv = payload.invitation || {};
-      var couples = payload.couples || [];
-      var events = payload.events || [];
-      var wishes = payload.wishes || [];
-      var wishSummary = payload.wishSummary || { total: 0, attending: 0, notAttending: 0, maybe: 0 };
-      var gifts = payload.giftAccounts || [];
-      var tf = payload.templateFields || {};
+			// --- Fetch invitation data ---
+			fetch(API)
+				.then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+				.then(function (payload) {
+					var inv = payload.invitation || {};
+					var couples = payload.couples || [];
+					var events = payload.events || [];
+					var wishes = payload.wishes || [];
+					var wishSummary = payload.wishSummary || { total: 0, attending: 0, notAttending: 0, maybe: 0 };
+					var gifts = payload.giftAccounts || [];
+					var tf = payload.templateFields || {};
 
-      var groom = couples.find(function(c) { return c.role === 'groom'; }) || couples[0] || {};
-      var bride = couples.find(function(c) { return c.role === 'bride'; }) || couples[1] || {};
+					var groom = couples.find(function (c) { return c.role === 'groom'; }) || couples[0] || {};
+					var bride = couples.find(function (c) { return c.role === 'bride'; }) || couples[1] || {};
 
-      applyGuestName(inv.coverGuestLabelDefault);
-      window.__WDP_DATA__ = payload;
+					applyGuestName(inv.coverGuestLabelDefault);
+					window.__WDP_DATA__ = payload;
 
-      // 1. Cover Gate
-      each('.wdp-mempelai', function(el) {
-        el.textContent = (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu');
-      });
+					// 1. Cover Gate
+					each('.wdp-mempelai', function (el) {
+						el.textContent = (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu');
+					});
 
-      // 2. Specific Template Hydrations
-      if (SLUG === 'raden-motion') {
-        // Hero names & date
-        text('[data-id="4b0b57e"] .elementor-heading-title', groom.displayName);
-        text('[data-id="08ea836"] .elementor-heading-title', bride.displayName);
-        if (events[0]) text('[data-id="44bbaa4"] p', events[0].date);
+					// 2. Specific Template Hydrations
+					if (SLUG === 'raden-motion') {
+						// Hero names & date
+						text('[data-id="4b0b57e"] .elementor-heading-title', groom.displayName);
+						text('[data-id="08ea836"] .elementor-heading-title', bride.displayName);
+						if (events[0]) text('[data-id="44bbaa4"] p', events[0].date);
 
-        // Quote & Greeting
-        if (inv.quoteText) text('[data-id="5b43713"] p', '(' + (inv.quoteSource || 'Ar-Rum 21') + ')');
-        if (inv.openingGreetingText) text('[data-id="dcb69b8"] p', inv.openingGreetingText);
+						// Quote & Greeting
+						if (inv.quoteText) text('[data-id="5b43713"] p', '(' + (inv.quoteSource || 'Ar-Rum 21') + ')');
+						if (inv.openingGreetingText) text('[data-id="dcb69b8"] p', inv.openingGreetingText);
 
-        // Couple profiles
-        text('[data-id="20d8c21"] p', bride.displayName);
-        text('[data-id="3eb9824"] p', bride.fullName);
-        if (bride.fatherName) {
-          text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
-        }
-        if (bride.instagramHandle) {
-          attr('[data-id="8624cff"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
-        }
+						// Couple profiles
+						text('[data-id="20d8c21"] p', bride.displayName);
+						text('[data-id="3eb9824"] p', bride.fullName);
+						if (bride.fatherName) {
+							text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+						}
+						if (bride.instagramHandle) {
+							attr('[data-id="8624cff"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
+						}
 
-        text('[data-id="09ba1c3"] p', groom.displayName);
-        text('[data-id="a2f50b3"] p', groom.fullName);
-        if (groom.fatherName) {
-          text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
-        }
-        if (groom.instagramHandle) {
-          attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
-        }
+						text('[data-id="09ba1c3"] p', groom.displayName);
+						text('[data-id="a2f50b3"] p', groom.fullName);
+						if (groom.fatherName) {
+							text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
+						}
+						if (groom.instagramHandle) {
+							attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
+						}
 
-        // Event 1 (Akad)
-        if (events[0]) {
-          text('[data-id="6009170"] .elementor-heading-title', events[0].label);
-          text('[data-id="c8e6e2a"] .elementor-heading-title', events[0].date);
-          text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
-          text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
-          if (events[0].mapsUrl) attr('[data-id="2f59679"] a', 'href', events[0].mapsUrl);
-        }
+						// Event 1 (Akad)
+						if (events[0]) {
+							text('[data-id="6009170"] .elementor-heading-title', events[0].label);
+							text('[data-id="c8e6e2a"] .elementor-heading-title', events[0].date);
+							text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
+							text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
+							if (events[0].mapsUrl) attr('[data-id="2f59679"] a', 'href', events[0].mapsUrl);
+						}
 
-        // Event 2 (Resepsi)
-        if (events[1]) {
-          text('[data-id="4edf461"] .elementor-heading-title', events[1].label);
-          text('[data-id="18b08f3"] .elementor-heading-title', events[1].date);
-          text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
-          text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
-          if (events[1].mapsUrl) attr('[data-id="36a639a"] a', 'href', events[1].mapsUrl);
-        }
+						// Event 2 (Resepsi)
+						if (events[1]) {
+							text('[data-id="4edf461"] .elementor-heading-title', events[1].label);
+							text('[data-id="18b08f3"] .elementor-heading-title', events[1].date);
+							text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
+							text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
+							if (events[1].mapsUrl) attr('[data-id="36a639a"] a', 'href', events[1].mapsUrl);
+						}
 
-        // Gifts
-        if (gifts[0]) {
-          text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
-          text('[data-id="b60bdab"] p', gifts[0].accountNumber);
-          attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
-        }
-        if (gifts[1]) {
-          text('[data-id="b9b1608"] .elementor-heading-title', 'An. ' + gifts[1].holderName);
-          text('[data-id="31757a0"] p', gifts[1].accountNumber);
-          attr('[data-id="1303ef3"] [data-clipboard-text]', 'data-clipboard-text', gifts[1].accountNumber);
-        }
+						// Gifts
+						if (gifts[0]) {
+							text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
+							text('[data-id="b60bdab"] p', gifts[0].accountNumber);
+							attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
+						}
+						if (gifts[1]) {
+							text('[data-id="b9b1608"] .elementor-heading-title', 'An. ' + gifts[1].holderName);
+							text('[data-id="31757a0"] p', gifts[1].accountNumber);
+							attr('[data-id="1303ef3"] [data-clipboard-text]', 'data-clipboard-text', gifts[1].accountNumber);
+						}
 
-        // Closing
-        if (inv.closingText) text('[data-id="cd646ce"] .elementor-heading-title', inv.closingText);
-        text('[data-id="5fcdb6b"] .elementor-heading-title', (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu'));
-      }
+						// Closing
+						if (inv.closingText) text('[data-id="cd646ce"] .elementor-heading-title', inv.closingText);
+						text('[data-id="5fcdb6b"] .elementor-heading-title', (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu'));
+					}
 
-      if (SLUG === 'betawi-motion') {
-        // Hero names
-        text('[data-id="40c760b"] p', (groom.displayName || 'Bang Ali') + ' & ' + (bride.displayName || 'Mpok Siti'));
-        text('[data-id="fcff30f"] .elementor-heading-title', groom.displayName ? groom.displayName.charAt(0) : 'A');
-        text('[data-id="04fd3fc"] .elementor-heading-title', bride.displayName ? bride.displayName.charAt(0) : 'S');
+					if (SLUG === 'betawi-motion') {
+						// Hero names
+						text('[data-id="40c760b"] p', (groom.displayName || 'Bang Ali') + ' & ' + (bride.displayName || 'Mpok Siti'));
+						text('[data-id="fcff30f"] .elementor-heading-title', groom.displayName ? groom.displayName.charAt(0) : 'A');
+						text('[data-id="04fd3fc"] .elementor-heading-title', bride.displayName ? bride.displayName.charAt(0) : 'S');
 
-        // Pantun
-        if (tf.pantun_text) text('[data-id="f51cc38"] p', tf.pantun_text);
-        if (tf.hero_video_url) {
-          var vid = document.querySelector('.motionSection video');
-          if (vid) {
-            vid.src = tf.hero_video_url;
-            vid.load();
-            vid.play().catch(function(){});
-          }
-        }
+						// Pantun
+						if (tf.pantun_text) text('[data-id="f51cc38"] p', tf.pantun_text);
+						if (tf.hero_video_url) {
+							var vid = document.querySelector('.motionSection video');
+							if (vid) {
+								vid.src = tf.hero_video_url;
+								vid.load();
+								vid.play().catch(function () { });
+							}
+						}
 
-        // Couple
-        text('[data-id="2a2cf2c"] p', bride.displayName);
-        text('[data-id="15e30fe"] p', bride.fullName);
-        if (bride.fatherName) {
-          text('[data-id="05666ff"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
-        }
-        if (bride.instagramHandle) attr('[data-id="ba7b58b"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
+						// Couple
+						text('[data-id="2a2cf2c"] p', bride.displayName);
+						text('[data-id="15e30fe"] p', bride.fullName);
+						if (bride.fatherName) {
+							text('[data-id="05666ff"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+						}
+						if (bride.instagramHandle) attr('[data-id="ba7b58b"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
 
-        text('[data-id="621f462"] p', groom.displayName);
-        text('[data-id="b44b577"] p', groom.fullName);
-        if (groom.fatherName) {
-          text('[data-id="9ac7612"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
-        }
-        if (groom.instagramHandle) attr('[data-id="000ead3"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
+						text('[data-id="621f462"] p', groom.displayName);
+						text('[data-id="b44b577"] p', groom.fullName);
+						if (groom.fatherName) {
+							text('[data-id="9ac7612"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
+						}
+						if (groom.instagramHandle) attr('[data-id="000ead3"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
 
-        // Events
-        if (events[0]) {
-          text('[data-id="3040225"] .elementor-heading-title', events[0].date);
-          text('[data-id="3d69322"] .elementor-icon-box-title', events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
-          text('[data-id="9455256"] .elementor-heading-title', events[0].venueName);
-          text('[data-id="b2025a3"] .elementor-heading-title', events[0].venueAddress);
-          if (events[0].mapsUrl) attr('[data-id="b5fd3d2"] a', 'href', events[0].mapsUrl);
-        }
+						// Events
+						if (events[0]) {
+							text('[data-id="3040225"] .elementor-heading-title', events[0].date);
+							text('[data-id="3d69322"] .elementor-icon-box-title', events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
+							text('[data-id="9455256"] .elementor-heading-title', events[0].venueName);
+							text('[data-id="b2025a3"] .elementor-heading-title', events[0].venueAddress);
+							if (events[0].mapsUrl) attr('[data-id="b5fd3d2"] a', 'href', events[0].mapsUrl);
+						}
 
-        // Gifts
-        if (gifts[0]) {
-          text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
-          text('[data-id="b60bdab"] p', gifts[0].accountNumber);
-          attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
-        }
+						// Gifts
+						if (gifts[0]) {
+							text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
+							text('[data-id="b60bdab"] p', gifts[0].accountNumber);
+							attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
+						}
 
-        // Closing
-        text('[data-id="30a60d7"] .elementor-heading-title', (groom.displayName || 'Bang Ali') + ' & ' + (bride.displayName || 'Mpok Siti'));
-      }
+						// Closing
+						text('[data-id="30a60d7"] .elementor-heading-title', (groom.displayName || 'Bang Ali') + ' & ' + (bride.displayName || 'Mpok Siti'));
+					}
 
-      if (SLUG === 'arjuna-tema-foto') {
-        // Hero names & date
-        text('[data-id="1560cbff"] .elementor-heading-title', (groom.displayName || 'Arjuna') + ' & ' + (bride.displayName || 'Laras'));
-        if (events[0]) text('[data-id="33dc06d4"] p', events[0].date);
+					if (SLUG === 'arjuna-tema-foto') {
+						// Hero names & date
+						text('[data-id="1560cbff"] .elementor-heading-title', (groom.displayName || 'Arjuna') + ' & ' + (bride.displayName || 'Laras'));
+						if (events[0]) text('[data-id="33dc06d4"] p', events[0].date);
 
-        // Couple
-        text('[data-id="65505007"] p', bride.displayName);
-        text('[data-id="3784e8b7"] p', bride.fullName);
-        if (bride.fatherName) {
-          text('[data-id="53d1ee8"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
-        }
-        if (bride.instagramHandle) attr('[data-id="1838018"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
+						// Couple
+						text('[data-id="65505007"] p', bride.displayName);
+						text('[data-id="3784e8b7"] p', bride.fullName);
+						if (bride.fatherName) {
+							text('[data-id="53d1ee8"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+						}
+						if (bride.instagramHandle) attr('[data-id="1838018"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
 
-        text('[data-id="4ad2874b"] p', groom.displayName);
-        text('[data-id="65648ce8"] p', groom.fullName);
-        if (groom.fatherName) {
-          text('[data-id="59e26c28"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
-        }
-        if (groom.instagramHandle) attr('[data-id="61a5580f"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
+						text('[data-id="4ad2874b"] p', groom.displayName);
+						text('[data-id="65648ce8"] p', groom.fullName);
+						if (groom.fatherName) {
+							text('[data-id="59e26c28"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
+						}
+						if (groom.instagramHandle) attr('[data-id="61a5580f"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
 
-        // Events
-        if (events[0]) {
-          text('[data-id="3bcbee05"] .elementor-heading-title', events[0].date);
-          text('[data-id="3fdd85dc"] .elementor-icon-box-title', events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
-          text('[data-id="6b6c083"] .elementor-heading-title', events[0].venueName);
-          text('[data-id="56efc21c"] .elementor-heading-title', events[0].venueAddress);
-          if (events[0].mapsUrl) attr('[data-id="4354a7eb"] a', 'href', events[0].mapsUrl);
-        }
+						// Events
+						if (events[0]) {
+							text('[data-id="3bcbee05"] .elementor-heading-title', events[0].date);
+							text('[data-id="3fdd85dc"] .elementor-icon-box-title', events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
+							text('[data-id="6b6c083"] .elementor-heading-title', events[0].venueName);
+							text('[data-id="56efc21c"] .elementor-heading-title', events[0].venueAddress);
+							if (events[0].mapsUrl) attr('[data-id="4354a7eb"] a', 'href', events[0].mapsUrl);
+						}
 
-        // Gifts
-        if (gifts[0]) {
-          text('[data-id="cc3c7e7"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
-          text('[data-id="cef3474"] p', gifts[0].accountNumber);
-          attr('[data-id="abcd1d5"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
-        }
+						// Gifts
+						if (gifts[0]) {
+							text('[data-id="cc3c7e7"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
+							text('[data-id="cef3474"] p', gifts[0].accountNumber);
+							attr('[data-id="abcd1d5"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
+						}
 
-        // Amplop digital button toggle
-        var giftBtn = document.querySelector('[data-id="3045c0b"] a, [data-id="3045c0b"] button');
-        var giftSection = document.querySelector('[data-id="d0211a7"]')?.closest('.elementor-section') || document.querySelector('[data-id="cc3c7e7"]')?.closest('.elementor-section');
-        if (giftBtn && giftSection) {
-          giftBtn.style.cursor = 'pointer';
-          giftBtn.onclick = function(e) {
-            e.preventDefault();
-            giftSection.style.display = (giftSection.style.display === 'none' ? 'block' : 'none');
-          };
-        }
-      }
+						// Amplop digital button toggle
+						var giftBtn = document.querySelector('[data-id="3045c0b"] a, [data-id="3045c0b"] button');
+						var giftSection = document.querySelector('[data-id="d0211a7"]')?.closest('.elementor-section') || document.querySelector('[data-id="cc3c7e7"]')?.closest('.elementor-section');
+						if (giftBtn && giftSection) {
+							giftBtn.style.cursor = 'pointer';
+							giftBtn.onclick = function (e) {
+								e.preventDefault();
+								giftSection.style.display = (giftSection.style.display === 'none' ? 'block' : 'none');
+							};
+						}
+					}
 
-      // Universal: Hashtag clipboard
-      if (inv.hashtag) {
-        each('[data-clipboard-text]', function(el) {
-          var val = el.getAttribute('data-clipboard-text');
-          if (val && val.charAt(0) === '#') {
-            el.setAttribute('data-clipboard-text', inv.hashtag);
-            var txt = el.querySelector('.elementor-button-text');
-            if (txt) txt.textContent = inv.hashtag;
-          }
-        });
-      }
+					// Universal: Hashtag clipboard
+					if (inv.hashtag) {
+						each('[data-clipboard-text]', function (el) {
+							var val = el.getAttribute('data-clipboard-text');
+							if (val && val.charAt(0) === '#') {
+								el.setAttribute('data-clipboard-text', inv.hashtag);
+								var txt = el.querySelector('.elementor-button-text');
+								if (txt) txt.textContent = inv.hashtag;
+							}
+						});
+					}
 
-      // Universal: Attendance Counters
-      each('.cui_card-hadir span:first-child', function(el) { el.textContent = wishSummary.attending; });
-      each('.cui_card-tidak_hadir span:first-child', function(el) { el.textContent = wishSummary.notAttending; });
-      each('.cui_card-masih_ragu span:first-child', function(el) { el.textContent = wishSummary.maybe; });
-      each('.header-cui a span, [id^="cui-link-"] span', function(el) { el.textContent = wishSummary.total; });
+					// Universal: Attendance Counters
+					each('.cui_card-hadir span:first-child', function (el) { el.textContent = wishSummary.attending; });
+					each('.cui_card-tidak_hadir span:first-child', function (el) { el.textContent = wishSummary.notAttending; });
+					each('.cui_card-masih_ragu span:first-child', function (el) { el.textContent = wishSummary.maybe; });
+					each('.header-cui a span, [id^="cui-link-"] span', function (el) { el.textContent = wishSummary.total; });
 
-      // Universal: Live RSVP Form Intercept
-      var form = document.querySelector('form[id^="commentform"]');
-      if (form) {
-        form.onsubmit = async function(e) {
-          e.preventDefault();
-          var authorEl = form.querySelector('[name="author"], #author');
-          var commentEl = form.querySelector('[name="comment"], #comment, textarea');
-          var statusEl = form.querySelector('[name="konfirmasi"], #konfirmasi');
-          var hpEl = form.querySelector('[name="name"], .cui-hide[name="name"]');
+					// Universal: Live RSVP Form Intercept
+					var form = document.querySelector('form[id^="commentform"]');
+					if (form) {
+						form.onsubmit = async function (e) {
+							e.preventDefault();
+							var authorEl = form.querySelector('[name="author"], #author');
+							var commentEl = form.querySelector('[name="comment"], #comment, textarea');
+							var statusEl = form.querySelector('[name="konfirmasi"], #konfirmasi');
+							var hpEl = form.querySelector('[name="name"], .cui-hide[name="name"]');
 
-          var author = authorEl ? authorEl.value.trim() : '';
-          var comment = commentEl ? commentEl.value.trim() : '';
-          var statusVal = statusEl ? statusEl.value : 'Hadir';
-          var hp = hpEl ? hpEl.value : '';
+							var author = authorEl ? authorEl.value.trim() : '';
+							var comment = commentEl ? commentEl.value.trim() : '';
+							var statusVal = statusEl ? statusEl.value : 'Hadir';
+							var hp = hpEl ? hpEl.value : '';
 
-          if (!author || author.length < 2) {
-            alert('Mohon isi nama Anda (minimal 2 karakter)');
-            return;
-          }
-          if (!comment || comment.length < 2) {
-            alert('Mohon isi ucapan Anda (minimal 2 karakter)');
-            return;
-          }
+							if (!author || author.length < 2) {
+								alert('Mohon isi nama Anda (minimal 2 karakter)');
+								return;
+							}
+							if (!comment || comment.length < 2) {
+								alert('Mohon isi ucapan Anda (minimal 2 karakter)');
+								return;
+							}
 
-          var st = 'attending';
-          if (statusVal === 'Tidak hadir' || statusVal === 'Absen') st = 'not_attending';
-          if (statusVal === 'Masih Ragu' || statusVal === 'Mungkin') st = 'maybe';
+							var st = 'attending';
+							if (statusVal === 'Tidak hadir' || statusVal === 'Absen') st = 'not_attending';
+							if (statusVal === 'Masih Ragu' || statusVal === 'Mungkin') st = 'maybe';
 
-          try {
-            var res = await fetch('/api/invitations/' + SLUG + '/wishes', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                guestName: author,
-                message: comment,
-                attendanceStatus: st,
-                website_hp: hp
-              })
-            });
-            var json = await res.json();
-            if (json.success) {
-              alert('Terima kasih! Ucapan dan konfirmasi kehadiran Anda berhasil terkirim.');
-              location.reload();
-            } else {
-              alert(json.error || 'Gagal mengirim ucapan');
-            }
-          } catch(err) {
-            alert('Terjadi kesalahan koneksi.');
-          }
-        };
-      }
+							try {
+								var res = await fetch('/api/invitations/' + SLUG + '/wishes', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({
+										guestName: author,
+										message: comment,
+										attendanceStatus: st,
+										website_hp: hp
+									})
+								});
+								var json = await res.json();
+								if (json.success) {
+									alert('Terima kasih! Ucapan dan konfirmasi kehadiran Anda berhasil terkirim.');
+									location.reload();
+								} else {
+									alert(json.error || 'Gagal mengirim ucapan');
+								}
+							} catch (err) {
+								alert('Terjadi kesalahan koneksi.');
+							}
+						};
+					}
 
-      // Re-trigger animation once data is placed
-      setTimeout(triggerAnimations, 200);
-      document.dispatchEvent(new CustomEvent('wdp:hydrated', { detail: payload }));
-    })
-    .catch(function(e) {
-      console.warn('[wdp] hydration error:', e.message);
-      applyGuestName(null);
-      triggerAnimations();
-    });
-})();
-</script>
+					// Re-trigger animation once data is placed
+					setTimeout(triggerAnimations, 200);
+					document.dispatchEvent(new CustomEvent('wdp:hydrated', { detail: payload }));
+				})
+				.catch(function (e) {
+					console.warn('[wdp] hydration error:', e.message);
+					applyGuestName(null);
+					triggerAnimations();
+				});
+		})();
+	</script>
 </body>
 
 </html>
