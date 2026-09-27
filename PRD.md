@@ -83,7 +83,7 @@ The current implementation has these concrete problems, observed directly in the
 9. **Wedding hashtag** — a static display of a couple-specific hashtag (e.g. `#TiovanallywithNiko` — note: sample data shows names inconsistent with the main couple, confirming this is templated/reused test content).
 10. **Wedding livestream** — date/time text + (implied) an embedded video link, shown only if provided.
 11. **Wedding gift** — intro text + a modal/section listing one or more bank/e-wallet accounts, each with: account holder name, account number, provider/bank name, and a "Copy Number"/"Copy Text" button (clipboard interaction, client-side only).
-12. **Closing** — closing Islamic phrase ("Wassalamualaikum Wr. Wb"), signature line ("Kami Yang Berbahagia, Kedua Mempelai & Keluarga Besar"), and a footer credit ("Designed By Website Invitation").
+12. **Closing** — closing Islamic phrase ("Wassalamualaikum Wr. Wb"), signature line ("Kami Yang Berbahagia, Kedua Mempelai & Keluarga Besar"), and a footer credit ("Designed By You Are Invited").
 13. **Background music** — a single `<audio>` element, autoplay-on-gesture (tied to the cover screen's "Buka Undangan" click), a mute/unmute toggle, and pause-on-tab-hidden / resume-on-visible behavior.
 14. **Guest-name personalization** — client-side JavaScript reads `?to=`, `?dear=`, or `?kepada=` from the URL query string, HTML-entity-decodes it, and injects it into every element with class `.namatamu`, falling back to "Tamu Undangan" (Generic Guest) if absent.
 
