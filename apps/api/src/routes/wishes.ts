@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db/client.js';
 import * as schema from '../db/schema.js';
-import { eq, and, desc, lt } from 'drizzle-orm';
+import { eq, and, desc, lt, or } from 'drizzle-orm';
 import type { CreateWishInput, Wish } from '@you-are-invited/shared-types';
 
 export const wishesRouter = new Hono();
@@ -14,6 +14,7 @@ wishesRouter.get('/:slug/wishes', (c) => {
   const slug = c.req.param('slug');
   const limit = Math.min(Number(c.req.query('limit')) || 10, 50);
   const cursor = c.req.query('cursor') ? Number(c.req.query('cursor')) : undefined;
+  const cursorId = c.req.query('cursorId') || undefined;
 
   const inv = db
     .select({ id: schema.invitations.id })
@@ -31,11 +32,13 @@ wishesRouter.get('/:slug/wishes', (c) => {
     .where(
       and(
         eq(schema.wishes.invitationId, inv.id),
-        eq(schema.wishes.isHidden, false),
-        cursor ? lt(schema.wishes.createdAt, cursor) : undefined
+        cursor ? or(
+          lt(schema.wishes.createdAt, cursor),
+          cursorId ? and(eq(schema.wishes.createdAt, cursor), lt(schema.wishes.id, cursorId)) : undefined
+        ) : undefined
       )
     )
-    .orderBy(desc(schema.wishes.createdAt))
+    .orderBy(desc(schema.wishes.createdAt), desc(schema.wishes.id))
     .limit(limit);
 
   const rows = query.all();
@@ -50,7 +53,10 @@ wishesRouter.get('/:slug/wishes', (c) => {
     createdAt: w.createdAt,
   }));
 
-  const nextCursor = formatted.length === limit ? formatted[formatted.length - 1].createdAt : null;
+  const nextCursor = formatted.length === limit ? {
+    createdAt: formatted[formatted.length - 1].createdAt,
+    id: formatted[formatted.length - 1].id,
+  } : null;
 
   return c.json({
     data: formatted,

@@ -71,11 +71,11 @@ invitationsRouter.get('/:slug', (c) => {
     templateFieldsRecord[f.fieldKey] = f.fieldValue;
   }
 
-  // Wishes stats
+  // Public wish list and RSVP counters include every stored wish, including hidden rows.
   const allWishes = db
     .select()
     .from(schema.wishes)
-    .where(and(eq(schema.wishes.invitationId, inv.id), eq(schema.wishes.isHidden, false)))
+    .where(eq(schema.wishes.invitationId, inv.id))
     .all();
 
   const wishSummary: WishSummary = {
@@ -85,12 +85,12 @@ invitationsRouter.get('/:slug', (c) => {
     maybe: allWishes.filter((w) => w.attendanceStatus === 'maybe').length,
   };
 
-  // Recent 10 wishes
+  // Recent wishes for initial page; full list uses GET /:slug/wishes with cursors.
   const recentWishes = db
     .select()
     .from(schema.wishes)
-    .where(and(eq(schema.wishes.invitationId, inv.id), eq(schema.wishes.isHidden, false)))
-    .orderBy(desc(schema.wishes.createdAt))
+    .where(eq(schema.wishes.invitationId, inv.id))
+    .orderBy(desc(schema.wishes.createdAt), desc(schema.wishes.id))
     .limit(10)
     .all();
 

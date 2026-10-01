@@ -10,9 +10,17 @@ export async function fetchInvitation(slug: string): Promise<PublicInvitationPay
   return res.json();
 }
 
-export async function fetchWishes(slug: string, cursor?: number, limit = 10): Promise<{ data: Wish[]; nextCursor: number | null }> {
+export interface WishCursor {
+  createdAt: number;
+  id: string;
+}
+
+export async function fetchWishes(slug: string, cursor?: WishCursor, limit = 10): Promise<{ data: Wish[]; nextCursor: WishCursor | null }> {
   const url = new URL(`${API_BASE}/invitations/${slug}/wishes`, window.location.origin);
-  if (cursor) url.searchParams.set('cursor', String(cursor));
+  if (cursor) {
+    url.searchParams.set('cursor', String(cursor.createdAt));
+    url.searchParams.set('cursorId', cursor.id);
+  }
   url.searchParams.set('limit', String(limit));
 
   const res = await fetch(url.toString());
