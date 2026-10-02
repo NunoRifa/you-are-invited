@@ -22,7 +22,7 @@ window.settingAutoplay = true;
       </script>
       <meta charset="UTF-8" />
       <title>You Are Invited Premium</title>
-      <style>
+      <style id="raden-mobile-fixes">
          #wpadminbar #wp-admin-bar-wccp_free_top_button .ab-icon:before {
             content: "\f160";
             color: #02ca02;
@@ -31,6 +31,31 @@ window.settingAutoplay = true;
 
          #wpadminbar #wp-admin-bar-wccp_free_top_button .ab-icon {
             transform: rotate(45deg);
+         }
+
+         /* Ensure maps buttons have top stacking context and can be clicked on mobile */
+         .elementor-element-2f59679,
+         .elementor-element-36a639a,
+         .elementor-widget-button {
+            position: relative !important;
+            z-index: 99 !important;
+            pointer-events: auto !important;
+         }
+         .elementor-element-2f59679 a,
+         .elementor-element-36a639a a,
+         .elementor-widget-button a {
+            position: relative !important;
+            z-index: 100 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.2) !important;
+         }
+         /* Ensure overlapping flower decorations do not intercept touch/click hits */
+         .elementor-element-2a22411,
+         .elementor-element-fd94e87,
+         .elementor-element-2a22411 *,
+         .elementor-element-fd94e87 * {
+            pointer-events: none !important;
          }
       </style>
       <style type="text/css">
@@ -1539,59 +1564,7 @@ window.settingAutoplay = true;
             pointer-events: auto !important;
          }
       </style>
-      <script>
-         (function(){function stop(e){e.preventDefault();e.stopPropagation();return!1}
-         document.addEventListener('contextmenu',e=>stop(e),!0);document.addEventListener('selectstart',e=>stop(e),!0);document.addEventListener('dragstart',e=>stop(e),!0);document.addEventListener('keydown',e=>{let k=(e.key||'').toLowerCase(),ctrl=e.ctrlKey||e.metaKey,shift=e.shiftKey;let devtools=(e.keyCode===123)||(ctrl&&shift&&(k==='i'||k==='c'||k==='j'))||(ctrl&&k==='u');let forbidden=(ctrl&&(k==='c'||k==='x'||k==='a'||k==='s'));if(devtools||forbidden)stop(e);},!0)})()
-      </script>
-      <script id="wpcp_disable_selection">
-         var image_save_msg='You are not allowed to save images!';var no_menu_msg='Context Menu disabled!';var smessage="";function disableEnterKey(e){var elemtype=e.target.tagName;elemtype=elemtype.toUpperCase();if(elemtype=="TEXT"||elemtype=="TEXTAREA"||elemtype=="INPUT"||elemtype=="PASSWORD"||elemtype=="SELECT"||elemtype=="OPTION"||elemtype=="EMBED"){elemtype='TEXT'}
-         if(e.ctrlKey){var key;if(window.event)
-         key=window.event.keyCode;else key=e.which;if(elemtype!='TEXT'&&(key==97||key==65||key==67||key==99||key==88||key==120||key==26||key==85||key==86||key==83||key==43||key==73)){if(wccp_free_iscontenteditable(e))return!0;show_wpcp_message('You are not allowed to copy content or view source');return!1}else return!0}}
-         function wccp_free_iscontenteditable(e){var e=e||window.event;var target=e.target||e.srcElement;var elemtype=e.target.nodeName;elemtype=elemtype.toUpperCase();var iscontenteditable="false";if(typeof target.getAttribute!="undefined")iscontenteditable=target.getAttribute("contenteditable");var iscontenteditable2=!1;if(typeof target.isContentEditable!="undefined")iscontenteditable2=target.isContentEditable;if(target.parentElement.isContentEditable)iscontenteditable2=!0;if(iscontenteditable=="true"||iscontenteditable2==!0){if(typeof target.style!="undefined")target.style.cursor="text";return!0}}
-         function disable_copy(e){var e=e||window.event;var elemtype=e.target.tagName;elemtype=elemtype.toUpperCase();if(elemtype=="TEXT"||elemtype=="TEXTAREA"||elemtype=="INPUT"||elemtype=="PASSWORD"||elemtype=="SELECT"||elemtype=="OPTION"||elemtype=="EMBED"){elemtype='TEXT'}
-         if(wccp_free_iscontenteditable(e))return!0;var isSafari=/Safari/.test(navigator.userAgent)&&/Apple Computer/.test(navigator.vendor);var checker_IMG='';if(elemtype=="IMG"&&checker_IMG=='checked'&&e.detail>=2){show_wpcp_message(alertMsg_IMG);return!1}
-         if(elemtype!="TEXT"){if(smessage!==""&&e.detail==2)
-         show_wpcp_message(smessage);if(isSafari)
-         return!0;else return!1}}
-         function disable_copy_ie(){var e=e||window.event;var elemtype=window.event.srcElement.nodeName;elemtype=elemtype.toUpperCase();if(wccp_free_iscontenteditable(e))return!0;if(elemtype=="IMG"){show_wpcp_message(alertMsg_IMG);return!1}
-         if(elemtype!="TEXT"&&elemtype!="TEXTAREA"&&elemtype!="INPUT"&&elemtype!="PASSWORD"&&elemtype!="SELECT"&&elemtype!="OPTION"&&elemtype!="EMBED"){return!1}}
-         function reEnable(){return!0}
-         document.onkeydown=disableEnterKey;document.onselectstart=disable_copy_ie;if(navigator.userAgent.indexOf('MSIE')==-1){document.onmousedown=disable_copy;document.onclick=reEnable}
-         function disableSelection(target){if(typeof target.onselectstart!="undefined")
-         target.onselectstart=disable_copy_ie;else if(typeof target.style.MozUserSelect!="undefined"){target.style.MozUserSelect="none"}else target.onmousedown=function(){return!1}
-         target.style.cursor="default"}
-         window.onload=function(){disableSelection(document.body)};var onlongtouch;var timer;var touchduration=1000;var elemtype="";function touchstart(e){var e=e||window.event;var target=e.target||e.srcElement;elemtype=window.event.srcElement.nodeName;elemtype=elemtype.toUpperCase();if(!wccp_pro_is_passive())e.preventDefault();if(!timer){timer=setTimeout(onlongtouch,touchduration)}}
-         function touchend(){if(timer){clearTimeout(timer);timer=null}
-         onlongtouch()}
-         onlongtouch=function(e){if(elemtype!="TEXT"&&elemtype!="TEXTAREA"&&elemtype!="INPUT"&&elemtype!="PASSWORD"&&elemtype!="SELECT"&&elemtype!="EMBED"&&elemtype!="OPTION"){if(window.getSelection){if(window.getSelection().empty){window.getSelection().empty()}else if(window.getSelection().removeAllRanges){window.getSelection().removeAllRanges()}}else if(document.selection){document.selection.empty()}
-         return!1}};document.addEventListener("DOMContentLiteSpeedLoaded",function(event){window.addEventListener("touchstart",touchstart,!1);window.addEventListener("touchend",touchend,!1)});function wccp_pro_is_passive(){var cold=!1,hike=function(){};try{const object1={};var aid=Object.defineProperty(object1,'passive',{get(){cold=!0}});window.addEventListener('test',hike,aid);window.removeEventListener('test',hike,aid)}catch(e){}
-         return cold}
-      </script>
-      <script id="wpcp_disable_Right_Click">
-         document.ondragstart=function(){return!1}
-         function nocontext(e){return!1}
-         document.oncontextmenu=nocontext
-      </script>
-      <style>
-         .unselectable {
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            cursor: default;
-         }
-
-         html {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-         }
-      </style>
-      <script id="wpcp_css_disable_selection">
-         var e=document.getElementsByTagName('body')[0];if(e){e.setAttribute('unselectable',"on")}
-      </script>
+      <!-- Legacy WordPress WPCP (copy-protector) removed to ensure responsive touch & copy in multi-device -->
       <script>
          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296598390029657');fbq('track','PageView');fbq('track','ViewContent')
       </script>
@@ -1739,7 +1712,7 @@ window.settingAutoplay = true;
    </head>
 
    <body
-      class="wp-singular post-template post-template-elementor_canvas single single-post postid-62777 single-format-standard wp-custom-logo wp-embed-responsive wp-theme-hello-elementor unselectable hello-elementor-default elementor-default elementor-template-canvas elementor-kit-12 elementor-page elementor-page-62777"
+      class="wp-singular post-template post-template-elementor_canvas single single-post postid-62777 single-format-standard wp-custom-logo wp-embed-responsive wp-theme-hello-elementor hello-elementor-default elementor-default elementor-template-canvas elementor-kit-12 elementor-page elementor-page-62777"
    >
       <div
          data-elementor-type="wp-post"
@@ -2614,8 +2587,6 @@ window.settingAutoplay = true;
                                           <a
                                              class="elementor-button elementor-button-link elementor-size-sm"
                                              href="https://goo.gl/maps/U9535fiQM1onqWqa6"
-                                             target="_blank"
-                                             rel="noopener noreferrer"
                                           >
                                              <span
                                                 class="elementor-button-content-wrapper"
@@ -2832,8 +2803,6 @@ window.settingAutoplay = true;
                                           <a
                                              class="elementor-button elementor-button-link elementor-size-sm"
                                              href="https://goo.gl/maps/U9535fiQM1onqWqa6"
-                                             target="_blank"
-                                             rel="noopener noreferrer"
                                           >
                                              <span
                                                 class="elementor-button-content-wrapper"
@@ -5414,61 +5383,7 @@ window.settingAutoplay = true;
             ]
          }
       </script>
-      <div id="wpcp-error-message" class="msgmsg-box-wpcp hideme">
-         <span>error: </span>
-      </div>
-      <script>
-         var timeout_result;function show_wpcp_message(smessage){if(smessage!==""){var smessage_text='<span>Alert: </span>'+smessage;document.getElementById("wpcp-error-message").innerHTML=smessage_text;document.getElementById("wpcp-error-message").className="msgmsg-box-wpcp warning-wpcp showme";clearTimeout(timeout_result);timeout_result=setTimeout(hide_message,3000)}}
-         function hide_message(){document.getElementById("wpcp-error-message").className="msgmsg-box-wpcp warning-wpcp hideme"}
-      </script>
-      <style type="text/css">
-         #wpcp-error-message {
-            direction: ltr;
-            text-align: center;
-            transition: opacity 900ms ease 0s;
-            z-index: 99999999;
-         }
-
-         .hideme {
-            opacity: 0;
-            visibility: hidden;
-         }
-
-         .showme {
-            opacity: 1;
-            visibility: visible;
-         }
-
-         .msgmsg-box-wpcp {
-            border: 1px solid #f5aca6;
-            border-radius: 10px;
-            color: #555;
-            font-family: Tahoma;
-            font-size: 11px;
-            margin: 10px;
-            padding: 10px 36px;
-            position: fixed;
-            width: 255px;
-            top: 50%;
-            left: 50%;
-            margin-top: -10px;
-            margin-left: -130px;
-            -webkit-box-shadow: 0px 0px 34px 2px rgba(242, 191, 191, 1);
-            -moz-box-shadow: 0px 0px 34px 2px rgba(242, 191, 191, 1);
-            box-shadow: 0px 0px 34px 2px rgba(242, 191, 191, 1);
-         }
-
-         .msgmsg-box-wpcp span {
-            font-weight: bold;
-            text-transform: uppercase;
-         }
-
-         .warning-wpcp {
-            background: #ffecec
-               url("/template-assets/webinvite.id/wp-content/plugins/wp-content-copy-protector/images/warning.png")
-               no-repeat 10px 50%;
-         }
-      </style>
+      <!-- Legacy WPCP error message container removed -->
       <script type="application/ld+json" id="slim-seo-schema">
          {
             "@context": "https://schema.org",
@@ -6677,6 +6592,25 @@ window.settingAutoplay = true;
         return url;
       }
 
+      function setupMapsButton(btnSelector, mapsUrl, venueName, venueAddress) {
+        var widget = document.querySelector(btnSelector);
+        if (!widget) return;
+        var a = widget.querySelector('a');
+        if (!a) return;
+
+        var finalUrl = formatMapsUrl(mapsUrl, venueName, venueAddress);
+        a.setAttribute('href', finalUrl);
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+
+        // Explicit click handler to guarantee opening across all mobile browsers and in-app webviews
+        a.onclick = function(e) {
+          e.stopPropagation();
+          window.open(finalUrl, '_blank');
+          return false;
+        };
+      }
+
       // Event 1 (Akad)
       if (events[0]) {
         var ev0Info = formatIndoDate(events[0].date);
@@ -6685,13 +6619,7 @@ window.settingAutoplay = true;
         text('[data-id="c8e6e2a"] .elementor-heading-title', ev0Info.dateFormatted);
         text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
         text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
-        var mapsA0 = document.querySelector('[data-id="2f59679"] a');
-        if (mapsA0) {
-          var finalUrl0 = formatMapsUrl(events[0].mapsUrl, events[0].venueName, events[0].venueAddress);
-          mapsA0.setAttribute('href', finalUrl0);
-          mapsA0.setAttribute('target', '_blank');
-          mapsA0.setAttribute('rel', 'noopener noreferrer');
-        }
+        setupMapsButton('[data-id="2f59679"]', events[0].mapsUrl, events[0].venueName, events[0].venueAddress);
       }
 
       // Event 2 (Resepsi)
@@ -6702,13 +6630,7 @@ window.settingAutoplay = true;
         text('[data-id="18b08f3"] .elementor-heading-title', ev1Info.dateFormatted);
         text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
         text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
-        var mapsA1 = document.querySelector('[data-id="36a639a"] a');
-        if (mapsA1) {
-          var finalUrl1 = formatMapsUrl(events[1].mapsUrl, events[1].venueName, events[1].venueAddress);
-          mapsA1.setAttribute('href', finalUrl1);
-          mapsA1.setAttribute('target', '_blank');
-          mapsA1.setAttribute('rel', 'noopener noreferrer');
-        }
+        setupMapsButton('[data-id="36a639a"]', events[1].mapsUrl, events[1].venueName, events[1].venueAddress);
       }
 
       // Wedding Live Hydration (Q3)

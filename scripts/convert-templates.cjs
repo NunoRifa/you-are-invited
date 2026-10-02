@@ -43,8 +43,29 @@ function neutralizeWordPress(html) {
   // Unhide comment section so guests see RSVP and comments
   out = out.replace(
     /(id=['"]cui-wrap-commnent-[^'"]*['"][^>]*style=['"][^'"]*?)display:\s*none;?/gi,
-    '$1display:block;'
+    '$1display:block !important;'
   );
+  out = out.replace(/class="cui-link cui-icon-link cui-icon-link-true auto-load-true"/gi, 'class="cui-link cui-icon-link cui-icon-link-true"');
+  out = out.replace(/<div id="cui-box" class="cui-box">/gi, '<div id="cui-box" class="cui-box" style="display: block !important; max-height: 30vh; overflow-y: auto;">');
+  out = out.replace(/<ul\s+id="cui-container-comment-[^"]*"/gi, '$& style="display: block !important;"');
+
+  // Strip legacy WordPress WPCP (copy-protector) scripts & styles that break mobile touch, copy & click
+  out = out.replace(/<script id="wpcp_disable_selection">[\s\S]*?<\/script>/gi, '');
+  out = out.replace(/<script id="wpcp_disable_Right_Click">[\s\S]*?<\/script>/gi, '');
+  out = out.replace(/<script id="wpcp_css_disable_selection">[\s\S]*?<\/script>/gi, '');
+  out = out.replace(/<script>\s*\(function\(\)\{function stop\(e\)\{e\.preventDefault\(\);[\s\S]*?<\/script>/gi, '');
+  out = out.replace(/<style>\s*\.unselectable\s*\{[\s\S]*?<\/style>/gi, '');
+  out = out.replace(/<div id="wpcp-error-message"[\s\S]*?<\/style>/gi, '');
+  out = out.replace(/\bunselectable\b/g, '');
+  out = out.replace(/var litespeed_vary\s*=\s*document\.cookie[\s\S]*?guest\.vary\.php[\s\S]*?<\/script>/gi, '');
+
+  // Rebrand product name: Website Invitation -> You Are Invited
+  out = out.replace(/<title>Website Invitation Premium<\/title>/gi, '<title>You Are Invited Premium</title>');
+  out = out.replace(/content="Website Invitation Premium"/gi, 'content="You Are Invited Premium"');
+  out = out.replace(/"name":\s*"Website Invitation Premium"/gi, '"name": "You Are Invited Premium"');
+  out = out.replace(/Website\.Invitation/g, 'You.Are.Invited');
+  out = out.replace(/Designed By Website Invitation/g, 'Designed By You Are Invited');
+
   return out;
 }
 

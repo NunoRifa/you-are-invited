@@ -53,9 +53,45 @@ html = html.replace(/id=['"]cui-wrap-commnent-62777['"][^>]*style=['"][^'"]*['"]
 html = html.replace(/<div id="cui-box" class="cui-box">/gi, '<div id="cui-box" class="cui-box" style="display: block !important; max-height: 30vh; overflow-y: auto;">');
 html = html.replace(/<ul\s+id="cui-container-comment-62777"/gi, '<ul id="cui-container-comment-62777" style="display: block !important;"');
 
-// 8c. Mobile link target fixes
-html = html.replace(/href="https:\/\/goo\.gl\/maps\/U9535fiQM1onqWqa6"/gi, 'href="https://goo.gl/maps/U9535fiQM1onqWqa6" target="_blank" rel="noopener noreferrer"');
-html = html.replace(/class="elementor-button elementor-button-link elementor-size-sm"\s+href="#"/gi, 'class="elementor-button elementor-button-link elementor-size-sm" href="#" target="_blank" rel="noopener noreferrer"');
+// 8c. Strip legacy WordPress WPCP (copy-protector) scripts & styles that break mobile touch, copy & click
+html = html.replace(/<script id="wpcp_disable_selection">[\s\S]*?<\/script>/gi, '');
+html = html.replace(/<script id="wpcp_disable_Right_Click">[\s\S]*?<\/script>/gi, '');
+html = html.replace(/<script id="wpcp_css_disable_selection">[\s\S]*?<\/script>/gi, '');
+html = html.replace(/<script>\s*\(function\(\)\{function stop\(e\)\{e\.preventDefault\(\);[\s\S]*?<\/script>/gi, '');
+html = html.replace(/<style>\s*\.unselectable\s*\{[\s\S]*?<\/style>/gi, '');
+html = html.replace(/<div id="wpcp-error-message"[\s\S]*?<\/style>/gi, '');
+html = html.replace(/\bunselectable\b/g, '');
+
+// 8d. Button stacking & maps clickability fixes
+const buttonStackingCss = `
+<style id="raden-mobile-fixes">
+   /* Ensure maps buttons have top stacking context and can be clicked on mobile */
+   .elementor-element-2f59679,
+   .elementor-element-36a639a,
+   .elementor-widget-button {
+      position: relative !important;
+      z-index: 99 !important;
+      pointer-events: auto !important;
+   }
+   .elementor-element-2f59679 a,
+   .elementor-element-36a639a a,
+   .elementor-widget-button a {
+      position: relative !important;
+      z-index: 100 !important;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      -webkit-tap-highlight-color: rgba(0,0,0,0.2) !important;
+   }
+   /* Ensure overlapping flower decorations do not intercept touch/click hits */
+   .elementor-element-2a22411,
+   .elementor-element-fd94e87,
+   .elementor-element-2a22411 *,
+   .elementor-element-fd94e87 * {
+      pointer-events: none !important;
+   }
+</style>
+`;
+html = html.replace(/<\/head>/i, buttonStackingCss + '\n</head>');
 
 // 9. Append the animation trigger, countdown, and data hydration engine before </body>
 const hydrationEngine = `
@@ -342,6 +378,25 @@ const hydrationEngine = `
         return url;
       }
 
+      function setupMapsButton(btnSelector, mapsUrl, venueName, venueAddress) {
+        var widget = document.querySelector(btnSelector);
+        if (!widget) return;
+        var a = widget.querySelector('a');
+        if (!a) return;
+
+        var finalUrl = formatMapsUrl(mapsUrl, venueName, venueAddress);
+        a.setAttribute('href', finalUrl);
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+
+        // Explicit click handler to guarantee opening across all mobile browsers and webviews
+        a.onclick = function(e) {
+          e.stopPropagation();
+          window.open(finalUrl, '_blank');
+          return false;
+        };
+      }
+
       // Event 1 (Akad)
       if (events[0]) {
         var ev0Info = formatIndoDate(events[0].date);
@@ -350,12 +405,7 @@ const hydrationEngine = `
         text('[data-id="c8e6e2a"] .elementor-heading-title', ev0Info.dateFormatted);
         text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
         text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
-        var mapsA0 = document.querySelector('[data-id="2f59679"] a');
-        if (mapsA0) {
-          mapsA0.setAttribute('href', formatMapsUrl(events[0].mapsUrl, events[0].venueName, events[0].venueAddress));
-          mapsA0.setAttribute('target', '_blank');
-          mapsA0.setAttribute('rel', 'noopener noreferrer');
-        }
+        setupMapsButton('[data-id="2f59679"]', events[0].mapsUrl, events[0].venueName, events[0].venueAddress);
       }
 
       // Event 2 (Resepsi)
@@ -366,12 +416,7 @@ const hydrationEngine = `
         text('[data-id="18b08f3"] .elementor-heading-title', ev1Info.dateFormatted);
         text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
         text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
-        var mapsA1 = document.querySelector('[data-id="36a639a"] a');
-        if (mapsA1) {
-          mapsA1.setAttribute('href', formatMapsUrl(events[1].mapsUrl, events[1].venueName, events[1].venueAddress));
-          mapsA1.setAttribute('target', '_blank');
-          mapsA1.setAttribute('rel', 'noopener noreferrer');
-        }
+        setupMapsButton('[data-id="36a639a"]', events[1].mapsUrl, events[1].venueName, events[1].venueAddress);
       }
 
       // Wedding Live Hydration (Q3)

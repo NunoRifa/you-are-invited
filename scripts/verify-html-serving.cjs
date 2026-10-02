@@ -13,6 +13,9 @@ http.get('http://localhost:5173/i/raden-motion?to=Budi+Santoso', (res) => {
     console.log('Contains copyTextToClipboard:', data.includes('copyTextToClipboard'));
     console.log('Contains formatMapsUrl:', data.includes('formatMapsUrl'));
     console.log('Contains Wedding Live Hydration:', data.includes('Wedding Live Hydration'));
+    console.log('Contains setupMapsButton:', data.includes('setupMapsButton'));
+    console.log('Contains raden-mobile-fixes:', data.includes('raden-mobile-fixes'));
+    console.log('Contains pointer-events none on flower image:', data.includes('.elementor-element-2a22411 *'));
     console.log('Target blank count in HTML:', (data.match(/target="_blank"/g) || []).length);
 
     // Check where cui-container-comment-62777 is located relative to form
