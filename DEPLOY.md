@@ -258,25 +258,35 @@ Agar undangan pernikahan terlihat profesional (menggunakan nama domain sendiri d
 
 ---
 
-### Metode B: Mengarahkan DNS Biasa (A Record) + Let's Encrypt Certbot
-Jika Anda tidak menggunakan Cloudflare:
+### Metode B: Mengarahkan DNS (A Record) + Let's Encrypt Certbot + Cloudflare Full SSL
 
-1. Di panel DNS domain Anda (di DomaiNesia), buat **A Record**:
-   - Host: `@` (atau subdomain misal `undangan`)
-   - Target / IP: `<IP_VPS_ANDA>`
+1. Di panel DNS Cloudflare atau DomaiNesia, arahkan **A Record** `@` dan `www` ke `<IP_VPS_ANDA>`.
 2. Pasang Certbot di Ubuntu VPS:
    ```bash
-   sudo apt install -y certbot python3-certbot-nginx
+   sudo apt install -y certbot
    ```
-3. Hentikan sementara container web agar port 80 bebas untuk verifikasi:
+3. Hentikan sementara container web agar port 80 bebas untuk verifikasi sertifikat:
    ```bash
+   cd /var/www/you-are-invited
    docker compose stop web
    ```
-4. Dapatkan sertifikat SSL:
+4. Dapatkan sertifikat SSL menggunakan mode standalone:
    ```bash
-   sudo certbot certonly --standalone -d domainanda.com -d www.domainanda.com
+   sudo certbot certonly --standalone -d you-are-invited.my.id -d www.you-are-invited.my.id
    ```
-5. Sertifikat akan tersimpan di `/etc/letsencrypt/live/domainanda.com/`. Pasang sertifikat ini ke dalam konfigurasi Nginx container atau buat reverse proxy Nginx di host VPS.
+   *(Sertifikat akan tersimpan di `/etc/letsencrypt/live/you-are-invited.my.id/`)*.
+5. Konfigurasi `docker-compose.yml` telah dipasang volume mount `/etc/letsencrypt:/etc/letsencrypt:ro` dan port `443:443`.
+6. Konfigurasi `docker/nginx.conf` telah disetel untuk `listen 80;` dan `listen 443 ssl;` dengan SSL Let's Encrypt.
+7. Di dashboard Cloudflare: Buka menu **SSL/TLS** -> pilih mode **Full** atau **Full (Strict)**.
+8. Buka port 443 di firewall UFW VPS jika aktif:
+   ```bash
+   sudo ufw allow 443/tcp
+   sudo ufw allow 80/tcp
+   ```
+9. Jalankan kembali container dengan konfigurasi baru:
+   ```bash
+   docker compose up -d --build
+   ```
 
 ---
 
