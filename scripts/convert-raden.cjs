@@ -53,6 +53,10 @@ html = html.replace(/id=['"]cui-wrap-commnent-62777['"][^>]*style=['"][^'"]*['"]
 html = html.replace(/<div id="cui-box" class="cui-box">/gi, '<div id="cui-box" class="cui-box" style="display: block !important; max-height: 30vh; overflow-y: auto;">');
 html = html.replace(/<ul\s+id="cui-container-comment-62777"/gi, '<ul id="cui-container-comment-62777" style="display: block !important;"');
 
+// 8c. Mobile link target fixes
+html = html.replace(/href="https:\/\/goo\.gl\/maps\/U9535fiQM1onqWqa6"/gi, 'href="https://goo.gl/maps/U9535fiQM1onqWqa6" target="_blank" rel="noopener noreferrer"');
+html = html.replace(/class="elementor-button elementor-button-link elementor-size-sm"\s+href="#"/gi, 'class="elementor-button elementor-button-link elementor-size-sm" href="#" target="_blank" rel="noopener noreferrer"');
+
 // 9. Append the animation trigger, countdown, and data hydration engine before </body>
 const hydrationEngine = `
 <script id="raden-engine">
@@ -164,6 +168,86 @@ const hydrationEngine = `
     }
   });
 
+  // Universal Robust Copy Handler for Multi-Device (iOS Safari, Android, Desktop)
+  function copyTextToClipboard(text) {
+    if (!text) return Promise.resolve(false);
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(function() {
+        return true;
+      }).catch(function() {
+        return fallbackCopy(text);
+      });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+
+  function fallbackCopy(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute('readonly', '');
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+    textArea.style.opacity = "0.01";
+    textArea.style.zIndex = "-9999";
+    document.body.appendChild(textArea);
+
+    var isiOS = navigator.userAgent.match(/ipad|ipod|iphone/i);
+    if (isiOS) {
+      var range = document.createRange();
+      range.selectNodeContents(textArea);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      textArea.setSelectionRange(0, 999999);
+    } else {
+      textArea.focus();
+      textArea.select();
+    }
+
+    var success = false;
+    try {
+      success = document.execCommand('copy');
+    } catch (err) {
+      success = false;
+    }
+    document.body.removeChild(textArea);
+    return success;
+  }
+
+  // Intercept all copy button clicks with useCapture=true so vendor jQuery doesn't interfere
+  document.addEventListener('click', function(e) {
+    var btn = e.target && e.target.closest('.wdp-copy-btn, [data-clipboard-text]');
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    var textToCopy = btn.getAttribute('data-clipboard-text') || '';
+    if (!textToCopy) {
+      var siblingCopy = btn.parentElement && btn.parentElement.querySelector('.copy-content');
+      if (siblingCopy) textToCopy = siblingCopy.textContent.trim();
+    }
+    if (!textToCopy) return;
+
+    var textEl = btn.querySelector('.elementor-button-text') || btn;
+    var origText = textEl.textContent;
+
+    copyTextToClipboard(textToCopy).then(function() {
+      textEl.textContent = '✓ Berhasil Disalin';
+      setTimeout(function() {
+        textEl.textContent = origText;
+      }, 2000);
+    });
+  }, true);
+
   // Helper date formatter in Indonesian
   function formatIndoDate(dateStr) {
     if (!dateStr) return { dayName: '', dateFormatted: '' };
@@ -251,6 +335,13 @@ const hydrationEngine = `
         attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
       }
 
+      function formatMapsUrl(url, venueName, venueAddress) {
+        if (!url || url === '#' || url.indexOf('goo.gl/maps') !== -1) {
+          return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venueName || '') + ' ' + (venueAddress || ''));
+        }
+        return url;
+      }
+
       // Event 1 (Akad)
       if (events[0]) {
         var ev0Info = formatIndoDate(events[0].date);
@@ -259,7 +350,12 @@ const hydrationEngine = `
         text('[data-id="c8e6e2a"] .elementor-heading-title', ev0Info.dateFormatted);
         text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
         text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
-        if (events[0].mapsUrl) attr('[data-id="2f59679"] a', 'href', events[0].mapsUrl);
+        var mapsA0 = document.querySelector('[data-id="2f59679"] a');
+        if (mapsA0) {
+          mapsA0.setAttribute('href', formatMapsUrl(events[0].mapsUrl, events[0].venueName, events[0].venueAddress));
+          mapsA0.setAttribute('target', '_blank');
+          mapsA0.setAttribute('rel', 'noopener noreferrer');
+        }
       }
 
       // Event 2 (Resepsi)
@@ -270,7 +366,28 @@ const hydrationEngine = `
         text('[data-id="18b08f3"] .elementor-heading-title', ev1Info.dateFormatted);
         text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
         text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
-        if (events[1].mapsUrl) attr('[data-id="36a639a"] a', 'href', events[1].mapsUrl);
+        var mapsA1 = document.querySelector('[data-id="36a639a"] a');
+        if (mapsA1) {
+          mapsA1.setAttribute('href', formatMapsUrl(events[1].mapsUrl, events[1].venueName, events[1].venueAddress));
+          mapsA1.setAttribute('target', '_blank');
+          mapsA1.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+
+      // Wedding Live Hydration (Q3)
+      var liveInfo = payload.livestream;
+      if (liveInfo && liveInfo.streamUrl) {
+        var liveBtn = document.querySelector('[data-id="9f515aa"] a');
+        if (liveBtn) {
+          liveBtn.setAttribute('href', liveInfo.streamUrl);
+          liveBtn.setAttribute('target', '_blank');
+          liveBtn.setAttribute('rel', 'noopener noreferrer');
+        }
+        if (liveInfo.date || liveInfo.timeLabel) {
+          var liveDateFormatted = liveInfo.date ? formatIndoDate(liveInfo.date).dateFormatted : '';
+          var timeTxt = (liveDateFormatted ? 'Hari/Tanggal : ' + liveDateFormatted + ' ' : '') + (liveInfo.timeLabel ? 'Jam : ' + liveInfo.timeLabel : '');
+          text('[data-id="f039c78"] p', timeTxt);
+        }
       }
 
       // Story Timeline Hydration (Q3: Sinkron data cerita dari database)
@@ -306,6 +423,8 @@ const hydrationEngine = `
             el.setAttribute('data-clipboard-text', inv.hashtag);
             var txt = el.querySelector('.elementor-button-text');
             if (txt) txt.textContent = inv.hashtag;
+            var sibling = el.parentElement && el.parentElement.querySelector('.copy-content');
+            if (sibling) sibling.textContent = inv.hashtag;
           }
         });
       }
@@ -315,11 +434,15 @@ const hydrationEngine = `
         text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
         text('[data-id="b60bdab"] p', gifts[0].accountNumber);
         attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
+        var copyDiv0 = document.querySelector('[data-id="e945266"] .copy-content');
+        if (copyDiv0) copyDiv0.textContent = gifts[0].accountNumber;
       }
       if (gifts[1]) {
         text('[data-id="b9b1608"] .elementor-heading-title', 'An. ' + gifts[1].holderName);
         text('[data-id="31757a0"] p', gifts[1].accountNumber);
         attr('[data-id="1303ef3"] [data-clipboard-text]', 'data-clipboard-text', gifts[1].accountNumber);
+        var copyDiv1 = document.querySelector('[data-id="1303ef3"] .copy-content');
+        if (copyDiv1) copyDiv1.textContent = gifts[1].accountNumber;
       }
 
       // Closing

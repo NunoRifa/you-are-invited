@@ -29,6 +29,7 @@ async function test() {
     console.log('\nGET /api/invitations/raden-motion status:', invRes.status);
     console.log('Wish summary in payload:', JSON.stringify(invRes.body?.wishSummary, null, 2));
     console.log('Wishes in payload:', invRes.body?.wishes?.length);
+    console.log('Livestream in payload:', JSON.stringify(invRes.body?.livestream, null, 2));
   } catch (err) {
     console.error('API check error:', err.message);
   }

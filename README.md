@@ -120,3 +120,39 @@ Frontend berjalan di `http://localhost:5173`.
 
 > **Jangan** mengedit file di `public/templates/{slug}/` secara manual — file itu akan
 > ditimpa oleh `convert-templates.cjs` pada konversi berikutnya.
+
+---
+
+## ⚙️ Lokasi Pengaturan Fitur & Konten Undangan
+
+### 1. Pengaturan Link "Wedding Live"
+Link siaran virtual (YouTube Live, Instagram Live, Zoom, dll.) disimpan di tabel database `livestream_info`. Anda dapat mengaturnya melalui:
+- **File Seeder Database:** `apps/api/src/db/seed/templates.ts` pada baris `schema.livestreamInfo`:
+  ```typescript
+  streamUrl: 'https://instagram.com/raden.bagus', // atau https://youtube.com/live/xxx
+  date: '2026-12-20',
+  timeLabel: 'Start 08.00 WIB'
+  ```
+- **API Endpoint Admin:**
+  `PATCH /api/admin/invitations/:id/livestream`
+  Payload JSON:
+  ```json
+  {
+    "streamUrl": "https://youtube.com/live/kode-live-anda",
+    "date": "2026-12-20",
+    "timeLabel": "Start 08.00 WIB"
+  }
+  ```
+- Tombol "Wedding Live" otomatis terhubung ke link tersebut dan membuka tab baru (`target="_blank" rel="noopener noreferrer"`).
+
+### 2. Pengaturan Link "Lihat Lokasi" (Google Maps)
+Link rute lokasi acara tersimpan di tabel `events` kolom `maps_url`.
+- **Format Rekomendasi:** Gunakan Google Maps Universal Link agar otomatis memicu aplikasi Google Maps di smartphone (Android/iOS):
+  `https://www.google.com/maps/search/?api=1&query=NAMA_TEMPAT+ALAMAT`
+- Tombol "Lihat Lokasi" otomatis dipasangi atribut `target="_blank"` dan `rel="noopener noreferrer"`.
+
+### 3. Pengaturan Rekening Kado (Wedding Gift)
+Disimpan di tabel `gift_accounts` pada database. Tombol "Salin Nomor" secara otomatis menyalin nomor rekening ke clipboard pada seluruh perangkat (desktop, Android, iOS Safari).
+
+### 4. Pengaturan Wedding Hashtag
+Disimpan di tabel `invitations` kolom `hashtag`. Tombol hashtag secara otomatis menyalin teks hashtag ke clipboard saat diklik.

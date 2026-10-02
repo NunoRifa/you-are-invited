@@ -183,6 +183,23 @@ export async function seedTemplates() {
     console.log(`- Seeded invitation: ${radenSlug}`);
   }
 
+  // Ensure Livestream Info for Raden Motion
+  const radenInv = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'raden-motion')).get();
+  if (radenInv) {
+    const existingLs = db.select().from(schema.livestreamInfo).where(eq(schema.livestreamInfo.invitationId, radenInv.id)).get();
+    if (!existingLs) {
+      db.insert(schema.livestreamInfo).values({
+        id: 'ls-raden',
+        invitationId: radenInv.id,
+        label: 'Wedding Live',
+        date: '2026-12-20',
+        timeLabel: 'Start 08.00 WIB',
+        streamUrl: 'https://instagram.com/raden.bagus',
+      }).run();
+      console.log(`- Seeded livestream for raden-motion`);
+    }
+  }
+
   // 2. Betawi Motion Demo
   const betawiSlug = 'betawi-motion';
   const existingBetawi = db.select().from(schema.invitations).where(eq(schema.invitations.slug, betawiSlug)).get();
@@ -383,6 +400,40 @@ export async function seedTemplates() {
     ]).run();
 
     console.log(`- Seeded invitation: ${arjunaSlug}`);
+  }
+
+  // Ensure Livestream Info for Betawi Motion
+  const betawiInv = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'betawi-motion')).get();
+  if (betawiInv) {
+    const existingLs = db.select().from(schema.livestreamInfo).where(eq(schema.livestreamInfo.invitationId, betawiInv.id)).get();
+    if (!existingLs) {
+      db.insert(schema.livestreamInfo).values({
+        id: 'ls-betawi',
+        invitationId: betawiInv.id,
+        label: 'Wedding Live',
+        date: '2026-11-15',
+        timeLabel: 'Start 09.00 WIB',
+        streamUrl: 'https://instagram.com/ali_betawi',
+      }).run();
+      console.log(`- Seeded livestream for betawi-motion`);
+    }
+  }
+
+  // Ensure Livestream Info for Arjuna Tema Foto
+  const arjunaInv = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'arjuna-tema-foto')).get();
+  if (arjunaInv) {
+    const existingLs = db.select().from(schema.livestreamInfo).where(eq(schema.livestreamInfo.invitationId, arjunaInv.id)).get();
+    if (!existingLs) {
+      db.insert(schema.livestreamInfo).values({
+        id: 'ls-arjuna',
+        invitationId: arjunaInv.id,
+        label: 'Wedding Live',
+        date: '2026-10-25',
+        timeLabel: 'Start 16.00 WIB',
+        streamUrl: 'https://instagram.com/arjuna.danendra',
+      }).run();
+      console.log(`- Seeded livestream for arjuna-tema-foto`);
+    }
   }
 
   console.log('Seeding complete.');

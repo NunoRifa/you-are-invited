@@ -5,6 +5,8 @@ dist
 *.log
 storage/db/*.sqlite
 storage/db/*.sqlite-journal
+storage/db/*.sqlite-shm
+storage/db/*.sqlite-wal
 storage/uploads/*
 !storage/uploads/.gitkeep
 !storage/db/.gitkeep

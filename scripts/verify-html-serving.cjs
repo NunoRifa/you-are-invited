@@ -10,6 +10,10 @@ http.get('http://localhost:5173/i/raden-motion?to=Budi+Santoso', (res) => {
     console.log('Contains cui-container-comment-62777:', data.includes('cui-container-comment-62777'));
     console.log('Contains renderComments:', data.includes('renderComments'));
     console.log('Contains updateWishesLoadMoreButton:', data.includes('updateWishesLoadMoreButton'));
+    console.log('Contains copyTextToClipboard:', data.includes('copyTextToClipboard'));
+    console.log('Contains formatMapsUrl:', data.includes('formatMapsUrl'));
+    console.log('Contains Wedding Live Hydration:', data.includes('Wedding Live Hydration'));
+    console.log('Target blank count in HTML:', (data.match(/target="_blank"/g) || []).length);
 
     // Check where cui-container-comment-62777 is located relative to form
     const formIdx = data.indexOf('id="commentform-62777"');
