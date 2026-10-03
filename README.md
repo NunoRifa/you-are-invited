@@ -105,10 +105,42 @@ Frontend berjalan di `http://localhost:5173`.
 
 ### 4. Mengakses Undangan
 - Beranda / Katalog: `http://localhost:5173/`
-- Demo Raden Motion: `http://localhost:5173/i/raden-motion?to=Budi+Santoso`
+- Demo Raden Motion (Master): `http://localhost:5173/i/raden-motion?to=Budi+Santoso`
 - Demo Betawi Motion: `http://localhost:5173/i/betawi-motion?to=Siti+Aminah`
 - Demo Arjuna Tema Foto: `http://localhost:5173/i/arjuna-tema-foto?to=Jessica+Mila`
+- Undangan Klien Anggi & Ivan: `http://localhost:5173/i/anggi-ivan?to=Nama+Tamu`
 - Dashboard Admin: `http://localhost:5173/admin`
+
+---
+
+## 👥 Alur Produksi Undangan Klien (Client Production Subfolder)
+
+Setiap klien yang memesan undangan online **tidak mengotak-atik master template**. Sebagai gantinya, sistem menyediakan subfolder produksi khusus di:
+`apps/web/public/production/{slug-klien}/index.html`
+
+### 1. Cara Membuat Undangan Klien Baru:
+Jalankan script generator:
+```bash
+node scripts/create-client-invitation.cjs <slug-klien> <nama-template>
+```
+*Contoh:*
+```bash
+node scripts/create-client-invitation.cjs anggi-ivan raden-motion
+```
+Atau via npm:
+```bash
+npm run client:create -- anggi-ivan raden-motion
+```
+
+### 2. Cara Kerja Subfolder Produksi Klien:
+1. File template digandakan dari master `public/templates/{template}/index.html` ke `public/production/{slug}/index.html`.
+2. Script otomatis mengikat `currentSlug = "{slug}"` sehingga data, komentar, dan RSVP terisolasi ke database klien tersebut.
+3. Bagian yang tidak diisi oleh klien (seperti Galeri, Kisah Cinta, Rekening Hadiah, atau Live Streaming) otomatis disembunyikan secara bersih dan rapi (*clean auto-hide*).
+4. Webserver (Vite & Nginx) melayani undangan klien tersebut pada URL elegan:
+   - `/i/{slug-klien}` (contoh: `https://you-are-invited.my.id/i/anggi-ivan?to=Nama+Tamu`)
+   - `/production/{slug-klien}/` (contoh: `https://you-are-invited.my.id/production/anggi-ivan/?to=Nama+Tamu`)
+
+---
 
 ## Menambahkan Template Baru (Checklist)
 

@@ -148,26 +148,6 @@ export async function seedTemplates() {
       },
     ]).run();
 
-    // Gift Accounts
-    db.insert(schema.giftAccounts).values([
-      {
-        id: 'gf-raden-1',
-        invitationId: invId,
-        holderName: 'Raden Mas Bagus Nugroho',
-        accountNumber: '1234567890',
-        providerName: 'BCA',
-        sortOrder: 1,
-      },
-      {
-        id: 'gf-raden-2',
-        invitationId: invId,
-        holderName: 'Ayu Kartika Sari',
-        accountNumber: '0987654321',
-        providerName: 'Bank Mandiri',
-        sortOrder: 2,
-      },
-    ]).run();
-
     // Wishes
     db.insert(schema.wishes).values([
       {
@@ -181,6 +161,17 @@ export async function seedTemplates() {
     ]).run();
 
     console.log(`- Seeded invitation: ${radenSlug}`);
+  }
+
+  // Remove legacy demo account rows only; invitation data and other clients remain untouched.
+  const radenDemoInvitation = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'raden-motion')).get();
+  if (radenDemoInvitation) {
+    db.select().from(schema.giftAccounts)
+      .where(eq(schema.giftAccounts.invitationId, radenDemoInvitation.id))
+      .all()
+      .filter((gift) => gift.id.startsWith('gf-raden-')
+        || ['1234567890', '0987654321'].includes(gift.accountNumber.replace(/\s/g, '')))
+      .forEach((gift) => db.delete(schema.giftAccounts).where(eq(schema.giftAccounts.id, gift.id)).run());
   }
 
   // Ensure Livestream Info for Raden Motion
@@ -198,6 +189,120 @@ export async function seedTemplates() {
       }).run();
       console.log(`- Seeded livestream for raden-motion`);
     }
+  }
+
+  // 1b. Anggi & Ivan Client Invitation (raden-motion template)
+  const anggiIvanSlug = 'anggi-ivan';
+  const existingAnggiIvan = db.select().from(schema.invitations).where(eq(schema.invitations.slug, anggiIvanSlug)).get();
+  if (!existingAnggiIvan) {
+    const invId = 'inv-anggi-ivan';
+    db.insert(schema.invitations).values({
+      id: invId,
+      slug: anggiIvanSlug,
+      title: 'Pernikahan Anggi & Ivan',
+      templateKey: 'raden-motion',
+      openingGreetingText: "Assalamu’alaikum Wr. Wb, Dengan memohon rahmat dan ridho Allah SWT, Kami Mengundang Bapak/Ibu/Saudara/i, untuk menghadiri acara pernikahan kami.",
+      closingText: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+      quoteText: 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang',
+      quoteSource: 'Q.S. Ar-Rum Ayat 21',
+      coverGuestLabelDefault: 'Tamu Undangan',
+      hashtag: '#IvanAnggiForever',
+      isPublished: true,
+      createdAt: now,
+      updatedAt: now,
+    }).run();
+
+    // Couples
+    db.insert(schema.couples).values([
+      {
+        id: 'c-anggi-groom',
+        invitationId: invId,
+        role: 'groom',
+        fullName: 'Ivan Budi Rianto',
+        displayName: 'Ivan',
+        fatherName: 'Bapak Budiyanto',
+        motherName: 'Ibu Ratna Andriati (Almh)',
+        birthOrderLabel: 'Putra Pertama',
+        instagramHandle: null,
+      },
+      {
+        id: 'c-anggi-bride',
+        invitationId: invId,
+        role: 'bride',
+        fullName: 'Anggi Azoka Dea Prabowo',
+        displayName: 'Anggi',
+        fatherName: 'Bapak Prabowo Budi Susilo',
+        motherName: 'Ibu Dewi Anggrayani, S.Pd',
+        birthOrderLabel: 'Putri Pertama',
+        instagramHandle: null,
+      },
+    ]).run();
+
+    // Events
+    db.insert(schema.events).values([
+      {
+        id: 'ev-anggi-akad',
+        invitationId: invId,
+        label: 'AKAD NIKAH',
+        date: '2026-11-07',
+        startTime: '10:00',
+        endTimeLabel: 'Selesai',
+        venueName: 'Ballroom Mall Metropolitan Cileungsi',
+        venueAddress: 'Jl. Kota Taman Metropolitan, Metland Transyogi, Cileungsi Kidul, Kec. Cileungsi, Kabupaten Bogor, Jawa Barat.',
+        mapsUrl: 'https://share.google/2GHXfyXwbhgy04fGi',
+        sortOrder: 1,
+      },
+      {
+        id: 'ev-anggi-resepsi',
+        invitationId: invId,
+        label: 'RESEPSI',
+        date: '2026-11-07',
+        startTime: '13:00',
+        endTimeLabel: '15.00 WIB',
+        venueName: 'Ballroom Mall Metropolitan Cileungsi',
+        venueAddress: 'Jl. Kota Taman Metropolitan, Metland Transyogi, Cileungsi Kidul, Kec. Cileungsi, Kabupaten Bogor, Jawa Barat.',
+        mapsUrl: 'https://share.google/2GHXfyXwbhgy04fGi',
+        sortOrder: 2,
+      },
+    ]).run();
+
+    console.log(`- Seeded invitation: ${anggiIvanSlug}`);
+  }
+
+  // Keep the current client details in sync when this seed runs again.
+  const anggiIvan = db.select().from(schema.invitations).where(eq(schema.invitations.slug, anggiIvanSlug)).get();
+  if (anggiIvan) {
+    db.update(schema.invitations)
+      .set({ hashtag: '#IvanAnggiForever', updatedAt: Date.now() })
+      .where(eq(schema.invitations.id, anggiIvan.id))
+      .run();
+
+    const existingBca = db.select().from(schema.giftAccounts)
+      .where(eq(schema.giftAccounts.invitationId, anggiIvan.id))
+      .all()
+      .find((gift) => gift.providerName === 'BCA');
+
+    if (existingBca) {
+      db.update(schema.giftAccounts)
+        .set({ holderName: 'Anggi Azoka Dea Prabowo', accountNumber: '4062284840', sortOrder: 1 })
+        .where(eq(schema.giftAccounts.id, existingBca.id))
+        .run();
+    } else {
+      db.insert(schema.giftAccounts).values({
+        id: 'gf-anggi-bca',
+        invitationId: anggiIvan.id,
+        holderName: 'Anggi Azoka Dea Prabowo',
+        accountNumber: '4062284840',
+        providerName: 'BCA',
+        sortOrder: 1,
+      }).run();
+    }
+
+    db.select().from(schema.giftAccounts)
+      .where(eq(schema.giftAccounts.invitationId, anggiIvan.id))
+      .all()
+      .filter((gift) => gift.providerName !== 'BCA')
+      .forEach((gift) => db.delete(schema.giftAccounts).where(eq(schema.giftAccounts.id, gift.id)).run());
   }
 
   // 2. Betawi Motion Demo

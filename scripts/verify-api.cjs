@@ -39,6 +39,29 @@ async function test() {
     const viteRes = await get('http://localhost:5173/api/invitations/raden-motion/wishes?limit=10');
     console.log('Via Vite proxy status:', viteRes.status);
     console.log('Via Vite proxy count:', viteRes.body?.data?.length);
+
+    console.log('\n=== TESTING ANGI-IVAN VIA VITE PROXY ===');
+    const anggiRes = await get('http://localhost:5173/api/invitations/anggi-ivan');
+    console.log('Anggi & Ivan API status:', anggiRes.status);
+    if (anggiRes.status === 200) {
+      const p = anggiRes.body;
+      console.log('Title:', p?.invitation?.title);
+      console.log('Template:', p?.invitation?.templateKey);
+      console.log('Couples:');
+      p?.couples?.forEach(c => {
+        console.log(`  - [${c.role}] ${c.fullName} (${c.displayName}) - ${c.birthOrderLabel} dari ${c.fatherName} & ${c.motherName}`);
+      });
+      console.log('Events:');
+      p?.events?.forEach(e => {
+        console.log(`  - [${e.label}] ${e.date} (${e.startTime} - ${e.endTimeLabel}) at ${e.venueName}`);
+        console.log(`    Maps URL: ${e.mapsUrl}`);
+      });
+      console.log('Gallery count:', p?.gallery?.length);
+      console.log('Story count:', p?.story?.length);
+      console.log('Gifts count:', p?.giftAccounts?.length);
+      console.log('Livestream:', p?.livestream);
+      console.log('Hashtag:', p?.invitation?.hashtag);
+    }
   } catch(err) {
     console.error('Vite proxy check error:', err.message);
   }

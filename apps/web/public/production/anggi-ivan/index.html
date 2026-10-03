@@ -6517,7 +6517,7 @@ window.settingAutoplay = true;
   }
 
   // Data Hydration from /api/invitations/:slug
-  var currentSlug = (window.location.pathname.match(/^\/(?:i|production)\/([^\/?#]+)/) || [])[1] || 'raden-motion';
+  var currentSlug = "anggi-ivan";
   fetch('/api/invitations/' + encodeURIComponent(currentSlug))
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(payload) {
@@ -6741,6 +6741,60 @@ window.settingAutoplay = true;
       if (inv.closingText) text('[data-id="cd646ce"] .elementor-heading-title', inv.closingText);
       if (groom.displayName && bride.displayName) {
         text('[data-id="5fcdb6b"] .elementor-heading-title', groom.displayName + ' & ' + bride.displayName);
+      }
+
+      
+      // --- Client Production Customizer (Auto-hide empty client sections) ---
+      // 1. Galeri
+      var gallerySection = document.querySelector('[data-id="05364ca"]');
+      if (gallerySection && (!payload.gallery || payload.gallery.length === 0)) {
+        gallerySection.style.display = 'none';
+      }
+
+      // 2. Cerita Cinta
+      var storySection = document.querySelector('[data-id="633fe11"]');
+      if (storySection && (!storyList || storyList.length === 0)) {
+        storySection.style.display = 'none';
+      }
+
+      // 3. Wedding Gift (Sembunyikan kartu kedua jika klien hanya punya 1 rekening)
+      var giftSection = document.querySelector('[data-id="e235bc9"]');
+      var hasGift = gifts && gifts.length > 0;
+      if (giftSection && !hasGift) {
+        giftSection.style.display = 'none';
+      }
+      if (giftSection && gifts && gifts.length === 1) {
+        var secondCard = giftSection.querySelector('[data-id="743f3b6"]');
+        if (secondCard) secondCard.style.display = 'none';
+      }
+
+      // 4. Wedding Live
+      var liveSection = document.querySelector('[data-id="988d142"]');
+      var hasLive = liveInfo && liveInfo.streamUrl && liveInfo.streamUrl.trim() !== '' && liveInfo.streamUrl !== '#';
+      if (liveSection && !hasLive) {
+        liveSection.style.display = 'none';
+      }
+
+      // If both Gift and Live are empty, hide the top section 4e4e2e4 so no empty gap is left
+      var topLiveGiftSection = document.querySelector('[data-id="4e4e2e4"]');
+      if (topLiveGiftSection && !hasGift && !hasLive) {
+        topLiveGiftSection.style.display = 'none';
+      }
+
+      // 5. Wedding Hashtag (hide the entire top section 70f3774 so no 90vh empty gap is left)
+      var topHashtagSection = document.querySelector('[data-id="70f3774"]');
+      if (topHashtagSection && (!inv.hashtag || inv.hashtag.trim() === '')) {
+        topHashtagSection.style.display = 'none';
+      }
+
+      // 6. Ikon Media Sosial
+      var brideIg = document.querySelector('[data-id="8624cff"]');
+      if (brideIg && (!bride.instagramHandle || bride.instagramHandle.trim() === '')) {
+        brideIg.style.display = 'none';
+      }
+      var groomIg = document.querySelector('[data-id="46113a6"]');
+      if (groomIg && (!groom.instagramHandle || groom.instagramHandle.trim() === '')) {
+        groomIg.style.display = 'none';
       }
 
       // Countdown Timer Engine (Q2)

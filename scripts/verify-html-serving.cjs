@@ -24,6 +24,18 @@ http.get('http://localhost:5173/i/raden-motion?to=Budi+Santoso', (res) => {
     console.log('Form position in HTML:', formIdx);
     console.log('Comment list UL position in HTML:', ulIdx);
     console.log('Is comment list AFTER form in DOM?', ulIdx > formIdx);
+    // Test Anggi & Ivan route
+    http.get('http://localhost:5173/i/anggi-ivan?to=Keluarga+Budi', (res2) => {
+      let data2 = '';
+      res2.on('data', chunk => data2 += chunk);
+      res2.on('end', () => {
+        console.log('\n=== TESTING ANGI-IVAN HTML ROUTE (/i/anggi-ivan) ===');
+        console.log('HTTP Status:', res2.statusCode);
+        console.log('Content Length:', data2.length);
+        console.log('Contains raden-engine:', data2.includes('raden-engine'));
+        console.log('Contains setupMapsButton:', data2.includes('setupMapsButton'));
+      });
+    });
   });
 }).on('error', (err) => {
   console.error('Fetch error:', err.message);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, ExternalLink, ShieldCheck, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Download, ExternalLink, ShieldCheck, ArrowLeft, RefreshCw, LogOut } from 'lucide-react';
 
 interface AdminInvitationItem {
   id: string;
@@ -9,14 +9,18 @@ interface AdminInvitationItem {
   createdAt: number;
 }
 
-export const AdminDashboard: React.FC = () => {
+export const AdminDashboard: React.FC<{ onNavigate: (path: string) => void; onLogout: () => void }> = ({ onNavigate, onLogout }) => {
   const [invitations, setInvitations] = useState<AdminInvitationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadInvitations = () => {
     setLoading(true);
-    fetch('/api/admin/invitations')
-      .then((res) => res.json())
+    fetch('/api/admin/invitations', { credentials: 'include' })
+      .then((res) => {
+        if (res.status === 401) { onLogout(); throw new Error('Sesi login tidak valid. Silakan masuk kembali.'); }
+        if (!res.ok) throw new Error('Gagal memuat undangan.');
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) setInvitations(data);
       })
@@ -43,6 +47,10 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => { void onLogout(); }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-stone-300 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50"
+            ><LogOut className="w-3.5 h-3.5"/><span>Keluar</span></button>
             <button
               onClick={loadInvitations}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-stone-300 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50"
@@ -88,15 +96,31 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-4 text-right space-x-2">
-                        <a
-                          href={`/api/admin/invitations/${inv.id}/wishes/export`}
-                          download
+                        <button
+                          onClick={() => onNavigate(`/admin/invitations/${inv.id}`)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg text-xs font-medium"
+                        >
+                          Kelola
+                        </button>
+                        <button
+                          onClick={async () => {
+                            const response = await fetch(`/api/admin/invitations/${inv.id}/wishes/export`, { credentials: 'include' });
+                            if (response.status === 401) { onLogout(); return; }
+                            if (!response.ok) return;
+                            const blob = await response.blob();
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `guest-wishes-${inv.id}.csv`;
+                            link.click();
+                            URL.revokeObjectURL(url);
+                          }}
                           className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-medium"
                           title="Unduh data RSVP & Ucapan ke CSV"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Export CSV</span>
-                        </a>
+                        </button>
                         <a
                           href={`/i/${inv.slug}`}
                           target="_blank"

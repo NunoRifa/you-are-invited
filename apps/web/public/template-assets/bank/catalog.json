@@ -1,0 +1,18 @@
+[
+  {"name":"BCA","logo":"/template-assets/bank/BCA.png"},
+  {"name":"BRI","logo":"/template-assets/bank/BRI.png"},
+  {"name":"BNI","logo":"/template-assets/bank/BNI.png"},
+  {"name":"Mandiri","logo":"/template-assets/bank/Mandiri.png"},
+  {"name":"BSI","logo":"/template-assets/bank/BSI.png"},
+  {"name":"CIMB Niaga","logo":"/template-assets/bank/CIMB-Niaga.png"},
+  {"name":"BTN","logo":"/template-assets/bank/BTN.png"},
+  {"name":"Permata","logo":"/template-assets/bank/Permata.png"},
+  {"name":"Danamon","logo":"/template-assets/bank/Danamon.png"},
+  {"name":"Bank Jago","logo":"/template-assets/bank/Jago.png"},
+  {"name":"blu/BCA Digital","logo":"/template-assets/bank/Blu-BCA.png"},
+  {"name":"DANA","logo":null},
+  {"name":"GoPay","logo":null},
+  {"name":"OVO","logo":null},
+  {"name":"ShopeePay","logo":null},
+  {"name":"LinkAja","logo":null}
+]

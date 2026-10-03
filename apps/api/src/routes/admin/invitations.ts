@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Hono } from 'hono';
 import { db } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
@@ -26,6 +27,8 @@ adminInvitationsRouter.get('/:id', (c) => {
 
   const couples = db.select().from(schema.couples).where(eq(schema.couples.invitationId, id)).all();
   const events = db.select().from(schema.events).where(eq(schema.events.invitationId, id)).all();
+  const giftAccounts = db.select().from(schema.giftAccounts).where(eq(schema.giftAccounts.invitationId, id)).all();
+  const wishes = db.select().from(schema.wishes).where(eq(schema.wishes.invitationId, id)).all();
   const fields = db.select().from(schema.invitationTemplateFields).where(eq(schema.invitationTemplateFields.invitationId, id)).all();
   const livestream = db.select().from(schema.livestreamInfo).where(eq(schema.livestreamInfo.invitationId, id)).get();
 
@@ -33,9 +36,94 @@ adminInvitationsRouter.get('/:id', (c) => {
     invitation: inv,
     couples,
     events,
+    giftAccounts,
+    wishes,
     templateFields: fields,
     livestream: livestream || null,
   });
+});
+
+// Update a couple within an invitation.
+adminInvitationsRouter.patch('/:id/couples/:coupleId', async (c) => {
+  const invitationId = c.req.param('id');
+  const coupleId = c.req.param('coupleId');
+  const body = await c.req.json<Partial<Pick<typeof schema.couples.$inferInsert, 'fullName' | 'displayName' | 'fatherName' | 'motherName' | 'birthOrderLabel' | 'instagramHandle'>>>();
+  const couple = db.select().from(schema.couples).where(eq(schema.couples.id, coupleId)).get();
+  if (!couple || couple.invitationId !== invitationId) return c.json({ error: 'Couple not found' }, 404);
+  db.update(schema.couples).set(body).where(eq(schema.couples.id, coupleId)).run();
+  return c.json({ success: true });
+});
+
+// Update an event within an invitation.
+adminInvitationsRouter.patch('/:id/events/:eventId', async (c) => {
+  const invitationId = c.req.param('id');
+  const eventId = c.req.param('eventId');
+  const body = await c.req.json<Partial<Pick<typeof schema.events.$inferInsert, 'label' | 'date' | 'startTime' | 'endTimeLabel' | 'venueName' | 'venueAddress' | 'mapsUrl' | 'sortOrder'>>>();
+  const event = db.select().from(schema.events).where(eq(schema.events.id, eventId)).get();
+  if (!event || event.invitationId !== invitationId) return c.json({ error: 'Event not found' }, 404);
+  db.update(schema.events).set(body).where(eq(schema.events.id, eventId)).run();
+  return c.json({ success: true });
+});
+
+// Create or update a gift account for an invitation.
+adminInvitationsRouter.post('/:id/gift-accounts', async (c) => {
+  const invitationId = c.req.param('id');
+  let body: { holderName?: string; accountNumber?: string; providerName?: string; sortOrder?: number };
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Invalid request body' }, 400);
+  }
+  const invitation = db.select().from(schema.invitations).where(eq(schema.invitations.id, invitationId)).get();
+  if (!invitation) return c.json({ error: 'Invitation not found' }, 404);
+  if (!body.holderName?.trim() || !body.accountNumber?.trim() || !body.providerName?.trim()) {
+    return c.json({ error: 'holderName, accountNumber and providerName are required' }, 400);
+  }
+  const id = `gf-${randomUUID()}`;
+  db.insert(schema.giftAccounts).values({
+    id,
+    invitationId,
+    holderName: body.holderName.trim(),
+    accountNumber: body.accountNumber.trim(),
+    providerName: body.providerName.trim(),
+    sortOrder: body.sortOrder ?? 0,
+  }).run();
+  return c.json({ id }, 201);
+});
+
+adminInvitationsRouter.patch('/:id/gift-accounts/:accountId', async (c) => {
+  const invitationId = c.req.param('id');
+  const accountId = c.req.param('accountId');
+  let body: Partial<Pick<typeof schema.giftAccounts.$inferInsert, 'holderName' | 'accountNumber' | 'providerName' | 'sortOrder'>>;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Invalid request body' }, 400);
+  }
+  const account = db.select().from(schema.giftAccounts)
+    .where(eq(schema.giftAccounts.id, accountId)).get();
+  if (!account || account.invitationId !== invitationId) return c.json({ error: 'Gift account not found' }, 404);
+  const update: Partial<typeof schema.giftAccounts.$inferInsert> = {};
+  if (body.holderName !== undefined) update.holderName = body.holderName.trim();
+  if (body.accountNumber !== undefined) update.accountNumber = body.accountNumber.trim();
+  if (body.providerName !== undefined) update.providerName = body.providerName.trim();
+  if (body.sortOrder !== undefined) update.sortOrder = body.sortOrder;
+  if (Object.keys(update).length === 0) return c.json({ error: 'No editable fields provided' }, 400);
+  if ((update.holderName !== undefined && !update.holderName) || (update.accountNumber !== undefined && !update.accountNumber) || (update.providerName !== undefined && !update.providerName)) {
+    return c.json({ error: 'Gift account fields cannot be empty' }, 400);
+  }
+  db.update(schema.giftAccounts).set(update).where(eq(schema.giftAccounts.id, accountId)).run();
+  return c.json({ success: true });
+});
+
+adminInvitationsRouter.delete('/:id/gift-accounts/:accountId', (c) => {
+  const invitationId = c.req.param('id');
+  const accountId = c.req.param('accountId');
+  const account = db.select().from(schema.giftAccounts)
+    .where(eq(schema.giftAccounts.id, accountId)).get();
+  if (!account || account.invitationId !== invitationId) return c.json({ error: 'Gift account not found' }, 404);
+  db.delete(schema.giftAccounts).where(eq(schema.giftAccounts.id, accountId)).run();
+  return c.json({ success: true });
 });
 
 // PATCH /api/admin/invitations/:id/livestream

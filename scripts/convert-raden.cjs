@@ -132,7 +132,7 @@ const hydrationEngine = `
             if (st) {
               try {
                 var parsed = JSON.parse(st.replace(/&quot;/g, '"'));
-                var a = parsed._animation || parsed._animation_mobile;
+                var a = parsed._animation || parsed._animation_mobile || parsed.animation || parsed.animation_mobile;
                 if (a && a !== 'none') el.classList.add("animated", a);
               } catch(e) {}
             }
@@ -147,6 +147,27 @@ const hydrationEngine = `
     }, { threshold: 0.15 });
 
     targets.forEach(function(el) { observer.observe(el); });
+    renderVisualMedia();
+  }
+
+  function renderVisualMedia() {
+    each('.e-gallery-image[data-thumbnail]', function(el) {
+      var thumb = el.getAttribute('data-thumbnail');
+      if (thumb) {
+        el.style.backgroundImage = 'url("' + thumb + '")';
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        el.classList.add('e-gallery-image-loaded');
+      }
+    });
+    each('img[data-src]', function(img) {
+      var ds = img.getAttribute('data-src');
+      if (ds && img.src && img.src.indexOf('data:image/svg') !== -1) {
+        img.src = ds;
+        var dss = img.getAttribute('data-srcset');
+        if (dss) img.srcset = dss;
+      }
+    });
   }
 
   if (document.readyState === "loading") {
@@ -297,8 +318,11 @@ const hydrationEngine = `
     };
   }
 
-  // Data Hydration from /api/invitations/raden-motion
-  fetch('/api/invitations/raden-motion')
+  // Data Hydration from /api/invitations/:slug
+  var currentSlug = (window.location.pathname.match(/^\/i\/([^\/?#]+)/) || [])[1] || 'raden-motion';
+  var API = '/api/invitations/' + encodeURIComponent(currentSlug);
+
+  fetch(API)
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(payload) {
       if (!payload) return;
@@ -460,6 +484,12 @@ const hydrationEngine = `
         });
       }
 
+      // Hashtag Section Visibility (Q1 Option A)
+      var topHashtagSection = document.querySelector('[data-id="70f3774"]');
+      if (topHashtagSection) {
+        topHashtagSection.style.display = (inv.hashtag && inv.hashtag.trim() !== '') ? '' : 'none';
+      }
+
       // Hashtag
       if (inv.hashtag) {
         each('[data-clipboard-text]', function(el) {
@@ -600,7 +630,7 @@ const hydrationEngine = `
           wishesLoadMoreBtn.textContent = 'Memuat ucapan...';
         }
 
-        var url = '/api/invitations/raden-motion/wishes?limit=' + wishesPageSize;
+        var url = '/api/invitations/' + encodeURIComponent(currentSlug) + '/wishes?limit=' + wishesPageSize;
         if (wishesCursor) {
           url += '&cursor=' + encodeURIComponent(wishesCursor.createdAt) + '&cursorId=' + encodeURIComponent(wishesCursor.id);
         }
@@ -688,7 +718,7 @@ const hydrationEngine = `
           }
           if (submitBtn) submitBtn.disabled = true;
 
-          fetch('/api/invitations/raden-motion/wishes', {
+          fetch('/api/invitations/' + encodeURIComponent(currentSlug) + '/wishes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
