@@ -1,7 +1,6 @@
 import type { Plugin } from 'vite';
 import fs from 'fs';
 import path from 'path';
-import Database from 'better-sqlite3';
 
 /**
  * Serves the converted standalone template HTML at /i/:slug.
@@ -17,6 +16,9 @@ export function invitationRoutePlugin(): Plugin {
   function getTemplateKeyForSlug(slug: string): string {
     try {
       if (fs.existsSync(dbPath)) {
+        // Safe dynamic require so building in frontend container does not require better-sqlite3
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Database = require('better-sqlite3');
         const db = new Database(dbPath, { readonly: true });
         const row = db.prepare('SELECT template_key FROM invitations WHERE slug = ?').get(slug) as { template_key: string } | undefined;
         db.close();
