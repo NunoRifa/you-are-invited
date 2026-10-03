@@ -23,6 +23,10 @@ const update = db.transaction(() => {
 
   db.prepare('DELETE FROM gift_accounts WHERE invitation_id = ? AND provider_name <> ?')
     .run(invitation.id, 'BCA');
+
+  // Update events maps_url for anggi-ivan
+  db.prepare('UPDATE events SET maps_url = ? WHERE invitation_id = ?')
+    .run('https://share.google/2GHXfyXwbhgy04fGi', invitation.id);
 });
 
 update();

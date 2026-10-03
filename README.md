@@ -188,3 +188,70 @@ Disimpan di tabel `gift_accounts` pada database. Tombol "Salin Nomor" secara oto
 
 ### 4. Pengaturan Wedding Hashtag
 Disimpan di tabel `invitations` kolom `hashtag`. Tombol hashtag secara otomatis menyalin teks hashtag ke clipboard saat diklik.
+
+---
+
+## 🔐 Manajemen Admin & Autentikasi Operator
+
+Menu Dashboard Admin (`/admin`) dan seluruh endpoint API admin (`/api/admin/*`) dilindungi oleh sistem sesi terenkripsi dengan hashing password `scrypt` dan cookie `HttpOnly; SameSite=Lax` (7 hari).
+
+### 1. Cara Membuat / Mereset Akun Admin Operator:
+Jalankan script CLI interaktif berikut:
+- **Di Lingkungan Lokal:**
+  ```bash
+  npm run admin:user
+  ```
+- **Di Server Produksi (Docker):**
+  ```bash
+  docker compose exec -it api node scripts/admin-user.cjs
+  ```
+Skrip akan meminta:
+1. `Operator email`: Email Anda (contoh: `admin@you-are-invited.my.id`)
+2. `Password`: Masukkan password (minimal 12 karakter, input disembunyikan)
+3. `Konfirmasi password`: Masukkan ulang password
+
+Akun akan langsung dibuat atau diperbarui di tabel `admin_users` SQLite dengan password ter-hash secara aman.
+
+### 2. Login ke Dashboard:
+1. Buka browser: `https://you-are-invited.my.id/admin` (atau `http://localhost:5173/admin` saat lokal).
+2. Masukkan email dan password yang telah dibuat.
+3. Setelah login berhasil, Anda dapat mengelola seluruh data undangan, mengubah hashtag, mengelola rekening hadiah, dan mengekspor CSV ucapan.
+
+---
+
+## 🚀 Panduan Deployment Produksi (Docker VPS)
+
+### 1. Struktur Layanan Docker:
+- **`api`**: Container Hono Backend (Node.js 20 Alpine) berjalan di port internal `3000`. Menyimpan database SQLite pada volume `./storage`.
+- **`web`**: Container Nginx Alpine melayani file statis frontend, aset template, dan bertindak sebagai reverse proxy ke container `api`. Mendukung port `80` (HTTP) dan `443` (HTTPS Let's Encrypt).
+
+### 2. Perintah Build & Deploy Pertama Kali di VPS:
+```bash
+# 1. Masuk ke direktori proyek di server
+cd /var/www/you-are-invited
+
+# 2. Ambil update kode terbaru dari repository
+git pull origin master
+
+# 3. Build dan jalankan container di latar belakang
+docker compose up -d --build
+
+# 4. Jalankan seeder database awal (Otomatis mengisi template & klien anggi-ivan)
+docker compose exec api npm run db:seed
+
+# 5. Buat akun operator admin pertama
+docker compose exec -it api node scripts/admin-user.cjs
+```
+
+### 3. Perintah Perawatan / Update Rutin:
+Setiap kali ada pembaruan kode baru dari git:
+```bash
+git pull origin master
+docker compose up -d --build
+```
+
+### 4. Tips Jika Tampilan Dashboard Belum Berubah:
+Jika setelah update tampilan dashboard belum meminta login atau CSS lama masih terbaca:
+- Lakukan **Hard Refresh** di browser Anda: tekan `Ctrl + Shift + R` (Windows/Linux) atau `Cmd + Shift + R` (Mac).
+- Atau buka melalui mode **Incognito / Private Window** untuk membersihkan cache lokal browser.
+

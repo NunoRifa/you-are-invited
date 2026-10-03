@@ -54,6 +54,45 @@ adminInvitationsRouter.patch('/:id/couples/:coupleId', async (c) => {
   return c.json({ success: true });
 });
 
+// Create an event within an invitation.
+adminInvitationsRouter.post('/:id/events', async (c) => {
+  const invitationId = c.req.param('id');
+  let body: {
+    label?: string;
+    date?: string;
+    startTime?: string;
+    endTimeLabel?: string;
+    venueName?: string;
+    venueAddress?: string;
+    mapsUrl?: string;
+    sortOrder?: number;
+  };
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Invalid request body' }, 400);
+  }
+  const invitation = db.select().from(schema.invitations).where(eq(schema.invitations.id, invitationId)).get();
+  if (!invitation) return c.json({ error: 'Invitation not found' }, 404);
+  if (!body.label?.trim() || !body.date?.trim() || !body.startTime?.trim() || !body.venueName?.trim() || !body.venueAddress?.trim()) {
+    return c.json({ error: 'label, date, startTime, venueName, and venueAddress are required' }, 400);
+  }
+  const id = `ev-${randomUUID()}`;
+  db.insert(schema.events).values({
+    id,
+    invitationId,
+    label: body.label.trim(),
+    date: body.date.trim(),
+    startTime: body.startTime.trim(),
+    endTimeLabel: body.endTimeLabel?.trim() || '',
+    venueName: body.venueName.trim(),
+    venueAddress: body.venueAddress.trim(),
+    mapsUrl: body.mapsUrl?.trim() || '',
+    sortOrder: body.sortOrder ?? 0,
+  }).run();
+  return c.json({ id }, 201);
+});
+
 // Update an event within an invitation.
 adminInvitationsRouter.patch('/:id/events/:eventId', async (c) => {
   const invitationId = c.req.param('id');
@@ -62,6 +101,16 @@ adminInvitationsRouter.patch('/:id/events/:eventId', async (c) => {
   const event = db.select().from(schema.events).where(eq(schema.events.id, eventId)).get();
   if (!event || event.invitationId !== invitationId) return c.json({ error: 'Event not found' }, 404);
   db.update(schema.events).set(body).where(eq(schema.events.id, eventId)).run();
+  return c.json({ success: true });
+});
+
+// Delete an event within an invitation.
+adminInvitationsRouter.delete('/:id/events/:eventId', (c) => {
+  const invitationId = c.req.param('id');
+  const eventId = c.req.param('eventId');
+  const event = db.select().from(schema.events).where(eq(schema.events.id, eventId)).get();
+  if (!event || event.invitationId !== invitationId) return c.json({ error: 'Event not found' }, 404);
+  db.delete(schema.events).where(eq(schema.events.id, eventId)).run();
   return c.json({ success: true });
 });
 

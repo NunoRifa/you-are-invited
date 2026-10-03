@@ -1917,7 +1917,7 @@ window.settingAutoplay = true;
                               class="elementor-background-video-hosted"
                               role="presentation"
                               src="/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
-                              preload="auto"
+                              preload="metadata"
                               muted
                               playsinline
                            ></video>
@@ -5303,43 +5303,42 @@ window.settingAutoplay = true;
                                              .zoom {
                                              opacity: 0;
                                              transition:
-                                                transform 2.5s ease,
-                                                /* ⏱ durasi masuk 2500ms */
-                                                   opacity 2.5s ease;
-                                             /* ⏱ durasi masuk 2500ms */
+                                                transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                                                opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+                                             will-change: transform, opacity;
                                           }
 
                                           /* POSISI AWAL */
                                           body:not(.elementor-editor-active)
                                              .muncul {
-                                             transform: translateY(80px);
+                                             transform: translateY(40px);
                                           }
 
                                           body:not(.elementor-editor-active)
                                              .muncul-kiri {
-                                             transform: translateX(80px);
+                                             transform: translateX(40px);
                                           }
 
                                           body:not(.elementor-editor-active)
                                              .muncul-kanan {
-                                             transform: translateX(-80px);
+                                             transform: translateX(-40px);
                                           }
 
                                           body:not(.elementor-editor-active)
                                              .zoom {
-                                             transform: scale(0.5);
+                                             transform: scale(0.85);
                                           }
 
                                           /* SAAT MASUK VIEWPORT */
                                           body:not(.elementor-editor-active)
                                              .active {
-                                             opacity: 1;
+                                             opacity: 1 !important;
                                              transform: translate3d(0, 0, 0)
-                                                scale(1);
+                                                scale(1) !important;
                                           }
                                        </style>
                                        <script>
-                                          document.addEventListener("DOMContentLiteSpeedLoaded",()=>{const items=document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom");const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("active")}else{entry.target.classList.remove("active")}})},{threshold:0.3});items.forEach(el=>observer.observe(el));if(document.body.classList.contains("elementor-editor-active")){setInterval(()=>{items.forEach(el=>{const r=el.getBoundingClientRect();const vh=window.innerHeight;if(r.top<vh-120&&r.bottom>120){el.classList.add("active")}else{el.classList.remove("active")}})},100)}})
+                                          document.addEventListener("DOMContentLiteSpeedLoaded",()=>{const items=document.querySelectorAll(".muncul, .muncul-kiri, .muncul-kanan, .zoom");const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("active");observer.unobserve(entry.target)}})},{threshold:0.15});items.forEach(el=>observer.observe(el));if(document.body.classList.contains("elementor-editor-active")){setInterval(()=>{items.forEach(el=>{const r=el.getBoundingClientRect();const vh=window.innerHeight;if(r.top<vh-120&&r.bottom>120){el.classList.add("active")}else{el.classList.remove("active")}})},100)}})
                                        </script>
                                     </div>
                                  </div>
@@ -6357,13 +6356,10 @@ window.settingAutoplay = true;
             }
           }
         } else {
-          // Re-trigger animation when scrolling back, matching template's original logic
-          if (el.classList.contains("muncul") || el.classList.contains("muncul-kiri") || el.classList.contains("muncul-kanan") || el.classList.contains("zoom")) {
-            el.classList.remove("active");
-          }
+          // Keep active once entered, preventing glitch on mobile scroll
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
     targets.forEach(function(el) { observer.observe(el); });
   }
@@ -6592,7 +6588,7 @@ window.settingAutoplay = true;
       }
 
       function formatMapsUrl(url, venueName, venueAddress) {
-        if (!url || url === '#' || url.indexOf('goo.gl/maps') !== -1) {
+        if (!url || url === '#') {
           return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venueName || '') + ' ' + (venueAddress || ''));
         }
         return url;

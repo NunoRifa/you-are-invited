@@ -32,6 +32,7 @@ wishesRouter.get('/:slug/wishes', (c) => {
     .where(
       and(
         eq(schema.wishes.invitationId, inv.id),
+        eq(schema.wishes.isHidden, false),
         cursor ? or(
           lt(schema.wishes.createdAt, cursor),
           cursorId ? and(eq(schema.wishes.createdAt, cursor), lt(schema.wishes.id, cursorId)) : undefined

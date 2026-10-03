@@ -8,14 +8,31 @@ import { useCallback } from 'react';
 export function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const navigate = useCallback((path: string) => {
     window.history.pushState({}, '', path);
     setCurrentPath(window.location.pathname);
   }, []);
+
   const logout = useCallback(async () => {
     await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
     setAdminAuthenticated(false);
     setCurrentPath(window.location.pathname);
+  }, []);
+
+  // Check persistent session cookie on initial load/refresh
+  useEffect(() => {
+    if (window.location.pathname.startsWith('/admin')) {
+      fetch('/api/admin/session', { credentials: 'include' })
+        .then((res) => {
+          if (res.ok) setAdminAuthenticated(true);
+        })
+        .catch(() => {})
+        .finally(() => setCheckingAuth(false));
+    } else {
+      setCheckingAuth(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -32,8 +49,16 @@ export function App() {
   // as the ORIGINAL template HTML — see vite-plugin-invitation.ts.
   // See CLAUDE.md: "Zero Visual Modification to Templates".
 
-  // Admin access is intentionally re-authenticated after every full page load.
+  // Admin routing with persistent session check
   if (currentPath.startsWith('/admin')) {
+    if (checkingAuth) {
+      return (
+        <div className="min-h-screen bg-stone-100 flex items-center justify-center text-xs text-stone-500 font-sans">
+          Memeriksa sesi login...
+        </div>
+      );
+    }
+
     if (!adminAuthenticated) {
       return <AdminLogin returnTo={window.location.pathname + window.location.search} onLogin={() => setAdminAuthenticated(true)} />;
     }

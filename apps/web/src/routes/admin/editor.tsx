@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff } from 'lucide-react';
 import { bankProviders, getBankProvider, otherProviderName } from '../../features/gift/bank-providers.js';
 
 interface EditorPayload {
@@ -86,6 +86,105 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     setPreviewVersion((version) => version + 1);
   };
 
+  const updateCouple = (id: string, field: string, value: string) => {
+    setPayload((current) => current ? {
+      ...current,
+      couples: current.couples.map((c) => c.id === id ? { ...c, [field]: value } : c),
+    } : current);
+  };
+
+  const saveCouple = async (couple: EditorPayload['couples'][number]) => {
+    const res = await fetch(`/api/admin/invitations/${invitationId}/couples/${couple.id}`, {
+      method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(couple),
+    });
+    if (!res.ok) throw new Error('Gagal menyimpan data mempelai.');
+    setNotice(`Data ${couple.displayName || 'mempelai'} tersimpan.`);
+    setPreviewVersion((v) => v + 1);
+  };
+
+  const updateEvent = (index: number, field: string, value: string) => {
+    setPayload((current) => current ? {
+      ...current,
+      events: current.events.map((e, i) => i === index ? { ...e, [field]: value } : e),
+    } : current);
+  };
+
+  const addEvent = () => setPayload((current) => current ? {
+    ...current,
+    events: [...current.events, {
+      id: `draft-${crypto.randomUUID()}`,
+      label: 'Acara Baru',
+      date: new Date().toISOString().split('T')[0],
+      startTime: '09:00',
+      endTimeLabel: 'Selesai',
+      venueName: '',
+      venueAddress: '',
+      mapsUrl: '',
+    }],
+  } : current);
+
+  const saveEvent = async (event: EditorPayload['events'][number]) => {
+    const isNew = event.id.startsWith('draft-');
+    const res = await fetch(isNew
+      ? `/api/admin/invitations/${invitationId}/events`
+      : `/api/admin/invitations/${invitationId}/events/${event.id}`, {
+      method: isNew ? 'POST' : 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(event),
+    });
+    if (!res.ok) throw new Error('Gagal menyimpan acara.');
+    const data = isNew ? await res.json() as { id: string } : null;
+    if (data?.id) {
+      setPayload((current) => current ? {
+        ...current,
+        events: current.events.map((e) => e.id === event.id ? { ...e, id: data.id } : e),
+      } : current);
+    }
+    setNotice(`Acara ${event.label} tersimpan.`);
+    setPreviewVersion((v) => v + 1);
+  };
+
+  const deleteEvent = async (event: EditorPayload['events'][number]) => {
+    if (!window.confirm(`Hapus acara "${event.label}" ini?`)) return;
+    if (!event.id.startsWith('draft-')) {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/events/${event.id}`, { method: 'DELETE', credentials: 'include' });
+      if (!res.ok) throw new Error('Gagal menghapus acara.');
+    }
+    setPayload((current) => current ? {
+      ...current,
+      events: current.events.filter((e) => e.id !== event.id),
+    } : current);
+    setNotice('Acara dihapus.');
+    setPreviewVersion((v) => v + 1);
+  };
+
+  const toggleWish = async (wish: EditorPayload['wishes'][number]) => {
+    const nextStatus = !wish.isHidden;
+    const res = await fetch(`/api/admin/invitations/${invitationId}/wishes/${wish.id}`, {
+      method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isHidden: nextStatus }),
+    });
+    if (!res.ok) throw new Error('Gagal mengubah status ucapan.');
+    setPayload((current) => current ? {
+      ...current,
+      wishes: current.wishes.map((w) => w.id === wish.id ? { ...w, isHidden: nextStatus } : w),
+    } : current);
+    setNotice(nextStatus ? 'Ucapan disembunyikan dari publik.' : 'Ucapan ditampilkan di publik.');
+    setPreviewVersion((v) => v + 1);
+  };
+
+  const deleteWish = async (wish: EditorPayload['wishes'][number]) => {
+    if (!window.confirm(`Hapus ucapan dari "${wish.guestName}"?`)) return;
+    const res = await fetch(`/api/admin/invitations/${invitationId}/wishes/${wish.id}`, { method: 'DELETE', credentials: 'include' });
+    if (!res.ok) throw new Error('Gagal menghapus ucapan.');
+    setPayload((current) => current ? {
+      ...current,
+      wishes: current.wishes.filter((w) => w.id !== wish.id),
+    } : current);
+    setNotice('Ucapan dihapus.');
+    setPreviewVersion((v) => v + 1);
+  };
+
   if (loading) return <div className="p-10 text-sm text-stone-600">Memuat editor undangan…</div>;
   if (!payload) return <div className="p-10 text-sm text-red-700">{notice || 'Data undangan tidak ditemukan.'}</div>;
 
@@ -117,8 +216,148 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
             <Field label="Sumber kutipan" value={payload.invitation.quoteSource || ''} onChange={(v) => patchInvitation('quoteSource', v)} />
             <Field label="Teks penutup" value={payload.invitation.closingText || ''} onChange={(v) => patchInvitation('closingText', v)} multiline />
           </>}
-          {activeTab === 'Mempelai' && payload.couples.map((person) => <article key={person.id} className="space-y-3 rounded-xl border border-stone-200 p-4"><h2 className="font-semibold capitalize">{person.role === 'bride' ? 'Mempelai wanita' : 'Mempelai pria'}</h2><p className="text-sm">{person.fullName} ({person.displayName})</p><p className="text-xs text-stone-600">Data pasangan dapat ditinjau di sini. Pengeditan lengkap melalui endpoint pasangan.</p></article>)}
-          {activeTab === 'Acara' && payload.events.map((event) => <article key={event.id} className="space-y-2 rounded-xl border border-stone-200 p-4"><h2 className="font-semibold">{event.label}</h2><p className="text-sm">{event.date} · {event.startTime} · {event.venueName}</p><p className="text-xs text-stone-600">{event.venueAddress}</p></article>)}
+          {activeTab === 'Mempelai' && payload.couples.map((person) => (
+            <article key={person.id} className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <h2 className="font-semibold capitalize text-stone-800">
+                  {person.role === 'bride' ? 'Mempelai Wanita' : 'Mempelai Pria'}
+                </h2>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-600">
+                  {person.role}
+                </span>
+              </div>
+              <Field
+                label="Nama Lengkap & Gelar"
+                value={person.fullName}
+                onChange={(v) => updateCouple(person.id, 'fullName', v)}
+                placeholder="Contoh: Anggi Azoka Dea Prabowo, S.Kom"
+              />
+              <Field
+                label="Nama Panggilan"
+                value={person.displayName}
+                onChange={(v) => updateCouple(person.id, 'displayName', v)}
+                placeholder="Contoh: Anggi"
+              />
+              <Field
+                label="Label Anak / Urutan Kelahiran"
+                value={person.birthOrderLabel || ''}
+                onChange={(v) => updateCouple(person.id, 'birthOrderLabel', v)}
+                placeholder="Contoh: Putri Pertama / Putra Kedua"
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Field
+                  label="Nama Ayah"
+                  value={person.fatherName || ''}
+                  onChange={(v) => updateCouple(person.id, 'fatherName', v)}
+                  placeholder="Bapak ..."
+                />
+                <Field
+                  label="Nama Ibu"
+                  value={person.motherName || ''}
+                  onChange={(v) => updateCouple(person.id, 'motherName', v)}
+                  placeholder="Ibu ..."
+                />
+              </div>
+              <Field
+                label="Akun Instagram"
+                value={person.instagramHandle || ''}
+                onChange={(v) => updateCouple(person.id, 'instagramHandle', v)}
+                placeholder="username_ig (tanpa @)"
+              />
+              <button
+                type="button"
+                onClick={() => void saveCouple(person).catch((e) => setNotice(e.message))}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs font-semibold hover:bg-stone-50"
+              >
+                Simpan Profil {person.displayName || person.role}
+              </button>
+            </article>
+          ))}
+
+          {activeTab === 'Acara' && <>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-stone-600">{payload.events.length} rangkaian acara</p>
+              <button
+                type="button"
+                onClick={addEvent}
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-900"
+              >
+                <Plus size={14}/>Tambah Acara
+              </button>
+            </div>
+            {payload.events.map((event, index) => (
+              <article key={event.id} className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                  <h2 className="font-semibold text-stone-800">
+                    Acara #{index + 1}: {event.label || 'Baru'}
+                  </h2>
+                  <button
+                    type="button"
+                    aria-label={`Hapus acara ${event.label}`}
+                    onClick={() => void deleteEvent(event).catch((e) => setNotice(e.message))}
+                    className="rounded p-1.5 text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 size={16}/>
+                  </button>
+                </div>
+                <Field
+                  label="Nama / Label Acara"
+                  value={event.label}
+                  onChange={(v) => updateEvent(index, 'label', v)}
+                  placeholder="Contoh: AKAD NIKAH / RESEPSI"
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Field
+                    label="Tanggal Acara"
+                    value={event.date}
+                    onChange={(v) => updateEvent(index, 'date', v)}
+                    placeholder="YYYY-MM-DD"
+                  />
+                  <Field
+                    label="Jam Mulai"
+                    value={event.startTime}
+                    onChange={(v) => updateEvent(index, 'startTime', v)}
+                    placeholder="Contoh: 10:00"
+                  />
+                  <Field
+                    label="Label Jam Selesai"
+                    value={event.endTimeLabel || ''}
+                    onChange={(v) => updateEvent(index, 'endTimeLabel', v)}
+                    placeholder="Contoh: Selesai / 15:00 WIB"
+                  />
+                </div>
+                <Field
+                  label="Nama Tempat / Gedung"
+                  value={event.venueName}
+                  onChange={(v) => updateEvent(index, 'venueName', v)}
+                  placeholder="Contoh: Ballroom Mall Metropolitan Cileungsi"
+                />
+                <Field
+                  label="Alamat Lengkap Lokasi"
+                  value={event.venueAddress}
+                  onChange={(v) => updateEvent(index, 'venueAddress', v)}
+                  placeholder="Jl. ..."
+                  multiline
+                />
+                <Field
+                  label="Tautan Google Maps Lokasi"
+                  value={event.mapsUrl || ''}
+                  onChange={(v) => updateEvent(index, 'mapsUrl', v)}
+                  placeholder="https://maps.app.goo.gl/... atau https://share.google/..."
+                />
+                <button
+                  type="button"
+                  onClick={() => void saveEvent(event).catch((e) => setNotice(e.message))}
+                  className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs font-semibold hover:bg-stone-50"
+                >
+                  Simpan Acara Ini
+                </button>
+              </article>
+            ))}
+            {payload.events.length === 0 && (
+              <p className="text-sm text-stone-600">Belum ada acara yang ditambahkan.</p>
+            )}
+          </>}
           {activeTab === 'Wedding Gift' && <>
             <div className="flex items-center justify-between gap-3"><p className="text-sm text-stone-600">{payload.giftAccounts.length} rekening</p><button onClick={addGift} className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-3 py-2 text-xs font-semibold text-white"><Plus size={14}/>Tambah rekening</button></div>
             {payload.giftAccounts.map((gift, index) => {
@@ -131,7 +370,73 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
             })}
             {payload.giftAccounts.length === 0 && <p className="text-sm text-stone-600">Belum ada rekening hadiah.</p>}
           </>}
-          {activeTab === 'Ucapan' && payload.wishes.map((wish) => <article key={wish.id} className="rounded-xl border border-stone-200 p-4"><p className="font-semibold">{wish.guestName} · {wish.attendanceStatus}</p><p className="mt-2 text-sm text-stone-700">{wish.message}</p><p className="mt-2 text-xs text-stone-500">Moderasi ucapan tersedia melalui endpoint admin.</p></article>)}
+          {activeTab === 'Ucapan' && <>
+            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+              <div>
+                <h2 className="font-semibold text-stone-800 text-sm">Moderasi Ucapan & Doa Tamu</h2>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Total {payload.wishes.length} ucapan ({payload.wishes.filter((w) => !w.isHidden).length} tampil, {payload.wishes.filter((w) => w.isHidden).length} disembunyikan)
+                </p>
+              </div>
+            </div>
+            {payload.wishes.map((wish) => (
+              <article
+                key={wish.id}
+                className={`rounded-xl border p-4 space-y-2.5 transition-colors ${
+                  wish.isHidden ? 'bg-stone-50/80 border-dashed border-stone-300 opacity-75' : 'bg-white border-stone-200 shadow-xs'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="font-semibold text-stone-900 text-sm">{wish.guestName}</span>
+                    <span className={`ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      wish.attendanceStatus === 'attending'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : wish.attendanceStatus === 'not_attending'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}>
+                      {wish.attendanceStatus === 'attending' ? 'Hadir' : wish.attendanceStatus === 'not_attending' ? 'Tidak Hadir' : 'Masih Ragu'}
+                    </span>
+                    {wish.isHidden && (
+                      <span className="ml-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+                        Disembunyikan dari Publik
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => void toggleWish(wish).catch((e) => setNotice(e.message))}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border ${
+                        wish.isHidden
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                          : 'bg-stone-100 text-stone-700 border-stone-300 hover:bg-stone-200'
+                      }`}
+                      title={wish.isHidden ? 'Tampilkan kembali di undangan publik' : 'Sembunyikan ucapan ini dari tamu publik'}
+                    >
+                      {wish.isHidden ? <Eye size={13}/> : <EyeOff size={13}/>}
+                      <span>{wish.isHidden ? 'Tampilkan' : 'Sembunyikan'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void deleteWish(wish).catch((e) => setNotice(e.message))}
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-800"
+                      title="Hapus ucapan secara permanen"
+                    >
+                      <Trash2 size={14}/>
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-stone-700 leading-relaxed bg-stone-50/50 p-2.5 rounded-lg border border-stone-100">
+                  {wish.message}
+                </p>
+              </article>
+            ))}
+            {payload.wishes.length === 0 && (
+              <p className="text-sm text-stone-500 text-center py-8">Belum ada ucapan dari tamu undangan.</p>
+            )}
+          </>}
         </div>
       </section>
       <section className="hidden min-h-0 flex-col bg-stone-200 p-4 lg:flex">
