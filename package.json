@@ -15,7 +15,11 @@
     "api:verify": "node scripts/verify-api.cjs",
     "browser:verify": "node scripts/verify-browser-wishes.cjs",
     "html:verify": "node scripts/verify-html-serving.cjs",
-    "e2e:verify": "node scripts/verify-e2e-wishes.cjs"
+    "e2e:verify": "node scripts/verify-e2e-wishes.cjs",
+    "client:create": "node scripts/create-client-invitation.cjs",
+    "client:update-anggi-ivan": "node scripts/update-anggi-ivan.cjs",
+    "admin:user": "node scripts/admin-user.cjs",
+    "sections:verify": "node scripts/verify-post-comment-sections.cjs"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
