@@ -71,141 +71,447 @@ window.settingAutoplay = true;
             max-height: none !important;
          }
 
-         /* --- Figma Debit Card In-Place Style on existing Elementor Card --- */
-         .elementor-element-1782dc7,
-         .elementor-element-743f3b6 {
-            border-radius: 24px !important;
-            padding: 22px 24px !important;
-            background: linear-gradient(135deg, #f5f8ff 0%, #ffffff 45%, #eff8ff 100%) !important;
-            box-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.12), 0 0 20px rgba(99, 102, 241, 0.06) !important;
-            border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            margin-bottom: 20px !important;
+         /* --- 100% Figma Spec Modern Premium Debit Card (.figma-debit-card) --- */
+         .figma-debit-card {
             box-sizing: border-box !important;
-            transition: transform 0.2s ease !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 32px !important;
+            gap: 24px !important;
+            isolation: isolate !important;
+            position: relative !important;
+            width: 100% !important;
+            max-width: 576px !important;
+            min-height: 321px !important;
+            margin: 20px auto !important;
+            background: radial-gradient(102.96% 185.27% at 90% 10%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 60%), #0A192F !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            border-radius: 24px !important;
+            overflow: hidden !important;
+            text-align: left !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
          }
-         /* 70-30 distribution: Card info on left, Bank Logo on right */
-         .elementor-element-1782dc7 .elementor-container,
-         .elementor-element-743f3b6 .elementor-container {
+
+         /* Decorative Holographic Orbs */
+         .figma-card-glow-right {
+            position: absolute !important;
+            width: 224px !important;
+            height: 224px !important;
+            right: -47px !important;
+            bottom: -63px !important;
+            background: rgba(56, 189, 248, 0.2) !important;
+            filter: blur(32px) !important;
+            border-radius: 9999px !important;
+            pointer-events: none !important;
+            z-index: 0 !important;
+         }
+         .figma-card-glow-left {
+            position: absolute !important;
+            width: 192px !important;
+            height: 192px !important;
+            left: -47px !important;
+            top: -63px !important;
+            background: rgba(99, 102, 241, 0.2) !important;
+            filter: blur(20px) !important;
+            border-radius: 9999px !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+         }
+
+         /* Top Row */
+         .figma-card-top {
             display: flex !important;
             flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
             justify-content: space-between !important;
-            gap: 16px !important;
+            align-items: center !important;
+            padding: 0px !important;
+            width: 100% !important;
+            height: 40px !important;
+            position: relative !important;
+            z-index: 2 !important;
          }
-         .elementor-element-80a2849,
-         .elementor-element-8a246d6 {
-            width: 70% !important;
-            flex: 0 0 70% !important;
-            max-width: 70% !important;
-            text-align: left !important;
+         .figma-card-chip-group {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            padding: 0px !important;
+            gap: 12px !important;
+            height: 32px !important;
          }
-         .elementor-element-8973dda,
-         .elementor-element-81a3a54 {
-            width: 30% !important;
-            flex: 0 0 30% !important;
-            max-width: 30% !important;
+         /* EMV Chip */
+         .figma-chip-box {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 0px !important;
+            position: relative !important;
+            isolation: isolate !important;
+            width: 44px !important;
+            height: 32px !important;
+            background: linear-gradient(125.54deg, #FFE896 0%, #D4AF37 50%, #997819 100%) !important;
+            border: 1px solid rgba(252, 211, 77, 0.3) !important;
+            box-shadow: inset 0px 2px 4px 1px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 6px !important;
+            flex-shrink: 0 !important;
+         }
+         .figma-chip-inner-border {
+            box-sizing: border-box !important;
+            width: 24px !important;
+            height: 16px !important;
+            border: 1px solid rgba(120, 53, 15, 0.3) !important;
+            border-radius: 4px !important;
+         }
+         .figma-chip-h-line {
+            position: absolute !important;
+            height: 1px !important;
+            left: 1px !important;
+            right: 1px !important;
+            top: 15.5px !important;
+            background: rgba(120, 53, 15, 0.3) !important;
+         }
+         .figma-chip-v-line {
+            position: absolute !important;
+            width: 1px !important;
+            left: 21.5px !important;
+            top: 1px !important;
+            bottom: 1px !important;
+            background: rgba(120, 53, 15, 0.3) !important;
+         }
+
+         /* Pill Badge Rekening Resmi */
+         .figma-badge-resmi {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            padding: 4px 10px !important;
+            gap: 6px !important;
+            height: 26px !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+            border-radius: 9999px !important;
+         }
+         .figma-badge-icon {
+            width: 14px !important;
+            height: 14px !important;
+            fill: #6EE7B7 !important;
+            flex-shrink: 0 !important;
+         }
+         .figma-badge-text {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 500 !important;
+            font-size: 12px !important;
+            line-height: 16px !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
+            color: #E0F2FE !important;
+            white-space: nowrap !important;
          }
-         /* Account Holder Heading */
-         .elementor-element-6ed591f .elementor-heading-title,
-         .elementor-element-b9b1608 .elementor-heading-title {
-            font-size: 15px !important;
-            font-weight: 800 !important;
-            color: #1e293b !important;
-            letter-spacing: 0.2px !important;
-            margin-bottom: 6px !important;
-         }
-         /* Account Number Text */
-         .elementor-element-b60bdab p,
-         .elementor-element-31757a0 p {
-            font-size: 24px !important;
-            font-weight: 800 !important;
-            color: #0f172a !important;
-            letter-spacing: 2px !important;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-            margin: 4px 0 14px 0 !important;
-            word-break: break-all !important;
-         }
-         /* Copy Button Styling */
-         .elementor-element-e945266 a.elementor-button,
-         .elementor-element-1303ef3 a.elementor-button {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 7px !important;
-            padding: 9px 16px !important;
-            border-radius: 14px !important;
-            background: #ffffff !important;
-            color: #005696 !important;
-            font-size: 12.5px !important;
-            font-weight: 700 !important;
-            border: 1px solid rgba(203, 213, 225, 0.8) !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
-            transition: all 0.2s ease !important;
-         }
-         .elementor-element-e945266 a.elementor-button:hover,
-         .elementor-element-1303ef3 a.elementor-button:hover {
-            background: #f8fafc !important;
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12) !important;
-            transform: translateY(-1px) !important;
-         }
-         /* Bank Logo Image Container & Size */
-         .elementor-element-4f75c25 .elementor-widget-container,
-         .elementor-element-03f2a72 .elementor-widget-container {
-            background: #ffffff !important;
-            padding: 10px 16px !important;
-            border-radius: 18px !important;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
-            border: 1px solid rgba(241, 245, 249, 0.9) !important;
-            display: inline-flex !important;
+
+         /* Official Bank BCA Emblem Styled Badge */
+         .figma-bank-badge {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: row !important;
             align-items: center !important;
             justify-content: center !important;
+            padding: 6px 14px !important;
+            gap: 8px !important;
+            position: relative !important;
+            isolation: isolate !important;
+            min-width: 98px !important;
+            height: 40px !important;
+            background: #FFFFFF !important;
+            box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+            border-radius: 12px !important;
+            flex-shrink: 0 !important;
          }
-         .elementor-element-4f75c25 img,
-         .elementor-element-03f2a72 img {
-            max-width: 110px !important;
-            max-height: 48px !important;
+         .figma-bank-logo-img {
+            max-width: 76px !important;
+            max-height: 28px !important;
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
             display: block !important;
-            margin: 0 auto !important;
          }
-         /* Responsive for mobile viewport */
+         .figma-bank-name-text {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 800 !important;
+            font-size: 18px !important;
+            line-height: 28px !important;
+            letter-spacing: 0.9px !important;
+            color: #003B73 !important;
+         }
+
+         /* Middle: Account Number Display Section */
+         .figma-card-middle {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 13.5px 0px 0px !important;
+            gap: 6.5px !important;
+            width: 100% !important;
+            position: relative !important;
+            z-index: 3 !important;
+         }
+         .figma-label-nomor {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            line-height: 16px !important;
+            letter-spacing: 1.2px !important;
+            text-transform: uppercase !important;
+            color: #BFDBFE !important;
+            margin: 0 !important;
+         }
+         .figma-number-wrap {
+            filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.05)) !important;
+         }
+         .figma-account-number {
+            font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+            font-style: normal !important;
+            font-weight: 700 !important;
+            font-size: 36px !important;
+            line-height: 40px !important;
+            letter-spacing: 1.8px !important;
+            color: #FFFFFF !important;
+            margin: 0 !important;
+            word-break: break-all !important;
+         }
+
+         /* Bottom: Account Holder Details & Primary Copy Action */
+         .figma-card-bottom {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: flex-end !important;
+            padding: 20px 0px 0px !important;
+            gap: 22px !important;
+            width: 100% !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            position: relative !important;
+            z-index: 4 !important;
+         }
+         .figma-owner-container {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 0px 0px 2.5px !important;
+            gap: 2px !important;
+            flex: 1 1 auto !important;
+         }
+         .figma-label-owner {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 500 !important;
+            font-size: 12px !important;
+            line-height: 16px !important;
+            letter-spacing: 0.6px !important;
+            text-transform: uppercase !important;
+            color: #BFDBFE !important;
+            margin: 0 !important;
+         }
+         .figma-owner-name {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 700 !important;
+            font-size: 18px !important;
+            line-height: 28px !important;
+            letter-spacing: 0.45px !important;
+            text-transform: capitalize !important;
+            color: #FFFFFF !important;
+            margin: 0 !important;
+            word-break: break-word !important;
+         }
+         .figma-sub-branch {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 400 !important;
+            font-size: 12px !important;
+            line-height: 16px !important;
+            color: rgba(191, 219, 254, 0.8) !important;
+            margin: 0 !important;
+         }
+
+         /* Interactive Copy Button */
+         .figma-btn-copy {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 12px 20px !important;
+            gap: 10px !important;
+            position: relative !important;
+            isolation: isolate !important;
+            min-width: 212px !important;
+            height: 44px !important;
+            background: #FFFFFF !important;
+            box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+            border-radius: 12px !important;
+            border: none !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+            transition: all 0.2s ease !important;
+            outline: none !important;
+         }
+         .figma-btn-copy:hover {
+            background: #F8FAFC !important;
+            box-shadow: 0px 12px 20px -3px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-1px) !important;
+         }
+         .figma-btn-copy.copied {
+            background: #ECFDF5 !important;
+            border: 1px solid #6EE7B7 !important;
+         }
+         .figma-copy-icon {
+            width: 16px !important;
+            height: 16px !important;
+            stroke: #005EB8 !important;
+            stroke-width: 1.5 !important;
+            fill: none !important;
+            flex-shrink: 0 !important;
+         }
+         .figma-btn-copy.copied .figma-copy-icon {
+            stroke: #059669 !important;
+         }
+         .figma-copy-text {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-style: normal !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            line-height: 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            text-align: center !important;
+            color: #003B73 !important;
+            white-space: nowrap !important;
+         }
+         .figma-btn-copy.copied .figma-copy-text {
+            color: #059669 !important;
+         }
+
+         /* Responsive adjustments across mobile & tablet */
+         @media (max-width: 580px) {
+            .figma-debit-card {
+               padding: 22px 18px !important;
+               border-radius: 20px !important;
+               min-height: auto !important;
+               gap: 18px !important;
+            }
+            .figma-card-top {
+               gap: 10px !important;
+            }
+            .figma-chip-box {
+               width: 38px !important;
+               height: 28px !important;
+            }
+            .figma-chip-inner-border {
+               width: 20px !important;
+               height: 14px !important;
+            }
+            .figma-chip-h-line {
+               top: 13.5px !important;
+            }
+            .figma-chip-v-line {
+               left: 18.5px !important;
+            }
+            .figma-badge-resmi {
+               padding: 3px 8px !important;
+               height: 24px !important;
+            }
+            .figma-badge-text {
+               font-size: 11px !important;
+            }
+            .figma-bank-badge {
+               min-width: 80px !important;
+               height: 36px !important;
+               padding: 4px 10px !important;
+            }
+            .figma-bank-name-text {
+               font-size: 15px !important;
+            }
+            .figma-card-middle {
+               padding-top: 6px !important;
+            }
+            .figma-account-number {
+               font-size: 24px !important;
+               line-height: 30px !important;
+               letter-spacing: 1.2px !important;
+            }
+            .figma-card-bottom {
+               flex-direction: column !important;
+               align-items: stretch !important;
+               padding-top: 16px !important;
+               gap: 16px !important;
+            }
+            .figma-btn-copy {
+               width: 100% !important;
+               min-width: auto !important;
+               height: 42px !important;
+            }
+         }
+
+         @media (max-width: 375px) {
+            .figma-debit-card {
+               padding: 18px 14px !important;
+            }
+            .figma-account-number {
+               font-size: 20px !important;
+               letter-spacing: 1px !important;
+            }
+            .figma-badge-text {
+               font-size: 10px !important;
+            }
+         }
+      
+         /* --- Mobile Fixes: Couple Profiles Safe Spacing & Layout --- */
          @media (max-width: 767px) {
-            .elementor-element-1782dc7,
-            .elementor-element-743f3b6 {
-               padding: 18px 16px !important;
+            /* Mempelai Wanita: Batasi lebar agar tetap rapi di kolom kiri dan tidak menabrak bingkai foto */
+            .elementor-element-20d8c21,
+            .elementor-element-3eb9824,
+            .elementor-element-464729a,
+            .elementor-element-20d8c21 > .elementor-widget-container,
+            .elementor-element-3eb9824 > .elementor-widget-container,
+            .elementor-element-464729a > .elementor-widget-container {
+               max-width: 62% !important;
             }
-            .elementor-element-80a2849,
-            .elementor-element-8a246d6 {
-               width: 68% !important;
-               flex: 0 0 68% !important;
-               max-width: 68% !important;
+            .elementor-element-464729a .elementor-widget-container {
+               line-height: 1.4em !important;
             }
-            .elementor-element-8973dda,
-            .elementor-element-81a3a54 {
-               width: 32% !important;
-               flex: 0 0 32% !important;
-               max-width: 32% !important;
+
+            /* Mempelai Pria: Batasi lebar di sisi kanan agar tidak menabrak bingkai foto */
+            .elementor-element-09ba1c3,
+            .elementor-element-a2f50b3,
+            .elementor-element-d6f55af,
+            .elementor-element-09ba1c3 > .elementor-widget-container,
+            .elementor-element-a2f50b3 > .elementor-widget-container,
+            .elementor-element-d6f55af > .elementor-widget-container {
+               max-width: 65% !important;
+               margin-left: auto !important;
             }
-            .elementor-element-b60bdab p,
-            .elementor-element-31757a0 p {
-               font-size: 19px !important;
-               letter-spacing: 1.5px !important;
+            .elementor-element-d6f55af .elementor-widget-container {
+               line-height: 1.4em !important;
             }
-            .elementor-element-4f75c25 img,
-            .elementor-element-03f2a72 img {
-               max-width: 80px !important;
-               max-height: 38px !important;
+
+            /* Paragraf Penutup (Closing Text): Jarak aman samping 28px agar tidak mentok tepi layar */
+            .elementor-element.elementor-element-cd646ce > .elementor-widget-container {
+               padding: 0 28px !important;
+               margin: 16px auto !important;
             }
-            .elementor-element-e945266 a.elementor-button,
-            .elementor-element-1303ef3 a.elementor-button {
-               padding: 7px 12px !important;
-               font-size: 11.5px !important;
+            .elementor-element.elementor-element-cd646ce .elementor-heading-title {
+               line-height: 1.6em !important;
+               font-size: 13.5px !important;
             }
          }
       </style>
@@ -4831,7 +5137,40 @@ window.settingAutoplay = true;
                                                    <script
                                                      
                                                    >
-                                                      var btnAmplop=document.getElementById("btnAmplop");var amplop=document.getElementById("amplop");btnAmplop.onclick=function(){if(amplop.style.display==="block"){amplop.style.display="none"}else{amplop.style.display="block"}}
+                                                      (function() {
+                                                         var giftButton = document.getElementById('btnAmplop');
+                                                         var giftPanel = document.getElementById('amplop');
+                                                         if (!giftButton || !giftPanel) return;
+                                                         giftButton.setAttribute('aria-expanded', 'false');
+                                                         giftButton.style.cursor = 'pointer';
+                                                         giftPanel.style.setProperty('display', 'none', 'important');
+
+                                                         function toggleAmplop(event) {
+                                                            if (event) {
+                                                               event.preventDefault();
+                                                               event.stopPropagation();
+                                                            }
+                                                            var isOpen = giftButton.getAttribute('aria-expanded') === 'true';
+                                                            giftButton.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                                                            giftPanel.style.setProperty('display', isOpen ? 'none' : 'block', 'important');
+                                                            if (!isOpen) {
+                                                               setTimeout(function() {
+                                                                  giftPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                                               }, 50);
+                                                            }
+                                                         }
+
+                                                         giftButton.onclick = toggleAmplop;
+                                                         var btnLink = giftButton.querySelector('a');
+                                                         if (btnLink) btnLink.onclick = toggleAmplop;
+
+                                                         document.addEventListener('click', function(event) {
+                                                            var target = event.target;
+                                                            var trigger = target && target.closest ? target.closest('#btnAmplop, #btnAmplop a, #btnAmplop button') : null;
+                                                            if (!trigger) return;
+                                                            toggleAmplop(event);
+                                                         }, true);
+                                                      })();
                                                    </script>
                                                 </div>
                                              </div>
@@ -6513,6 +6852,9 @@ window.settingAutoplay = true;
   }
 
   // Data Hydration from /api/invitations/:slug
+  window.__BANK_PROVIDER_CATALOG_READY__ = fetch('/template-assets/bank/catalog.json')
+    .then(function(response) { return response.ok ? response.json() : []; })
+    .catch(function() { return []; });
   var currentSlug = (window.location.pathname.match(/^\/(?:i|production)\/([^\/?#]+)/) || [])[1] || 'raden-motion';
   fetch('/api/invitations/' + encodeURIComponent(currentSlug))
     .then(function(r) { return r.ok ? r.json() : null; })
@@ -6571,7 +6913,9 @@ window.settingAutoplay = true;
       if (bride.displayName) text('[data-id="20d8c21"] p', bride.displayName);
       if (bride.fullName) text('[data-id="3eb9824"] p', bride.fullName);
       if (bride.fatherName) {
-        text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri Kedua') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+        var cleanBrideFather = (bride.fatherName || '').replace(/^Bapak\s+/i, '');
+        var cleanBrideMother = (bride.motherName || '').replace(/^Ibu\s+/i, '');
+        text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri Kedua') + ' dari Bapak ' + cleanBrideFather + (cleanBrideMother ? ' dan Ibu ' + cleanBrideMother : ''));
       }
       if (bride.instagramHandle) {
         attr('[data-id="8624cff"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
@@ -6581,7 +6925,9 @@ window.settingAutoplay = true;
       if (groom.displayName) text('[data-id="09ba1c3"] p', groom.displayName);
       if (groom.fullName) text('[data-id="a2f50b3"] p', groom.fullName);
       if (groom.fatherName) {
-        text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra Pertama') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
+        var cleanGroomFather = (groom.fatherName || '').replace(/^Bapak\s+/i, '');
+        var cleanGroomMother = (groom.motherName || '').replace(/^Ibu\s+/i, '');
+        text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra Pertama') + ' dari Bapak ' + cleanGroomFather + (cleanGroomMother ? ' dan Ibu ' + cleanGroomMother : ''));
       }
       if (groom.instagramHandle) {
         attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
@@ -6690,47 +7036,100 @@ window.settingAutoplay = true;
         });
       }
 
-      // Gifts
-      function applyBankLogo(cardId, providerName) {
-        var cardSection = document.querySelector('[data-id="' + cardId + '"]');
-        if (!cardSection) return;
-        var logoImg = cardSection.querySelector('.elementor-widget-image img');
-        if (!logoImg) return;
-        var pName = (providerName || '').trim();
-        var catalogReady = window.__BANK_PROVIDER_CATALOG_READY__ || Promise.resolve([]);
-        catalogReady.then(function(catalog) {
-          var found = (catalog || []).find(function(item) {
-            return String(item.name || '').toLowerCase() === pName.toLowerCase();
-          });
-          if (found && found.logo) {
-            logoImg.src = found.logo;
-            logoImg.setAttribute('data-src', found.logo);
-            logoImg.removeAttribute('data-srcset');
-            logoImg.alt = pName + ' logo';
-          } else if (pName) {
-            var labelSpan = document.createElement('span');
-            labelSpan.textContent = pName;
-            labelSpan.style.cssText = 'font-weight: 800; font-size: 16px; color: #005696;';
-            logoImg.replaceWith(labelSpan);
-          }
-        });
-      }
+      // Gifts: 100% Figma Spec Debit Card Rendering
+      var giftSection = document.querySelector('[data-id="e235bc9"]');
+      var validGifts = gifts.filter(function(g) {
+        var num = String(g.accountNumber || '').replace(/\s/g, '');
+        return num && num !== '123456789' && num !== '1234567890';
+      });
 
-      if (gifts[0]) {
-        text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
-        text('[data-id="b60bdab"] p', gifts[0].accountNumber);
-        attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
-        var copyDiv0 = document.querySelector('[data-id="e945266"] .copy-content');
-        if (copyDiv0) copyDiv0.textContent = gifts[0].accountNumber;
-        applyBankLogo('1782dc7', gifts[0].providerName);
-      }
-      if (gifts[1]) {
-        text('[data-id="b9b1608"] .elementor-heading-title', 'An. ' + gifts[1].holderName);
-        text('[data-id="31757a0"] p', gifts[1].accountNumber);
-        attr('[data-id="1303ef3"] [data-clipboard-text]', 'data-clipboard-text', gifts[1].accountNumber);
-        var copyDiv1 = document.querySelector('[data-id="1303ef3"] .copy-content');
-        if (copyDiv1) copyDiv1.textContent = gifts[1].accountNumber;
-        applyBankLogo('743f3b6', gifts[1].providerName);
+      if (giftSection) {
+        var amplopBox = document.querySelector('#amplop') || giftSection;
+        var giftWrap = amplopBox.querySelector('.elementor-widget-wrap') || amplopBox;
+        var origCard1 = giftSection.querySelector('[data-id="1782dc7"]');
+        var origCard2 = giftSection.querySelector('[data-id="743f3b6"]');
+        if (origCard1) origCard1.style.display = 'none';
+        if (origCard2) origCard2.style.display = 'none';
+
+        if (validGifts.length > 0) {
+          var oldFigmaCards = amplopBox.querySelectorAll('.figma-debit-card');
+          oldFigmaCards.forEach(function(el) { el.remove(); });
+
+          var catalogReady = window.__BANK_PROVIDER_CATALOG_READY__ || fetch('/template-assets/bank/catalog.json').then(function(response) { return response.ok ? response.json() : []; }).catch(function() { return []; });
+          catalogReady.then(function(catalog) {
+            validGifts.forEach(function(gift) {
+              var provider = String(gift.providerName || '').trim();
+              var catalogEntry = (catalog || []).find(function(item) {
+                return String(item.name || '').toLowerCase() === provider.toLowerCase();
+              });
+              var logoPath = catalogEntry && catalogEntry.logo ? catalogEntry.logo : '';
+
+              var card = document.createElement('div');
+              card.className = 'figma-debit-card';
+
+              var logoHtml = logoPath
+                ? '<img src="' + logoPath + '" alt="' + escapeHtml(provider) + '" class="figma-bank-logo-img" />'
+                : '<span class="figma-bank-name-text">' + escapeHtml(provider || 'BCA') + '</span>';
+
+              card.innerHTML =
+                '<div class="figma-card-glow-right"></div>' +
+                '<div class="figma-card-glow-left"></div>' +
+                '<div class="figma-card-top">' +
+                  '<div class="figma-card-chip-group">' +
+                    '<div class="figma-chip-box">' +
+                      '<div class="figma-chip-inner-border"></div>' +
+                      '<div class="figma-chip-h-line"></div>' +
+                      '<div class="figma-chip-v-line"></div>' +
+                    '</div>' +
+                    '<div class="figma-badge-resmi">' +
+                      '<svg class="figma-badge-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>' +
+                      '<span class="figma-badge-text">Rekening Resmi</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="figma-bank-badge">' + logoHtml + '</div>' +
+                '</div>' +
+                '<div class="figma-card-middle">' +
+                  '<span class="figma-label-nomor">NOMOR REKENING TUJUAN</span>' +
+                  '<div class="figma-number-wrap">' +
+                    '<span class="figma-account-number">' + escapeHtml(gift.accountNumber) + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="figma-card-bottom">' +
+                  '<div class="figma-owner-container">' +
+                    '<span class="figma-label-owner">NAMA PEMILIK REKENING</span>' +
+                    '<span class="figma-owner-name">' + escapeHtml(gift.holderName) + '</span>' +
+                    '<span class="figma-sub-branch">Kantor Cabang Utama ' + escapeHtml(provider || 'BCA') + ' • IDR</span>' +
+                  '</div>' +
+                  '<button type="button" class="figma-btn-copy">' +
+                    '<svg class="figma-copy-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' +
+                    '<span class="figma-copy-text">Salin Nomor Rekening</span>' +
+                  '</button>' +
+                '</div>';
+
+              var copyBtn = card.querySelector('.figma-btn-copy');
+              if (copyBtn) {
+                copyBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  var textSpan = copyBtn.querySelector('.figma-copy-text');
+                  var iconSvg = copyBtn.querySelector('svg');
+                  copyTextToClipboard(gift.accountNumber).then(function() {
+                    copyBtn.classList.add('copied');
+                    if (textSpan) textSpan.textContent = '✓ Berhasil Disalin';
+                    setTimeout(function() {
+                      copyBtn.classList.remove('copied');
+                      if (textSpan) textSpan.textContent = 'Salin Nomor Rekening';
+                    }, 2000);
+                  });
+                });
+              }
+
+              giftWrap.appendChild(card);
+            });
+          });
+        } else {
+          giftSection.style.display = 'none';
+        }
       }
 
       // Closing

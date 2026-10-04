@@ -83,12 +83,16 @@ const clientCustomizer = `
 
       // 6. Ikon Media Sosial
       var brideIg = document.querySelector('[data-id="8624cff"]');
+      var bridePhoto = document.querySelector('[data-id="5775dd2"] > .elementor-widget-container');
       if (brideIg && (!bride.instagramHandle || bride.instagramHandle.trim() === '')) {
         brideIg.style.display = 'none';
+        if (bridePhoto) bridePhoto.style.setProperty('margin-top', '5%', 'important');
       }
       var groomIg = document.querySelector('[data-id="46113a6"]');
+      var groomPhoto = document.querySelector('[data-id="2126396"] > .elementor-widget-container');
       if (groomIg && (!groom.instagramHandle || groom.instagramHandle.trim() === '')) {
         groomIg.style.display = 'none';
+        if (groomPhoto) groomPhoto.style.setProperty('margin-top', '5%', 'important');
       }
 `;
 

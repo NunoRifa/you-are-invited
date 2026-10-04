@@ -89,6 +89,46 @@ const buttonStackingCss = `
    .elementor-element-fd94e87 * {
       pointer-events: none !important;
    }
+
+         /* --- Mobile Fixes: Couple Profiles Safe Spacing & Layout --- */
+         @media (max-width: 767px) {
+            /* Mempelai Wanita: Batasi lebar agar tetap rapi di kolom kiri dan tidak menabrak bingkai foto */
+            .elementor-element-20d8c21,
+            .elementor-element-3eb9824,
+            .elementor-element-464729a,
+            .elementor-element-20d8c21 > .elementor-widget-container,
+            .elementor-element-3eb9824 > .elementor-widget-container,
+            .elementor-element-464729a > .elementor-widget-container {
+               max-width: 62% !important;
+            }
+            .elementor-element-464729a .elementor-widget-container {
+               line-height: 1.4em !important;
+            }
+
+            /* Mempelai Pria: Batasi lebar di sisi kanan agar tidak menabrak bingkai foto */
+            .elementor-element-09ba1c3,
+            .elementor-element-a2f50b3,
+            .elementor-element-d6f55af,
+            .elementor-element-09ba1c3 > .elementor-widget-container,
+            .elementor-element-a2f50b3 > .elementor-widget-container,
+            .elementor-element-d6f55af > .elementor-widget-container {
+               max-width: 65% !important;
+               margin-left: auto !important;
+            }
+            .elementor-element-d6f55af .elementor-widget-container {
+               line-height: 1.4em !important;
+            }
+
+            /* Paragraf Penutup (Closing Text): Jarak aman samping 28px agar tidak mentok tepi layar */
+            .elementor-element.elementor-element-cd646ce > .elementor-widget-container {
+               padding: 0 28px !important;
+               margin: 16px auto !important;
+            }
+            .elementor-element.elementor-element-cd646ce .elementor-heading-title {
+               line-height: 1.6em !important;
+               font-size: 13.5px !important;
+            }
+         }
 </style>
 `;
 html = html.replace(/<\/head>/i, buttonStackingCss + '\n</head>');
@@ -379,7 +419,9 @@ const hydrationEngine = `
       if (bride.displayName) text('[data-id="20d8c21"] p', bride.displayName);
       if (bride.fullName) text('[data-id="3eb9824"] p', bride.fullName);
       if (bride.fatherName) {
-        text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri Kedua') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+        var cleanBrideFather = (bride.fatherName || '').replace(/^Bapak\s+/i, '');
+        var cleanBrideMother = (bride.motherName || '').replace(/^Ibu\s+/i, '');
+        text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri Kedua') + ' dari Bapak ' + cleanBrideFather + (cleanBrideMother ? ' dan Ibu ' + cleanBrideMother : ''));
       }
       if (bride.instagramHandle) {
         attr('[data-id="8624cff"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
@@ -389,7 +431,9 @@ const hydrationEngine = `
       if (groom.displayName) text('[data-id="09ba1c3"] p', groom.displayName);
       if (groom.fullName) text('[data-id="a2f50b3"] p', groom.fullName);
       if (groom.fatherName) {
-        text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra Pertama') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
+        var cleanGroomFather = (groom.fatherName || '').replace(/^Bapak\s+/i, '');
+        var cleanGroomMother = (groom.motherName || '').replace(/^Ibu\s+/i, '');
+        text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra Pertama') + ' dari Bapak ' + cleanGroomFather + (cleanGroomMother ? ' dan Ibu ' + cleanGroomMother : ''));
       }
       if (groom.instagramHandle) {
         attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));

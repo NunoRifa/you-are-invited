@@ -213,78 +213,11 @@ function injectHydration(html, slug) {
         text('[data-id="20d8c21"] p', bride.displayName);
         text('[data-id="3eb9824"] p', bride.fullName);
         if (bride.fatherName) {
-          text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
-        }
-        if (bride.instagramHandle) {
-          attr('[data-id="8624cff"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
-        }
-
-        text('[data-id="09ba1c3"] p', groom.displayName);
-        text('[data-id="a2f50b3"] p', groom.fullName);
-        if (groom.fatherName) {
-          text('[data-id="d6f55af"] p', (groom.birthOrderLabel || 'Putra') + ' dari Bapak ' + groom.fatherName + ' dan Ibu ' + (groom.motherName || ''));
-        }
-        if (groom.instagramHandle) {
-          attr('[data-id="46113a6"] a', 'href', 'https://instagram.com/' + groom.instagramHandle.replace('@', ''));
-        }
-
-        // Event 1 (Akad)
-        if (events[0]) {
-          text('[data-id="6009170"] .elementor-heading-title', events[0].label);
-          text('[data-id="c8e6e2a"] .elementor-heading-title', events[0].date);
-          text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
-          text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
-          if (events[0].mapsUrl) attr('[data-id="2f59679"] a', 'href', events[0].mapsUrl);
-        }
-
-        // Event 2 (Resepsi)
-        if (events[1]) {
-          text('[data-id="4edf461"] .elementor-heading-title', events[1].label);
-          text('[data-id="18b08f3"] .elementor-heading-title', events[1].date);
-          text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
-          text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
-          if (events[1].mapsUrl) attr('[data-id="36a639a"] a', 'href', events[1].mapsUrl);
-        }
-
-        // Gifts
-        if (gifts[0]) {
-          text('[data-id="6ed591f"] .elementor-heading-title', 'An. ' + gifts[0].holderName);
-          text('[data-id="b60bdab"] p', gifts[0].accountNumber);
-          attr('[data-id="e945266"] [data-clipboard-text]', 'data-clipboard-text', gifts[0].accountNumber);
-        }
-        if (gifts[1]) {
-          text('[data-id="b9b1608"] .elementor-heading-title', 'An. ' + gifts[1].holderName);
-          text('[data-id="31757a0"] p', gifts[1].accountNumber);
-          attr('[data-id="1303ef3"] [data-clipboard-text]', 'data-clipboard-text', gifts[1].accountNumber);
-        }
-
-        // Closing
-        if (inv.closingText) text('[data-id="cd646ce"] .elementor-heading-title', inv.closingText);
-        text('[data-id="5fcdb6b"] .elementor-heading-title', (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu'));
-      }
-
-      if (SLUG === 'betawi-motion') {
-        // Hero names
-        text('[data-id="40c760b"] p', (groom.displayName || 'Bang Ali') + ' & ' + (bride.displayName || 'Mpok Siti'));
-        text('[data-id="fcff30f"] .elementor-heading-title', groom.displayName ? groom.displayName.charAt(0) : 'A');
-        text('[data-id="04fd3fc"] .elementor-heading-title', bride.displayName ? bride.displayName.charAt(0) : 'S');
-
-        // Pantun
-        if (tf.pantun_text) text('[data-id="f51cc38"] p', tf.pantun_text);
-        if (tf.hero_video_url) {
-          var vid = document.querySelector('.motionSection video');
-          if (vid) {
-            vid.src = tf.hero_video_url;
-            vid.load();
-            vid.play().catch(function(){});
-          }
-        }
-
-        // Couple
-        text('[data-id="2a2cf2c"] p', bride.displayName);
-        text('[data-id="15e30fe"] p', bride.fullName);
-        if (bride.fatherName) {
-          text('[data-id="05666ff"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + bride.fatherName + ' dan Ibu ' + (bride.motherName || ''));
+          var cleanBrideFather = (bride.fatherName || '').replace(/^Bapak\s+/i, '');
+          var cleanBrideMother = (bride.motherName || '').replace(/^Ibu\s+/i, '');
+          var cleanBrideFather = (bride.fatherName || '').replace(/^Bapak\s+/i, '');
+          var cleanBrideMother = (bride.motherName || '').replace(/^Ibu\s+/i, '');
+          text('[data-id="464729a"] p', (bride.birthOrderLabel || 'Putri') + ' dari Bapak ' + cleanBrideFather + (cleanBrideMother ? ' dan Ibu ' + cleanBrideMother : ''));
         }
         if (bride.instagramHandle) attr('[data-id="ba7b58b"] a', 'href', 'https://instagram.com/' + bride.instagramHandle.replace('@', ''));
 

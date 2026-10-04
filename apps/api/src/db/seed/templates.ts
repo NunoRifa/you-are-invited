@@ -243,7 +243,7 @@ export async function seedTemplates() {
       {
         id: 'ev-anggi-akad',
         invitationId: invId,
-        label: 'AKAD NIKAH',
+        label: 'Akad Nikah',
         date: '2026-11-07',
         startTime: '10:00',
         endTimeLabel: 'Selesai',
@@ -255,7 +255,7 @@ export async function seedTemplates() {
       {
         id: 'ev-anggi-resepsi',
         invitationId: invId,
-        label: 'RESEPSI',
+        label: 'Resepsi',
         date: '2026-11-07',
         startTime: '13:00',
         endTimeLabel: '15.00 WIB',
