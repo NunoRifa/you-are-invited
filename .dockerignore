@@ -1,0 +1,32 @@
+# Version control & tooling
+.git
+.gitignore
+.github
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output (rebuilt inside the image)
+dist
+**/dist
+
+# Live SQLite database and its WAL/SHM sidecars — never ship these in an image
+storage/db/*.sqlite
+storage/db/*.sqlite-wal
+storage/db/*.sqlite-shm
+storage/db/*.sqlite-journal
+apps/api/storage
+
+# Local backups / logs / env
+db-backup-pre-fix
+*.log
+.env
+.env.local
+
+# Editor / OS / scratch
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+.playwright-mcp

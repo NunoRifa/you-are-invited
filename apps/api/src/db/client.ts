@@ -23,9 +23,91 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-export const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
+// --- Pre-flight check on an existing database file -------------------------
+// Evidence-based guard. A truncated / partially-copied database still carries a
+// header that DECLARES more pages than the file actually contains; SQLite then
+// fails the WAL pragma with
+//   SqliteError: database disk image is malformed  (SQLITE_CORRUPT)
+// and the container crash-loops on an opaque error.
+//
+// This function only REPORTS. It never deletes or rewrites a database that may
+// still hold recoverable data.
+export function describeDatabaseSanity(target: string): string | null {
+  if (!fs.existsSync(target)) return null; // Fresh deploy — will be created.
+  const { size } = fs.statSync(target);
+  if (size === 0) {
+    return 'the database file exists but is 0 bytes (an incomplete copy or interrupted write)';
+  }
+
+  // Read the 100-byte SQLite header.
+  let header: Buffer;
+  try {
+    const fd = fs.openSync(target, 'r');
+    header = Buffer.alloc(100);
+    const read = fs.readSync(fd, header, 0, 100, 0);
+    fs.closeSync(fd);
+    if (read < 100) return 'the database file is smaller than a SQLite header (100 bytes) — it is truncated';
+  } catch {
+    return null; // Unreadable — let better-sqlite3 produce the real error.
+  }
+
+  if (header.toString('utf8', 0, 15) !== 'SQLite format 3') {
+    return 'the file does not start with the SQLite header ("SQLite format 3") — it is not a SQLite database';
+  }
+
+  // Page size lives at bytes 16-17 (big-endian); the value 1 means 65536.
+  const rawPageSize = header.readUInt16BE(16);
+  const pageSize = rawPageSize === 1 ? 65536 : rawPageSize;
+  if (pageSize < 512 || (pageSize & (pageSize - 1)) !== 0) {
+    return `the header declares an invalid page size (${rawPageSize})`;
+  }
+
+  const actualPages = size / pageSize;
+  if (!Number.isInteger(actualPages)) {
+    return `the database file size (${size} bytes) is not a whole number of ${pageSize}-byte pages — it is truncated or partially copied`;
+  }
+
+  // Page count lives at bytes 28-31 (big-endian). In WAL mode the main file's
+  // value is a checkpoint-boundary lower bound, so a file may legitimately hold
+  // MORE pages than declared — but never fewer.
+  const declaredPages = header.readUInt32BE(28);
+  if (declaredPages > actualPages) {
+    return `the header declares ${declaredPages} pages but the file contains only ${actualPages} — it is truncated (the proven cause of "database disk image is malformed")`;
+  }
+
+  return null;
+}
+
+function openDatabase(target: string): Database.Database {
+  const sanityIssue = describeDatabaseSanity(target);
+  if (sanityIssue) {
+    console.error(`[db] FATAL: refusing to open the SQLite database at ${target}.`);
+    console.error(`[db] Reason: ${sanityIssue}.`);
+    console.error('[db] A malformed database must NOT be deleted if it may hold data.');
+    console.error(`[db] 1) Back it up:  cp "${target}" "${target}.bak"`);
+    console.error(`[db] 2) Inspect safely (read-only):  node scripts/db-integrity-check.cjs "${target}"`);
+    console.error('[db] 3) If it is a bad copy, restore a known-good backup.');
+    console.error('[db] 4) Only if the data is expendable: remove the file so a fresh one is created.');
+    process.exit(1);
+  }
+
+  try {
+    const database = new Database(target);
+    database.pragma('journal_mode = WAL');
+    database.pragma('foreign_keys = ON');
+    return database;
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    console.error(`[db] FATAL: cannot open SQLite database at ${target}${code ? ` (${code})` : ''}`);
+    if (code === 'SQLITE_CORRUPT' || code === 'SQLITE_NOTADB') {
+      console.error('[db] The file did not pass SQLite validation. Back it up and inspect');
+      console.error(`[db] read-only before acting:  node scripts/db-integrity-check.cjs "${target}"`);
+    }
+    process.exit(1);
+  }
+}
+
+export const sqlite = openDatabase(dbPath);
 
 // Initialize tables if they do not exist
 sqlite.exec(`

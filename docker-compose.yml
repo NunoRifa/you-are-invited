@@ -16,8 +16,19 @@ services:
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
     volumes:
-      - ./storage:/app/storage
-    restart: unless-stopped
+      # Named volume — the live database is owned by Docker, not by the repo.
+      # This is what prevents a stale git-tracked SQLite file from ever landing
+      # next to a fresh, empty database (the cause of SQLITE_CORRUPT).
+      - app-storage:/app/storage
+    # Bound the restart loop: a permanently-broken DB should surface as a
+    # stopped container, not spin forever masking the real error.
+    restart: on-failure:5
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   web:
     build:
@@ -31,3 +42,7 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+
+volumes:
+  app-storage:
+
