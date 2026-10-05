@@ -15,6 +15,9 @@ export interface Invitation {
   coverGuestLabelDefault: string;
   hashtag?: string | null;
   theme?: string | null;
+  coupleDisplayName?: string | null;
+  coverPhotoAssetId?: string | null;
+  coverPhotoUrl?: string | null;
   isPublished: boolean;
   createdAt: number;
   updatedAt: number;
@@ -120,6 +123,13 @@ export interface CreateWishInput {
   attendanceStatus: AttendanceStatus;
   message: string;
   website_hp?: string; // honeypot field
+  turnstileToken?: string; // Cloudflare Turnstile response token
+}
+
+export interface AdminLoginInput {
+  email: string;
+  password: string;
+  turnstileToken?: string; // Cloudflare Turnstile response token
 }
 
 export interface PublicInvitationPayload {

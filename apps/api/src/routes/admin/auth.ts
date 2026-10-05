@@ -3,6 +3,8 @@ import { Hono } from 'hono';
 import { db } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
 import { eq } from 'drizzle-orm';
+import { guardTurnstile, clientIpFromHeaders } from '../../turnstile.js';
+import type { AdminLoginInput } from '@you-are-invited/shared-types';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const adminAuthRouter = new Hono();
@@ -31,12 +33,25 @@ function sessionCookie(sessionId: string, maxAge: number): string {
 }
 
 adminAuthRouter.post('/login', async (c) => {
-  let body: { email?: string; password?: string };
+  let body: AdminLoginInput;
   try {
     body = await c.req.json();
   } catch {
     return c.json({ error: 'Invalid request body' }, 400);
   }
+
+  // Cloudflare Turnstile verification (server-side, fails closed) before any
+  // credential work, so forged/stuffed requests never reach the password check.
+  const turnstileRejection = await guardTurnstile({
+    token: body.turnstileToken,
+    action: 'admin-login',
+    endpoint: 'POST /api/admin/login',
+    remoteIp: clientIpFromHeaders(c.req.header('x-forwarded-for')),
+  });
+  if (turnstileRejection) {
+    return c.json({ error: turnstileRejection.message }, turnstileRejection.status);
+  }
+
   const email = body.email?.trim().toLowerCase();
   if (!email || !body.password) return c.json({ error: 'Email and password required' }, 400);
 

@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import fs from 'node:fs';
 import { Hono } from 'hono';
 import { db } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
@@ -31,23 +33,159 @@ adminInvitationsRouter.get('/:id', (c) => {
   const wishes = db.select().from(schema.wishes).where(eq(schema.wishes.invitationId, id)).all();
   const fields = db.select().from(schema.invitationTemplateFields).where(eq(schema.invitationTemplateFields.invitationId, id)).all();
   const livestream = db.select().from(schema.livestreamInfo).where(eq(schema.livestreamInfo.invitationId, id)).get();
+  const assets = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.invitationId, id)).all();
+  const gallery = db.select().from(schema.galleryImages).where(eq(schema.galleryImages.invitationId, id)).orderBy(schema.galleryImages.sortOrder).all();
 
   return c.json({
-    invitation: inv,
-    couples,
+    invitation: {
+      ...inv,
+      coverPhotoUrl: inv.coverPhotoAssetId ? `/api/assets/${inv.coverPhotoAssetId}` : null,
+    },
+    couples: couples.map((cp) => ({
+      ...cp,
+      photoUrl: cp.photoAssetId ? `/api/assets/${cp.photoAssetId}` : null,
+    })),
     events,
     giftAccounts,
     wishes,
     templateFields: fields,
     livestream: livestream || null,
+    assets: assets.map((a) => ({
+      ...a,
+      url: `/api/assets/${a.id}`,
+    })),
+    gallery: gallery.map((g) => ({
+      ...g,
+      url: `/api/assets/${g.assetId}`,
+    })),
   });
+});
+
+// POST /api/admin/invitations/:id/assets - Multipart file upload
+adminInvitationsRouter.post('/:id/assets', async (c) => {
+  const invitationId = c.req.param('id');
+  const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, invitationId)).get();
+  if (!inv) return c.json({ error: 'Invitation not found' }, 404);
+
+  const body = await c.req.parseBody();
+  const file = body['file'];
+  const kind = (body['kind'] as 'image' | 'audio' | 'font') || 'image';
+
+  if (!file || typeof file === 'string') {
+    return c.json({ error: 'No file uploaded' }, 400);
+  }
+
+  const uploadDir = path.resolve(process.cwd(), `storage/uploads/${invitationId}`);
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const assetId = `ast-${randomUUID()}`;
+  const originalFilename = file.name || 'image.jpg';
+  const ext = path.extname(originalFilename) || '.jpg';
+  const safeFilename = `${assetId}${ext}`;
+  const targetPath = path.join(uploadDir, safeFilename);
+  const relativePath = `storage/uploads/${invitationId}/${safeFilename}`;
+
+  const arrayBuffer = await file.arrayBuffer();
+  fs.writeFileSync(targetPath, Buffer.from(arrayBuffer));
+
+  const mimeType = file.type || 'image/jpeg';
+  db.insert(schema.invitationAssets).values({
+    id: assetId,
+    invitationId,
+    kind,
+    storagePath: relativePath,
+    mimeType,
+    originalFilename,
+    createdAt: Date.now(),
+  }).run();
+
+  return c.json({
+    id: assetId,
+    url: `/api/assets/${assetId}`,
+    kind,
+    mimeType,
+    originalFilename,
+  }, 201);
+});
+
+// DELETE /api/admin/invitations/:id/assets/:assetId
+adminInvitationsRouter.delete('/:id/assets/:assetId', (c) => {
+  const invitationId = c.req.param('id');
+  const assetId = c.req.param('assetId');
+
+  const asset = db.select().from(schema.invitationAssets)
+    .where(eq(schema.invitationAssets.id, assetId)).get();
+  if (!asset || asset.invitationId !== invitationId) {
+    return c.json({ error: 'Asset not found' }, 404);
+  }
+
+  // Clear references from cover photo and couples
+  db.update(schema.invitations)
+    .set({ coverPhotoAssetId: null })
+    .where(eq(schema.invitations.coverPhotoAssetId, assetId))
+    .run();
+
+  db.update(schema.couples)
+    .set({ photoAssetId: null })
+    .where(eq(schema.couples.photoAssetId, assetId))
+    .run();
+
+  db.delete(schema.galleryImages)
+    .where(eq(schema.galleryImages.assetId, assetId))
+    .run();
+
+  db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, assetId)).run();
+
+  try {
+    const fullPath = path.isAbsolute(asset.storagePath) ? asset.storagePath : path.resolve(process.cwd(), asset.storagePath);
+    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+  } catch {}
+
+  return c.json({ success: true });
+});
+
+// POST /api/admin/invitations/:id/gallery
+adminInvitationsRouter.post('/:id/gallery', async (c) => {
+  const invitationId = c.req.param('id');
+  const body = await c.req.json<{ assetId?: string; caption?: string; sortOrder?: number }>();
+  if (!body.assetId) return c.json({ error: 'assetId is required' }, 400);
+
+  const id = `gal-${randomUUID()}`;
+  db.insert(schema.galleryImages).values({
+    id,
+    invitationId,
+    assetId: body.assetId,
+    caption: body.caption || '',
+    sortOrder: body.sortOrder ?? 0,
+  }).run();
+
+  return c.json({
+    id,
+    assetId: body.assetId,
+    caption: body.caption || '',
+    sortOrder: body.sortOrder ?? 0,
+    url: `/api/assets/${body.assetId}`,
+  }, 201);
+});
+
+// DELETE /api/admin/invitations/:id/gallery/:galleryId
+adminInvitationsRouter.delete('/:id/gallery/:galleryId', (c) => {
+  const invitationId = c.req.param('id');
+  const galleryId = c.req.param('galleryId');
+  const item = db.select().from(schema.galleryImages).where(eq(schema.galleryImages.id, galleryId)).get();
+  if (!item || item.invitationId !== invitationId) return c.json({ error: 'Gallery item not found' }, 404);
+
+  db.delete(schema.galleryImages).where(eq(schema.galleryImages.id, galleryId)).run();
+  return c.json({ success: true });
 });
 
 // Update a couple within an invitation.
 adminInvitationsRouter.patch('/:id/couples/:coupleId', async (c) => {
   const invitationId = c.req.param('id');
   const coupleId = c.req.param('coupleId');
-  const body = await c.req.json<Partial<Pick<typeof schema.couples.$inferInsert, 'fullName' | 'displayName' | 'fatherName' | 'motherName' | 'birthOrderLabel' | 'instagramHandle'>>>();
+  const body = await c.req.json<Partial<Pick<typeof schema.couples.$inferInsert, 'fullName' | 'displayName' | 'fatherName' | 'motherName' | 'birthOrderLabel' | 'instagramHandle' | 'photoAssetId'>>>();
   const couple = db.select().from(schema.couples).where(eq(schema.couples.id, coupleId)).get();
   if (!couple || couple.invitationId !== invitationId) return c.json({ error: 'Couple not found' }, 404);
   db.update(schema.couples).set(body).where(eq(schema.couples.id, coupleId)).run();

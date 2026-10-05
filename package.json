@@ -19,7 +19,8 @@
     "client:create": "node scripts/create-client-invitation.cjs",
     "client:update-anggi-ivan": "node scripts/update-anggi-ivan.cjs",
     "admin:user": "node scripts/admin-user.cjs",
-    "sections:verify": "node scripts/verify-post-comment-sections.cjs"
+    "sections:verify": "node scripts/verify-post-comment-sections.cjs",
+    "client:verify-revisions": "node scripts/verify-client-revisions.cjs"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

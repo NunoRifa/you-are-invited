@@ -4,13 +4,19 @@ import { serve } from '@hono/node-server';
 import { invitationsRouter } from './routes/invitations.js';
 import { wishesRouter } from './routes/wishes.js';
 import { templatesRouter } from './routes/templates.js';
+import { assetsRouter } from './routes/assets.js';
+import { configRouter } from './routes/config.js';
 import { adminAuthRouter, requireAdminSession } from './routes/admin/auth.js';
 import { adminInvitationsRouter } from './routes/admin/invitations.js';
 import { adminWishesRouter } from './routes/admin/wishes.js';
 import { seedTemplates } from './db/seed/templates.js';
+import { assertProductionTurnstileConfig } from './turnstile.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+// Refuse to boot in production with a missing or test Turnstile secret.
+assertProductionTurnstileConfig();
 
 const app = new Hono();
 
@@ -30,7 +36,9 @@ app.use('*', cors({
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }));
 
 // Public Routes
+app.route('/api/config', configRouter);
 app.route('/api/templates', templatesRouter);
+app.route('/api/assets', assetsRouter);
 app.route('/api/invitations', invitationsRouter);
 app.route('/api/invitations', wishesRouter);
 

@@ -1,22 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff, Upload, Image, X } from 'lucide-react';
 import { bankProviders, getBankProvider, otherProviderName } from '../../features/gift/bank-providers.js';
 
 interface EditorPayload {
-  invitation: { id: string; slug: string; title: string; hashtag: string | null; openingGreetingText: string | null; closingText: string | null; quoteText: string | null; quoteSource: string | null; coverGuestLabelDefault: string };
-  couples: Array<{ id: string; role: string; fullName: string; displayName: string; fatherName: string | null; motherName: string | null; birthOrderLabel: string | null; instagramHandle: string | null }>;
-  events: Array<{ id: string; label: string; date: string; startTime: string; endTimeLabel: string | null; venueName: string; venueAddress: string; mapsUrl: string | null }>;
-  giftAccounts: Array<{ id: string; holderName: string; accountNumber: string; providerName: string; sortOrder: number }>;
-  wishes: Array<{ id: string; guestName: string; message: string; attendanceStatus: string; isHidden: boolean }>;
+  invitation: {
+    id: string;
+    slug: string;
+    title: string;
+    hashtag: string | null;
+    coupleDisplayName?: string | null;
+    coverPhotoAssetId?: string | null;
+    coverPhotoUrl?: string | null;
+    openingGreetingText: string | null;
+    closingText: string | null;
+    quoteText: string | null;
+    quoteSource: string | null;
+    coverGuestLabelDefault: string;
+  };
+  couples: Array<{
+    id: string;
+    role: string;
+    fullName: string;
+    displayName: string;
+    fatherName: string | null;
+    motherName: string | null;
+    birthOrderLabel: string | null;
+    instagramHandle: string | null;
+    photoAssetId?: string | null;
+    photoUrl?: string | null;
+  }>;
+  events: Array<{
+    id: string;
+    label: string;
+    date: string;
+    startTime: string;
+    endTimeLabel: string | null;
+    venueName: string;
+    venueAddress: string;
+    mapsUrl: string | null;
+  }>;
+  giftAccounts: Array<{
+    id: string;
+    holderName: string;
+    accountNumber: string;
+    providerName: string;
+    sortOrder: number;
+  }>;
+  wishes: Array<{
+    id: string;
+    guestName: string;
+    message: string;
+    attendanceStatus: string;
+    isHidden: boolean;
+  }>;
+  assets?: Array<{
+    id: string;
+    url: string;
+    originalFilename: string;
+    kind: string;
+  }>;
+  gallery?: Array<{
+    id: string;
+    assetId: string;
+    caption: string | null;
+    sortOrder: number;
+    url: string;
+  }>;
 }
 
-const tabs = ['Umum', 'Mempelai', 'Acara', 'Wedding Gift', 'Ucapan'];
+const tabs = ['Umum', 'Mempelai', 'Foto & Media', 'Acara', 'Wedding Gift', 'Ucapan'];
 
 export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (path: string) => void; onLogout: () => void }> = ({ invitationId, onNavigate, onLogout }) => {
   const [payload, setPayload] = useState<EditorPayload | null>(null);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [previewVersion, setPreviewVersion] = useState(0);
 
@@ -56,6 +115,167 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       setNotice(error instanceof Error ? error.message : 'Gagal menyimpan.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const uploadAssetFile = async (file: File): Promise<{ id: string; url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('kind', 'image');
+    const res = await fetch(`/api/admin/invitations/${invitationId}/assets`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Gagal mengunggah file gambar.');
+    return await res.json();
+  };
+
+  const handleUploadCoverPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget('cover');
+    setNotice('Mengunggah foto cover…');
+    try {
+      const uploaded = await uploadAssetFile(file);
+      const res = await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverPhotoAssetId: uploaded.id }),
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan foto cover.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, coverPhotoAssetId: uploaded.id, coverPhotoUrl: uploaded.url },
+      } : cur);
+      setNotice('Foto cover berhasil diperbarui.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload foto cover.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveCoverPhoto = async () => {
+    if (!window.confirm('Hapus foto cover ini?')) return;
+    try {
+      await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverPhotoAssetId: null }),
+      });
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, coverPhotoAssetId: null, coverPhotoUrl: null },
+      } : cur);
+      setNotice('Foto cover dihapus.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto cover.');
+    }
+  };
+
+  const handleUploadCouplePhoto = async (coupleId: string, role: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget(coupleId);
+    setNotice(`Mengunggah foto ${role === 'bride' ? 'mempelai wanita' : 'mempelai pria'}…`);
+    try {
+      const uploaded = await uploadAssetFile(file);
+      const res = await fetch(`/api/admin/invitations/${invitationId}/couples/${coupleId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoAssetId: uploaded.id }),
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan foto mempelai.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        couples: cur.couples.map((c) => c.id === coupleId ? { ...c, photoAssetId: uploaded.id, photoUrl: uploaded.url } : c),
+      } : cur);
+      setNotice(`Foto ${role === 'bride' ? 'mempelai wanita' : 'mempelai pria'} berhasil diperbarui.`);
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload foto mempelai.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveCouplePhoto = async (coupleId: string, role: string) => {
+    if (!window.confirm(`Hapus foto ${role === 'bride' ? 'mempelai wanita' : 'mempelai pria'}?`)) return;
+    try {
+      await fetch(`/api/admin/invitations/${invitationId}/couples/${coupleId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoAssetId: null }),
+      });
+      setPayload((cur) => cur ? {
+        ...cur,
+        couples: cur.couples.map((c) => c.id === coupleId ? { ...c, photoAssetId: null, photoUrl: null } : c),
+      } : cur);
+      setNotice('Foto mempelai dihapus.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto.');
+    }
+  };
+
+  const handleAddGalleryPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget('gallery');
+    setNotice('Mengunggah foto galeri…');
+    try {
+      const uploaded = await uploadAssetFile(file);
+      const res = await fetch(`/api/admin/invitations/${invitationId}/gallery`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assetId: uploaded.id,
+          caption: file.name.replace(/\.[^/.]+$/, ''),
+          sortOrder: (payload?.gallery?.length || 0) + 1,
+        }),
+      });
+      if (!res.ok) throw new Error('Gagal menambahkan foto ke galeri.');
+      const newItem = await res.json();
+      setPayload((cur) => cur ? {
+        ...cur,
+        gallery: [...(cur.gallery || []), newItem],
+      } : cur);
+      setNotice('Foto berhasil ditambahkan ke galeri.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload foto galeri.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteGalleryItem = async (galleryId: string) => {
+    if (!window.confirm('Hapus foto ini dari galeri?')) return;
+    try {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/gallery/${galleryId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Gagal menghapus foto galeri.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        gallery: (cur.gallery || []).filter((g) => g.id !== galleryId),
+      } : cur);
+      setNotice('Foto dihapus dari galeri.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto.');
     }
   };
 
@@ -192,6 +412,11 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     setPayload((current) => current ? { ...current, giftAccounts: current.giftAccounts.map((gift, i) => i === index ? { ...gift, [field]: value } : gift) } : current);
   };
 
+  // Ensure bride comes first in accordance with requirement
+  const sortedCouples = [...payload.couples].sort((a, b) => (a.role === 'bride' ? -1 : 1));
+  const bride = payload.couples.find((c) => c.role === 'bride');
+  const groom = payload.couples.find((c) => c.role === 'groom');
+
   return <main className="min-h-screen bg-stone-100 text-stone-900">
     <header className="flex items-center justify-between gap-4 border-b border-stone-200 bg-white px-5 py-4">
       <button onClick={() => onNavigate('/admin')} className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900"><ArrowLeft size={16}/>Daftar Undangan</button>
@@ -202,77 +427,307 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
         <button onClick={() => void save()} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"><Save size={15}/>{saving ? 'Menyimpan…' : 'Simpan'}</button>
       </div>
     </header>
-    <div className="grid min-h-[calc(100vh-65px)] lg:grid-cols-[minmax(360px,460px)_1fr]">
+    <div className="grid min-h-[calc(100vh-65px)] lg:grid-cols-[minmax(380px,480px)_1fr]">
       <section className="border-r border-stone-200 bg-white">
         <div className="border-b border-stone-200 px-6 py-5"><p className="text-xs uppercase tracking-widest text-stone-500">Editor Undangan</p><h1 className="mt-1 text-xl font-semibold">{payload.invitation.title}</h1></div>
-        <nav aria-label="Bagian undangan" className="flex gap-1 overflow-x-auto border-b border-stone-200 px-4 py-3">{tabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-md px-3 py-2 text-xs font-medium ${activeTab === tab ? 'bg-amber-100 text-amber-950' : 'text-stone-600 hover:bg-stone-100'}`}>{tab}</button>)}</nav>
+        <nav aria-label="Bagian undangan" className="flex gap-1 overflow-x-auto border-b border-stone-200 px-4 py-3">{tabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-md px-3 py-2 text-xs font-medium ${activeTab === tab ? 'bg-amber-100 text-amber-950 font-semibold' : 'text-stone-600 hover:bg-stone-100'}`}>{tab}</button>)}</nav>
         <div className="space-y-4 p-6">
           {activeTab === 'Umum' && <>
             <Field label="Judul undangan" value={payload.invitation.title} onChange={(v) => patchInvitation('title', v)} />
-            <Field label="Hashtag" value={payload.invitation.hashtag || ''} onChange={(v) => patchInvitation('hashtag', v)} placeholder="#NamaPasanganForever" />
+            <Field
+              label="Display Name Pasangan (Format Klien)"
+              value={payload.invitation.coupleDisplayName || ''}
+              onChange={(v) => patchInvitation('coupleDisplayName', v)}
+              placeholder="Contoh: Anggi & Ivan"
+            />
+            <Field label="Hashtag" value={payload.invitation.hashtag || ''} onChange={(v) => patchInvitation('hashtag', v)} placeholder="#AnggiIvanForever" />
             <Field label="Label default tamu" value={payload.invitation.coverGuestLabelDefault} onChange={(v) => patchInvitation('coverGuestLabelDefault', v)} />
             <Field label="Salam pembuka" value={payload.invitation.openingGreetingText || ''} onChange={(v) => patchInvitation('openingGreetingText', v)} multiline />
             <Field label="Kutipan" value={payload.invitation.quoteText || ''} onChange={(v) => patchInvitation('quoteText', v)} multiline />
             <Field label="Sumber kutipan" value={payload.invitation.quoteSource || ''} onChange={(v) => patchInvitation('quoteSource', v)} />
             <Field label="Teks penutup" value={payload.invitation.closingText || ''} onChange={(v) => patchInvitation('closingText', v)} multiline />
           </>}
-          {activeTab === 'Mempelai' && payload.couples.map((person) => (
-            <article key={person.id} className="space-y-3 rounded-xl border border-stone-200 p-4">
-              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
-                <h2 className="font-semibold capitalize text-stone-800">
-                  {person.role === 'bride' ? 'Mempelai Wanita' : 'Mempelai Pria'}
-                </h2>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-600">
-                  {person.role}
-                </span>
-              </div>
+
+          {activeTab === 'Mempelai' && <>
+            <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 space-y-2">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-amber-900">Format Display Nama Pasangan</h2>
               <Field
-                label="Nama Lengkap & Gelar"
-                value={person.fullName}
-                onChange={(v) => updateCouple(person.id, 'fullName', v)}
-                placeholder="Contoh: Anggi Azoka Dea Prabowo, S.Kom"
+                label="Display Name Pasangan (Cover, Hero, Penutup)"
+                value={payload.invitation.coupleDisplayName || ''}
+                onChange={(v) => patchInvitation('coupleDisplayName', v)}
+                placeholder="Contoh: Anggi & Ivan"
               />
-              <Field
-                label="Nama Panggilan"
-                value={person.displayName}
-                onChange={(v) => updateCouple(person.id, 'displayName', v)}
-                placeholder="Contoh: Anggi"
-              />
-              <Field
-                label="Label Anak / Urutan Kelahiran"
-                value={person.birthOrderLabel || ''}
-                onChange={(v) => updateCouple(person.id, 'birthOrderLabel', v)}
-                placeholder="Contoh: Putri Pertama / Putra Kedua"
-              />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field
-                  label="Nama Ayah"
-                  value={person.fatherName || ''}
-                  onChange={(v) => updateCouple(person.id, 'fatherName', v)}
-                  placeholder="Bapak ..."
-                />
-                <Field
-                  label="Nama Ibu"
-                  value={person.motherName || ''}
-                  onChange={(v) => updateCouple(person.id, 'motherName', v)}
-                  placeholder="Ibu ..."
-                />
-              </div>
-              <Field
-                label="Akun Instagram"
-                value={person.instagramHandle || ''}
-                onChange={(v) => updateCouple(person.id, 'instagramHandle', v)}
-                placeholder="username_ig (tanpa @)"
-              />
+              <p className="text-[11px] text-stone-600">
+                Nama pasangan ini tampil di seluruh bagian website. Mengikuti urutan wanita terlebih dahulu (&quot;Anggi &amp; Ivan&quot;).
+              </p>
               <button
                 type="button"
-                onClick={() => void saveCouple(person).catch((e) => setNotice(e.message))}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs font-semibold hover:bg-stone-50"
+                onClick={() => void save()}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 text-white px-3 py-1.5 text-xs font-semibold hover:bg-amber-900"
               >
-                Simpan Profil {person.displayName || person.role}
+                Simpan Display Pasangan
               </button>
+            </div>
+
+            {sortedCouples.map((person) => (
+              <article key={person.id} className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                  <h2 className="font-semibold capitalize text-stone-800">
+                    {person.role === 'bride' ? 'Mempelai Wanita' : 'Mempelai Pria'}
+                  </h2>
+                  <span className={`text-[11px] font-mono px-2 py-0.5 rounded ${person.role === 'bride' ? 'bg-rose-50 text-rose-700' : 'bg-blue-50 text-blue-700'}`}>
+                    {person.role === 'bride' ? 'Wanita (Utama)' : 'Pria'}
+                  </span>
+                </div>
+                <Field
+                  label="Nama Lengkap & Gelar"
+                  value={person.fullName}
+                  onChange={(v) => updateCouple(person.id, 'fullName', v)}
+                  placeholder={person.role === 'bride' ? 'Contoh: Anggi Azoka Dea Prabowo, S.Kom' : 'Contoh: Ivan Budi Rianto'}
+                />
+                <Field
+                  label="Nama Panggilan"
+                  value={person.displayName}
+                  onChange={(v) => updateCouple(person.id, 'displayName', v)}
+                  placeholder={person.role === 'bride' ? 'Contoh: Anggi' : 'Contoh: Ivan'}
+                />
+                <Field
+                  label="Label Anak / Urutan Kelahiran"
+                  value={person.birthOrderLabel || ''}
+                  onChange={(v) => updateCouple(person.id, 'birthOrderLabel', v)}
+                  placeholder="Contoh: Putri Pertama / Putra Kedua"
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field
+                    label="Nama Ayah"
+                    value={person.fatherName || ''}
+                    onChange={(v) => updateCouple(person.id, 'fatherName', v)}
+                    placeholder="Bapak ..."
+                  />
+                  <Field
+                    label="Nama Ibu"
+                    value={person.motherName || ''}
+                    onChange={(v) => updateCouple(person.id, 'motherName', v)}
+                    placeholder="Ibu ..."
+                  />
+                </div>
+                <Field
+                  label="Akun Instagram"
+                  value={person.instagramHandle || ''}
+                  onChange={(v) => updateCouple(person.id, 'instagramHandle', v)}
+                  placeholder="username_ig (tanpa @)"
+                />
+                <button
+                  type="button"
+                  onClick={() => void saveCouple(person).catch((e) => setNotice(e.message))}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs font-semibold hover:bg-stone-50"
+                >
+                  Simpan Profil {person.displayName || person.role}
+                </button>
+              </article>
+            ))}
+          </>}
+
+          {activeTab === 'Foto & Media' && <>
+            <div className="border-b border-stone-200 pb-3">
+              <h2 className="font-semibold text-stone-800 text-sm">Pengelolaan Foto &amp; Media Undangan</h2>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Ganti foto bawaan template dengan foto asli milik klien secara dinamis tanpa merusak layout.
+              </p>
+            </div>
+
+            {/* 1. Foto Cover Pasangan */}
+            <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm">Foto Cover / Pasangan</h3>
+                  <p className="text-xs text-stone-500">Tampil pada amplop cover, foto tengah &amp; penutup</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-300 bg-stone-100 flex items-center justify-center">
+                  {payload.invitation.coverPhotoUrl ? (
+                    <img src={payload.invitation.coverPhotoUrl} alt="Cover" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="text-center p-2 text-stone-400">
+                      <Image size={24} className="mx-auto" />
+                      <span className="text-[10px] mt-1 block">Bawaan Template</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2 flex-1">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                    <Upload size={14}/>
+                    <span>{uploadingTarget === 'cover' ? 'Mengunggah…' : (payload.invitation.coverPhotoUrl ? 'Ganti Foto Cover' : 'Upload Foto Cover')}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingTarget === 'cover'}
+                      onChange={(e) => void handleUploadCoverPhoto(e)}
+                    />
+                  </label>
+                  {payload.invitation.coverPhotoUrl && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => void handleRemoveCoverPhoto()}
+                        className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={13}/> Hapus Foto Kustom
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </article>
-          ))}
+
+            {/* 2. Foto Mempelai Wanita */}
+            {bride && (
+              <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                  <div>
+                    <h3 className="font-semibold text-stone-800 text-sm">Foto Mempelai Wanita ({bride.displayName})</h3>
+                    <p className="text-xs text-stone-500">Tampil pada bingkai foto profil wanita</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-300 bg-stone-100 flex items-center justify-center">
+                    {bride.photoUrl ? (
+                      <img src={bride.photoUrl} alt="Foto Mempelai Wanita" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="text-center p-2 text-stone-400">
+                        <Image size={24} className="mx-auto" />
+                        <span className="text-[10px] mt-1 block">Bawaan Template</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2 flex-1">
+                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                      <Upload size={14}/>
+                      <span>{uploadingTarget === bride.id ? 'Mengunggah…' : (bride.photoUrl ? 'Ganti Foto Wanita' : 'Upload Foto Wanita')}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingTarget === bride.id}
+                        onChange={(e) => void handleUploadCouplePhoto(bride.id, 'bride', e)}
+                      />
+                    </label>
+                    {bride.photoUrl && (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => void handleRemoveCouplePhoto(bride.id, 'bride')}
+                          className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 size={13}/> Hapus Foto Kustom
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </article>
+            )}
+
+            {/* 3. Foto Mempelai Pria */}
+            {groom && (
+              <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                  <div>
+                    <h3 className="font-semibold text-stone-800 text-sm">Foto Mempelai Pria ({groom.displayName})</h3>
+                    <p className="text-xs text-stone-500">Tampil pada bingkai foto profil pria</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-300 bg-stone-100 flex items-center justify-center">
+                    {groom.photoUrl ? (
+                      <img src={groom.photoUrl} alt="Foto Mempelai Pria" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="text-center p-2 text-stone-400">
+                        <Image size={24} className="mx-auto" />
+                        <span className="text-[10px] mt-1 block">Bawaan Template</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2 flex-1">
+                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                      <Upload size={14}/>
+                      <span>{uploadingTarget === groom.id ? 'Mengunggah…' : (groom.photoUrl ? 'Ganti Foto Pria' : 'Upload Foto Pria')}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingTarget === groom.id}
+                        onChange={(e) => void handleUploadCouplePhoto(groom.id, 'groom', e)}
+                      />
+                    </label>
+                    {groom.photoUrl && (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => void handleRemoveCouplePhoto(groom.id, 'groom')}
+                          className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 size={13}/> Hapus Foto Kustom
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </article>
+            )}
+
+            {/* 4. Galeri Foto Undangan */}
+            <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm">Galeri Foto Undangan</h3>
+                  <p className="text-xs text-stone-500">{payload.gallery?.length || 0} foto dalam galeri</p>
+                </div>
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-900">
+                  <Plus size={14}/>
+                  <span>{uploadingTarget === 'gallery' ? 'Mengunggah…' : 'Tambah Foto'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingTarget === 'gallery'}
+                    onChange={(e) => void handleAddGalleryPhoto(e)}
+                  />
+                </label>
+              </div>
+
+              {(!payload.gallery || payload.gallery.length === 0) ? (
+                <p className="text-xs text-stone-500 py-3 text-center">
+                  Belum ada foto galeri kustom yang diunggah. Template menampilkan foto default.
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {payload.gallery.map((item, idx) => (
+                    <div key={item.id} className="group relative rounded-lg border border-stone-200 overflow-hidden bg-stone-50">
+                      <div className="h-28 w-full overflow-hidden">
+                        <img src={item.url} alt={item.caption || `Galeri ${idx + 1}`} className="h-full w-full object-cover" />
+                      </div>
+                      <div className="p-2 flex items-center justify-between gap-1 text-[11px]">
+                        <span className="truncate text-stone-700" title={item.caption || ''}>
+                          {item.caption || `Foto #${idx + 1}`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void handleDeleteGalleryItem(item.id)}
+                          className="shrink-0 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                          title="Hapus foto dari galeri"
+                        >
+                          <Trash2 size={13}/>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </article>
+          </>}
 
           {activeTab === 'Acara' && <>
             <div className="flex items-center justify-between gap-3">

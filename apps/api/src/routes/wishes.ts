@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { db } from '../db/client.js';
 import * as schema from '../db/schema.js';
 import { eq, and, desc, lt, or } from 'drizzle-orm';
+import { guardTurnstile, clientIpFromHeaders } from '../turnstile.js';
 import type { CreateWishInput, Wish } from '@you-are-invited/shared-types';
 
 export const wishesRouter = new Hono();
@@ -85,7 +86,20 @@ wishesRouter.post('/:slug/wishes', async (c) => {
   }
   rateLimitMap.set(clientIp, now);
 
-  // 3. Validation
+  // 3. Cloudflare Turnstile verification (server-side, fails closed).
+  //    Inserted after the existing honeypot/rate-limit so their behavior is
+  //    unchanged, and before field validation so spam is rejected early.
+  const turnstileRejection = await guardTurnstile({
+    token: body.turnstileToken,
+    action: 'wishes',
+    endpoint: 'POST /api/invitations/:slug/wishes',
+    remoteIp: clientIpFromHeaders(c.req.header('x-forwarded-for')),
+  });
+  if (turnstileRejection) {
+    return c.json({ error: turnstileRejection.message }, turnstileRejection.status);
+  }
+
+  // 4. Validation
   const guestName = (body.guestName || '').trim();
   const message = (body.message || '').trim();
   const attendanceStatus = body.attendanceStatus || 'attending';

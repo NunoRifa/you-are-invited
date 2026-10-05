@@ -38,6 +38,8 @@ export const invitations = sqliteTable('invitations', {
   coverGuestLabelDefault: text('cover_guest_label_default').notNull().default('Tamu Undangan'),
   hashtag: text('hashtag'),
   theme: text('theme'),
+  coupleDisplayName: text('couple_display_name'),
+  coverPhotoAssetId: text('cover_photo_asset_id'),
   isPublished: integer('is_published', { mode: 'boolean' }).notNull().default(true),
   createdAt: integer('created_at').notNull(),
   updatedAt: integer('updated_at').notNull(),

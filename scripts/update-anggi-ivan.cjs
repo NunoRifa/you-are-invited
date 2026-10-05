@@ -8,8 +8,8 @@ if (!invitation) {
 }
 
 const update = db.transaction(() => {
-  db.prepare('UPDATE invitations SET hashtag = ?, updated_at = ? WHERE id = ?')
-    .run('#IvanAnggiForever', Date.now(), invitation.id);
+  db.prepare('UPDATE invitations SET hashtag = ?, couple_display_name = ?, title = ?, updated_at = ? WHERE id = ?')
+    .run('#AnggiIvanForever', 'Anggi & Ivan', 'Pernikahan Anggi & Ivan', Date.now(), invitation.id);
 
   const bca = db.prepare('SELECT id FROM gift_accounts WHERE invitation_id = ? AND provider_name = ?')
     .get(invitation.id, 'BCA');

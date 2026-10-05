@@ -67,6 +67,8 @@ sqlite.exec(`
     cover_guest_label_default TEXT NOT NULL DEFAULT 'Tamu Undangan',
     hashtag TEXT,
     theme TEXT,
+    couple_display_name TEXT,
+    cover_photo_asset_id TEXT REFERENCES invitation_assets(id),
     is_published INTEGER NOT NULL DEFAULT 1,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
@@ -164,5 +166,18 @@ sqlite.exec(`
   CREATE INDEX IF NOT EXISTS idx_wishes_inv_created ON wishes(invitation_id, created_at);
   CREATE INDEX IF NOT EXISTS idx_events_inv_sort ON events(invitation_id, sort_order);
 `);
+
+// Run non-destructive column migrations for existing SQLite databases
+try {
+  const invCols = sqlite.prepare("PRAGMA table_info(invitations)").all() as { name: string }[];
+  if (!invCols.some((c) => c.name === 'couple_display_name')) {
+    sqlite.exec('ALTER TABLE invitations ADD COLUMN couple_display_name TEXT;');
+  }
+  if (!invCols.some((c) => c.name === 'cover_photo_asset_id')) {
+    sqlite.exec('ALTER TABLE invitations ADD COLUMN cover_photo_asset_id TEXT REFERENCES invitation_assets(id);');
+  }
+} catch (e) {
+  console.error('Migration warning for invitations:', e);
+}
 
 export const db = drizzle(sqlite, { schema });

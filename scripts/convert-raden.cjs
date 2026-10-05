@@ -362,6 +362,61 @@ const hydrationEngine = `
   var currentSlug = (window.location.pathname.match(/^\/i\/([^\/?#]+)/) || [])[1] || 'raden-motion';
   var API = '/api/invitations/' + encodeURIComponent(currentSlug);
 
+  // --- Cloudflare Turnstile (invisible) ---
+  // Loads the public site key from our backend, renders an invisible widget, and
+  // exposes getTurnstileToken() which the RSVP submit handler awaits to obtain a
+  // fresh single-use token. If the gate is off or the script fails, it resolves
+  // '' and the server decides — the client never gates on its own.
+  window.__TURNSTILE_READY__ = fetch('/api/config/turnstile')
+    .then(function(r) { return r.ok ? r.json() : { enabled: false }; })
+    .then(function(cfg) {
+      if (!cfg || !cfg.enabled || !cfg.siteKey) return null;
+      return new Promise(function(resolve) {
+        var script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        script.async = true;
+        script.defer = true;
+        script.onload = function() {
+          if (!window.turnstile) { resolve(null); return; }
+          var holder = document.createElement('div');
+          holder.style.display = 'none';
+          (document.body || document.documentElement).appendChild(holder);
+          var token = '';
+          var pending = null;
+          var widgetId = window.turnstile.render(holder, {
+            sitekey: cfg.siteKey,
+            action: 'wishes',
+            callback: function(t) { token = t; if (pending) { pending(t); pending = null; } },
+            'expired-callback': function() { token = ''; },
+            'error-callback': function() { token = ''; if (pending) { pending(''); pending = null; } }
+          });
+          resolve({
+            getToken: function() {
+              return new Promise(function(res) {
+                if (token) { var t = token; token = ''; res(t); return; }
+                pending = res;
+                try { window.turnstile.execute(widgetId); } catch (e) { pending = null; res(''); }
+              });
+            },
+            reset: function() { token = ''; try { window.turnstile.reset(widgetId); } catch (e) {} }
+          });
+        };
+        script.onerror = function() { resolve(null); };
+        document.head.appendChild(script);
+      });
+    })
+    .catch(function() { return null; });
+
+  function getTurnstileToken() {
+    return window.__TURNSTILE_READY__.then(function(w) {
+      return w ? w.getToken() : '';
+    }).catch(function() { return ''; });
+  }
+
+  function resetTurnstile() {
+    window.__TURNSTILE_READY__.then(function(w) { if (w) w.reset(); }).catch(function() {});
+  }
+
   fetch(API)
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(payload) {
@@ -396,19 +451,90 @@ const hydrationEngine = `
       var guest = rawGuest && rawGuest.trim() ? rawGuest.trim() : (inv.coverGuestLabelDefault || 'Tamu Undangan');
       each('.namatamu', function(el) { el.textContent = guest; });
 
-      // Cover names
-      if (groom.displayName && bride.displayName) {
-        each('.wdp-mempelai', function(el) {
-          el.textContent = groom.displayName + ' & ' + bride.displayName;
-        });
+      function setImage(sel, url) {
+        if (!url) return;
+        var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+        if (!el) return;
+        var img = el.tagName === 'IMG' ? el : el.querySelector('img');
+        if (img) {
+          img.src = url;
+          img.setAttribute('data-src', url);
+          img.removeAttribute('srcset');
+          img.removeAttribute('data-srcset');
+        }
       }
 
-      // Hero names
-      if (groom.displayName) text('[data-id="4b0b57e"] .elementor-heading-title', groom.displayName);
-      if (bride.displayName) text('[data-id="08ea836"] .elementor-heading-title', bride.displayName);
+      var pairDisplayName = inv.coupleDisplayName || ((bride.displayName || 'Anggi') + ' & ' + (groom.displayName || 'Ivan'));
+      if (pairDisplayName) {
+        document.title = (inv.title || ('The Wedding of ' + pairDisplayName)) + ' - You Are Invited';
+      }
+
+      // Guest Name from URL parameter
+      var p = new URLSearchParams(location.search);
+      var rawGuest = p.get('to') || p.get('dear') || p.get('kepada');
+      var guest = rawGuest && rawGuest.trim() ? rawGuest.trim() : (inv.coverGuestLabelDefault || 'Tamu Undangan');
+      each('.namatamu', function(el) { el.textContent = guest; });
+
+      // Cover names (Female first or dynamic coupleDisplayName)
+      each('.wdp-mempelai', function(el) {
+        el.textContent = pairDisplayName;
+      });
+
+      // Hero names (Female first: bride -> groom)
+      if (bride.displayName) text('[data-id="4b0b57e"] .elementor-heading-title', bride.displayName);
+      if (groom.displayName) text('[data-id="08ea836"] .elementor-heading-title', groom.displayName);
       if (events[0] && events[0].date) {
         var ev0Date = formatIndoDate(events[0].date);
         text('[data-id="44bbaa4"] p', ev0Date.dateFormatted);
+      }
+
+      // Photos & Media Hydration
+      if (inv.coverPhotoUrl) {
+        setImage('[data-id="379ea7b"]', inv.coverPhotoUrl);
+        setImage('[data-id="54e147f"]', inv.coverPhotoUrl);
+        setImage('[data-id="8ab5600"]', inv.coverPhotoUrl);
+      }
+      if (bride.photoUrl) {
+        setImage('[data-id="5775dd2"]', bride.photoUrl);
+      }
+      if (groom.photoUrl) {
+        setImage('[data-id="2126396"]', groom.photoUrl);
+      }
+
+      // Gallery Images Hydration
+      var galleryWidget = document.querySelector('[data-id="b6f6ff8"]');
+      if (galleryWidget && payload.gallery && payload.gallery.length > 0) {
+        var galleryContainer = galleryWidget.querySelector('.elementor-gallery__container');
+        if (galleryContainer) {
+          galleryContainer.innerHTML = '';
+          payload.gallery.forEach(function(item, idx) {
+            var a = document.createElement('a');
+            a.className = 'e-gallery-item elementor-gallery-item elementor-animated-content';
+            a.href = item.url;
+            a.setAttribute('data-elementor-open-lightbox', 'yes');
+            a.setAttribute('data-elementor-lightbox-slideshow', 'b6f6ff8');
+            a.setAttribute('data-elementor-lightbox-title', item.caption || ('Galeri ' + (idx + 1)));
+
+            var imgDiv = document.createElement('div');
+            imgDiv.className = 'e-gallery-image elementor-gallery-item__image';
+            imgDiv.setAttribute('data-thumbnail', item.url);
+            imgDiv.setAttribute('role', 'img');
+            imgDiv.setAttribute('aria-label', item.caption || ('Galeri ' + (idx + 1)));
+            imgDiv.style.backgroundImage = 'url("' + item.url + '")';
+            imgDiv.style.backgroundSize = 'cover';
+            imgDiv.style.backgroundPosition = 'center';
+            imgDiv.style.width = '100%';
+            imgDiv.style.height = '100%';
+            imgDiv.style.display = 'block';
+
+            var overlay = document.createElement('div');
+            overlay.className = 'elementor-gallery-item__overlay';
+
+            a.appendChild(imgDiv);
+            a.appendChild(overlay);
+            galleryContainer.appendChild(a);
+          });
+        }
       }
 
       // Quote & Greeting
@@ -564,11 +690,9 @@ const hydrationEngine = `
         if (copyDiv1) copyDiv1.textContent = gifts[1].accountNumber;
       }
 
-      // Closing
+      // Closing (Female first: pairDisplayName)
       if (inv.closingText) text('[data-id="cd646ce"] .elementor-heading-title', inv.closingText);
-      if (groom.displayName && bride.displayName) {
-        text('[data-id="5fcdb6b"] .elementor-heading-title', groom.displayName + ' & ' + bride.displayName);
-      }
+      text('[data-id="5fcdb6b"] .elementor-heading-title', pairDisplayName);
 
       // Countdown Timer Engine (Q2)
       var targetDate = (events[0] && events[0].date)
@@ -757,21 +881,24 @@ const hydrationEngine = `
           if (statusVal === 'Masih Ragu' || statusVal === 'Mungkin') st = 'maybe';
 
           if (statusEl) {
-            statusEl.innerHTML = '<p style="color: #666; padding: 8px 0;"><span class="cuio-loading"></span> Menyimpan ucapan Anda...</p>';
+            statusEl.innerHTML = '<p style="color: #666; padding: 8px 0;"><span class="cuio-loading"></span> Memverifikasi keamanan &amp; menyimpan ucapan Anda...</p>';
             statusEl.style.display = 'block';
           }
           if (submitBtn) submitBtn.disabled = true;
 
-          fetch('/api/invitations/' + encodeURIComponent(currentSlug) + '/wishes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              guestName: author,
-              message: msg,
-              attendanceStatus: st
+          getTurnstileToken().then(function(turnstileToken) {
+            return fetch('/api/invitations/' + encodeURIComponent(currentSlug) + '/wishes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                guestName: author,
+                message: msg,
+                attendanceStatus: st,
+                turnstileToken: turnstileToken
+              })
             })
+            .then(function(res) { return res.json(); });
           })
-          .then(function(res) { return res.json(); })
           .then(function(result) {
             if (submitBtn) submitBtn.disabled = false;
             if (result.success && result.data) {
@@ -828,6 +955,7 @@ const hydrationEngine = `
               // Clear message
               if (msgEl) msgEl.value = '';
             } else {
+              resetTurnstile();
               if (statusEl) {
                 statusEl.innerHTML = '<p class="cui-ajax-error" style="color: #d90a11; font-weight: bold; padding: 8px 0;">' + (result.error || 'Gagal mengirim ucapan.') + '</p>';
                 statusEl.style.display = 'block';
@@ -835,6 +963,7 @@ const hydrationEngine = `
             }
           })
           .catch(function(err) {
+            resetTurnstile();
             if (submitBtn) submitBtn.disabled = false;
             if (statusEl) {
               statusEl.innerHTML = '<p class="cui-ajax-error" style="color: #d90a11; font-weight: bold; padding: 8px 0;">Terjadi kesalahan koneksi.</p>';

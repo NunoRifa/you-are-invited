@@ -193,16 +193,18 @@ function injectHydration(html, slug) {
       applyGuestName(inv.coverGuestLabelDefault);
       window.__WDP_DATA__ = payload;
 
+      var pairDisplayName = inv.coupleDisplayName || ((bride.displayName || 'Anggi') + ' & ' + (groom.displayName || 'Ivan'));
+
       // 1. Cover Gate
       each('.wdp-mempelai', function(el) {
-        el.textContent = (groom.displayName || 'Raden') + ' & ' + (bride.displayName || 'Ayu');
+        el.textContent = pairDisplayName;
       });
 
       // 2. Specific Template Hydrations
       if (SLUG === 'raden-motion') {
-        // Hero names & date
-        text('[data-id="4b0b57e"] .elementor-heading-title', groom.displayName);
-        text('[data-id="08ea836"] .elementor-heading-title', bride.displayName);
+        // Hero names & date (Female first: bride -> groom)
+        text('[data-id="4b0b57e"] .elementor-heading-title', bride.displayName);
+        text('[data-id="08ea836"] .elementor-heading-title', groom.displayName);
         if (events[0]) text('[data-id="44bbaa4"] p', events[0].date);
 
         // Quote & Greeting
