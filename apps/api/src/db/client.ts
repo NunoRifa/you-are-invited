@@ -5,7 +5,17 @@ import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Load .env from cwd or project root (for npm workspaces)
+const envPaths = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), '../../.env'),
+];
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 // Determine root storage directory
 let dbPath = process.env.DATABASE_URL;

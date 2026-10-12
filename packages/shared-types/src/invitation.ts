@@ -18,6 +18,10 @@ export interface Invitation {
   coupleDisplayName?: string | null;
   coverPhotoAssetId?: string | null;
   coverPhotoUrl?: string | null;
+  heroPhotoAssetId?: string | null;
+  heroPhotoUrl?: string | null;
+  closingPhotoAssetId?: string | null;
+  closingPhotoUrl?: string | null;
   isPublished: boolean;
   createdAt: number;
   updatedAt: number;

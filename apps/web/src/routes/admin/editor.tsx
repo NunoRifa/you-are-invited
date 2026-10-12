@@ -11,6 +11,10 @@ interface EditorPayload {
     coupleDisplayName?: string | null;
     coverPhotoAssetId?: string | null;
     coverPhotoUrl?: string | null;
+    heroPhotoAssetId?: string | null;
+    heroPhotoUrl?: string | null;
+    closingPhotoAssetId?: string | null;
+    closingPhotoUrl?: string | null;
     openingGreetingText: string | null;
     closingText: string | null;
     quoteText: string | null;
@@ -176,6 +180,102 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       setPreviewVersion((v) => v + 1);
     } catch (err) {
       setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto cover.');
+    }
+  };
+
+  const handleUploadHeroPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget('hero');
+    setNotice('Mengunggah foto utama tengah…');
+    try {
+      const uploaded = await uploadAssetFile(file);
+      const res = await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroPhotoAssetId: uploaded.id }),
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan foto utama tengah.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, heroPhotoAssetId: uploaded.id, heroPhotoUrl: uploaded.url },
+      } : cur);
+      setNotice('Foto utama tengah berhasil diperbarui.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload foto utama tengah.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveHeroPhoto = async () => {
+    if (!window.confirm('Hapus foto utama tengah ini?')) return;
+    try {
+      await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroPhotoAssetId: null }),
+      });
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, heroPhotoAssetId: null, heroPhotoUrl: null },
+      } : cur);
+      setNotice('Foto utama tengah dihapus.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto utama tengah.');
+    }
+  };
+
+  const handleUploadClosingPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget('closing');
+    setNotice('Mengunggah foto penutup…');
+    try {
+      const uploaded = await uploadAssetFile(file);
+      const res = await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ closingPhotoAssetId: uploaded.id }),
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan foto penutup.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, closingPhotoAssetId: uploaded.id, closingPhotoUrl: uploaded.url },
+      } : cur);
+      setNotice('Foto penutup berhasil diperbarui.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload foto penutup.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveClosingPhoto = async () => {
+    if (!window.confirm('Hapus foto penutup ini?')) return;
+    try {
+      await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ closingPhotoAssetId: null }),
+      });
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, closingPhotoAssetId: null, closingPhotoUrl: null },
+      } : cur);
+      setNotice('Foto penutup dihapus.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus foto penutup.');
     }
   };
 
@@ -536,12 +636,12 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               </p>
             </div>
 
-            {/* 1. Foto Cover Pasangan */}
+            {/* 1. Foto Cover (Amplop Depan) */}
             <article className="space-y-3 rounded-xl border border-stone-200 p-4">
               <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                 <div>
-                  <h3 className="font-semibold text-stone-800 text-sm">Foto Cover / Pasangan</h3>
-                  <p className="text-xs text-stone-500">Tampil pada amplop cover, foto tengah &amp; penutup</p>
+                  <h3 className="font-semibold text-stone-800 text-sm">Foto Cover (Amplop Depan)</h3>
+                  <p className="text-xs text-stone-500">Tampil pada amplop cover saat pertama dibuka</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -582,13 +682,59 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               </div>
             </article>
 
-            {/* 2. Foto Mempelai Wanita */}
+            {/* 2. Foto Utama (Hero Tengah) */}
+            <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm">Foto Utama (Hero Tengah)</h3>
+                  <p className="text-xs text-stone-500">Tampil pada foto besar persegi panjang di tengah halaman (zoom)</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-300 bg-stone-100 flex items-center justify-center">
+                  {payload.invitation.heroPhotoUrl ? (
+                    <img src={payload.invitation.heroPhotoUrl} alt="Foto Utama Tengah" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="text-center p-2 text-stone-400">
+                      <Image size={24} className="mx-auto" />
+                      <span className="text-[10px] mt-1 block">Bawaan Template</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2 flex-1">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                    <Upload size={14}/>
+                    <span>{uploadingTarget === 'hero' ? 'Mengunggah…' : (payload.invitation.heroPhotoUrl ? 'Ganti Foto Tengah' : 'Upload Foto Tengah')}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingTarget === 'hero'}
+                      onChange={(e) => void handleUploadHeroPhoto(e)}
+                    />
+                  </label>
+                  {payload.invitation.heroPhotoUrl && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => void handleRemoveHeroPhoto()}
+                        className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={13}/> Hapus Foto Kustom
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+
+            {/* 3. Foto Mempelai Wanita */}
             {bride && (
               <article className="space-y-3 rounded-xl border border-stone-200 p-4">
                 <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                   <div>
                     <h3 className="font-semibold text-stone-800 text-sm">Foto Mempelai Wanita ({bride.displayName})</h3>
-                    <p className="text-xs text-stone-500">Tampil pada bingkai foto profil wanita</p>
+                    <p className="text-xs text-stone-500">Tampil pada bingkai oval foto profil wanita</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -630,13 +776,13 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               </article>
             )}
 
-            {/* 3. Foto Mempelai Pria */}
+            {/* 4. Foto Mempelai Pria */}
             {groom && (
               <article className="space-y-3 rounded-xl border border-stone-200 p-4">
                 <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                   <div>
                     <h3 className="font-semibold text-stone-800 text-sm">Foto Mempelai Pria ({groom.displayName})</h3>
-                    <p className="text-xs text-stone-500">Tampil pada bingkai foto profil pria</p>
+                    <p className="text-xs text-stone-500">Tampil pada bingkai oval foto profil pria</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -678,7 +824,53 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               </article>
             )}
 
-            {/* 4. Galeri Foto Undangan */}
+            {/* 5. Foto Penutup (Closing) */}
+            <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm">Foto Penutup (Closing)</h3>
+                  <p className="text-xs text-stone-500">Tampil pada bingkai oval bagian penutup / ucapan terima kasih</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-300 bg-stone-100 flex items-center justify-center">
+                  {payload.invitation.closingPhotoUrl ? (
+                    <img src={payload.invitation.closingPhotoUrl} alt="Foto Penutup" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="text-center p-2 text-stone-400">
+                      <Image size={24} className="mx-auto" />
+                      <span className="text-[10px] mt-1 block">Bawaan Template</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2 flex-1">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                    <Upload size={14}/>
+                    <span>{uploadingTarget === 'closing' ? 'Mengunggah…' : (payload.invitation.closingPhotoUrl ? 'Ganti Foto Penutup' : 'Upload Foto Penutup')}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingTarget === 'closing'}
+                      onChange={(e) => void handleUploadClosingPhoto(e)}
+                    />
+                  </label>
+                  {payload.invitation.closingPhotoUrl && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => void handleRemoveClosingPhoto()}
+                        className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={13}/> Hapus Foto Kustom
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+
+            {/* 6. Galeri Foto Undangan */}
             <article className="space-y-3 rounded-xl border border-stone-200 p-4">
               <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                 <div>

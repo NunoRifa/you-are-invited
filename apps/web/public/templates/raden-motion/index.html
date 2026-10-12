@@ -6952,6 +6952,7 @@ window.settingAutoplay = true;
           img.setAttribute('data-src', url);
           img.removeAttribute('srcset');
           img.removeAttribute('data-srcset');
+          img.removeAttribute('data-lazyloaded');
         }
       }
 
@@ -6980,10 +6981,15 @@ window.settingAutoplay = true;
       }
 
       // Photos & Media Hydration
-      if (inv.coverPhotoUrl) {
-        setImage('[data-id="379ea7b"]', inv.coverPhotoUrl);
-        setImage('[data-id="54e147f"]', inv.coverPhotoUrl);
-        setImage('[data-id="8ab5600"]', inv.coverPhotoUrl);
+      var coverEl = document.querySelector('.elementor-element-e2ef6a0 .overlayy');
+      if (coverEl && inv.coverPhotoUrl) {
+        coverEl.style.setProperty('background-image', 'url("' + inv.coverPhotoUrl + '")', 'important');
+      }
+      if (inv.heroPhotoUrl) {
+        setImage('[data-id="54e147f"]', inv.heroPhotoUrl);
+      }
+      if (inv.closingPhotoUrl) {
+        setImage('[data-id="8ab5600"]', inv.closingPhotoUrl);
       }
       if (bride.photoUrl) {
         setImage('[data-id="5775dd2"]', bride.photoUrl);

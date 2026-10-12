@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { Hono } from 'hono';
 import { db } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 
 export const adminInvitationsRouter = new Hono();
 
@@ -36,10 +36,17 @@ adminInvitationsRouter.get('/:id', (c) => {
   const assets = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.invitationId, id)).all();
   const gallery = db.select().from(schema.galleryImages).where(eq(schema.galleryImages.invitationId, id)).orderBy(schema.galleryImages.sortOrder).all();
 
+  const heroField = fields.find((f) => f.fieldKey === 'hero_photo_asset_id');
+  const closingField = fields.find((f) => f.fieldKey === 'closing_photo_asset_id');
+
   return c.json({
     invitation: {
       ...inv,
       coverPhotoUrl: inv.coverPhotoAssetId ? `/api/assets/${inv.coverPhotoAssetId}` : null,
+      heroPhotoAssetId: heroField?.fieldValue || null,
+      heroPhotoUrl: heroField?.fieldValue ? `/api/assets/${heroField.fieldValue}` : null,
+      closingPhotoAssetId: closingField?.fieldValue || null,
+      closingPhotoUrl: closingField?.fieldValue ? `/api/assets/${closingField.fieldValue}` : null,
     },
     couples: couples.map((cp) => ({
       ...cp,
@@ -134,6 +141,13 @@ adminInvitationsRouter.delete('/:id/assets/:assetId', (c) => {
 
   db.delete(schema.galleryImages)
     .where(eq(schema.galleryImages.assetId, assetId))
+    .run();
+
+  db.delete(schema.invitationTemplateFields)
+    .where(and(
+      eq(schema.invitationTemplateFields.invitationId, invitationId),
+      eq(schema.invitationTemplateFields.fieldValue, assetId)
+    ))
     .run();
 
   db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, assetId)).run();
@@ -346,19 +360,72 @@ adminInvitationsRouter.patch('/:id/livestream', async (c) => {
 // PATCH /api/admin/invitations/:id
 adminInvitationsRouter.patch('/:id', async (c) => {
   const id = c.req.param('id');
-  const body = await c.req.json<Partial<typeof schema.invitations.$inferInsert>>();
+  const body = await c.req.json<any>();
+  const { heroPhotoAssetId, closingPhotoAssetId, ...invitationFields } = body;
 
-  const updated = db
-    .update(schema.invitations)
-    .set({
-      ...body,
-      updatedAt: Date.now(),
-    })
-    .where(eq(schema.invitations.id, id))
-    .run();
-
-  if (updated.changes === 0) {
+  const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, id)).get();
+  if (!inv) {
     return c.json({ error: 'Invitation not found' }, 404);
+  }
+
+  if (heroPhotoAssetId !== undefined) {
+    if (heroPhotoAssetId === null) {
+      db.delete(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'hero_photo_asset_id')))
+        .run();
+    } else {
+      const existing = db.select().from(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'hero_photo_asset_id')))
+        .get();
+      if (existing) {
+        db.update(schema.invitationTemplateFields)
+          .set({ fieldValue: String(heroPhotoAssetId) })
+          .where(eq(schema.invitationTemplateFields.id, existing.id))
+          .run();
+      } else {
+        db.insert(schema.invitationTemplateFields).values({
+          id: `tf-hero-${randomUUID()}`,
+          invitationId: id,
+          fieldKey: 'hero_photo_asset_id',
+          fieldValue: String(heroPhotoAssetId),
+        }).run();
+      }
+    }
+  }
+
+  if (closingPhotoAssetId !== undefined) {
+    if (closingPhotoAssetId === null) {
+      db.delete(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'closing_photo_asset_id')))
+        .run();
+    } else {
+      const existing = db.select().from(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'closing_photo_asset_id')))
+        .get();
+      if (existing) {
+        db.update(schema.invitationTemplateFields)
+          .set({ fieldValue: String(closingPhotoAssetId) })
+          .where(eq(schema.invitationTemplateFields.id, existing.id))
+          .run();
+      } else {
+        db.insert(schema.invitationTemplateFields).values({
+          id: `tf-closing-${randomUUID()}`,
+          invitationId: id,
+          fieldKey: 'closing_photo_asset_id',
+          fieldValue: String(closingPhotoAssetId),
+        }).run();
+      }
+    }
+  }
+
+  if (Object.keys(invitationFields).length > 0) {
+    db.update(schema.invitations)
+      .set({
+        ...invitationFields,
+        updatedAt: Date.now(),
+      })
+      .where(eq(schema.invitations.id, id))
+      .run();
   }
 
   return c.json({ success: true });

@@ -11,9 +11,21 @@ import { adminInvitationsRouter } from './routes/admin/invitations.js';
 import { adminWishesRouter } from './routes/admin/wishes.js';
 import { seedTemplates } from './db/seed/templates.js';
 import { assertProductionTurnstileConfig } from './turnstile.js';
+import fs from 'node:fs';
+import path from 'node:path';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Load .env from cwd or project root (for npm workspaces)
+const envPaths = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), '../../.env'),
+];
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 // Refuse to boot in production with a missing or test Turnstile secret.
 assertProductionTurnstileConfig();
