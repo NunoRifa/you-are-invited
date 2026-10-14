@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff, Upload, Image, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff, Upload, Image, X, Music, Volume2 } from 'lucide-react';
 import { bankProviders, getBankProvider, otherProviderName } from '../../features/gift/bank-providers.js';
 
 interface EditorPayload {
@@ -15,6 +15,13 @@ interface EditorPayload {
     heroPhotoUrl?: string | null;
     closingPhotoAssetId?: string | null;
     closingPhotoUrl?: string | null;
+    galleryVideoUrl?: string | null;
+    musicUrl?: string | null;
+    musicAsset?: {
+      id: string;
+      originalFilename: string;
+      url: string;
+    } | null;
     openingGreetingText: string | null;
     closingText: string | null;
     quoteText: string | null;
@@ -122,17 +129,69 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     }
   };
 
-  const uploadAssetFile = async (file: File): Promise<{ id: string; url: string }> => {
+  const uploadAssetFile = async (file: File, kind: 'image' | 'audio' = 'image'): Promise<{ id: string; url: string }> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('kind', 'image');
+    formData.append('kind', kind);
     const res = await fetch(`/api/admin/invitations/${invitationId}/assets`, {
       method: 'POST',
       credentials: 'include',
       body: formData,
     });
-    if (!res.ok) throw new Error('Gagal mengunggah file gambar.');
+    if (!res.ok) throw new Error(kind === 'audio' ? 'Gagal mengunggah file musik.' : 'Gagal mengunggah file gambar.');
     return await res.json();
+  };
+
+  const handleUploadMusic = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTarget('music');
+    setNotice('Mengunggah lagu latar belakang…');
+    try {
+      const uploaded = await uploadAssetFile(file, 'audio');
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: {
+          ...cur.invitation,
+          musicUrl: uploaded.url,
+          musicAsset: {
+            id: uploaded.id,
+            originalFilename: file.name,
+            url: uploaded.url,
+          },
+        },
+      } : cur);
+      setNotice('Lagu latar belakang berhasil diperbarui.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload lagu.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveMusic = async () => {
+    if (!window.confirm('Hapus lagu kustom ini dan kembali ke lagu bawaan template?')) return;
+    try {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/music`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Gagal menghapus lagu kustom.');
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: {
+          ...cur.invitation,
+          musicUrl: null,
+          musicAsset: null,
+        },
+      } : cur);
+      setNotice('Lagu kustom dihapus. Kembali ke lagu bawaan template.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus lagu.');
+    }
   };
 
   const handleUploadCoverPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -870,7 +929,64 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               </div>
             </article>
 
-            {/* 6. Galeri Foto Undangan */}
+            {/* 6. Musik Latar Belakang (Background Music) */}
+            <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm flex items-center gap-1.5">
+                    <Music size={15} className="text-amber-800"/>
+                    <span>Musik Latar Belakang (Background Music)</span>
+                  </h3>
+                  <p className="text-xs text-stone-500">Lagu yang otomatis berputar saat undangan dibuka oleh tamu</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="rounded-lg bg-stone-50 border border-stone-200 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">Status Musik Aktif:</span>
+                    <div className="flex items-center gap-2">
+                      <Volume2 size={15} className={payload.invitation.musicUrl ? 'text-emerald-600' : 'text-stone-400'} />
+                      <span className="text-xs font-medium text-stone-800">
+                        {payload.invitation.musicAsset?.originalFilename
+                          ? `${payload.invitation.musicAsset.originalFilename} (Lagu Kustom)`
+                          : 'Lagu Bawaan Template (Kabagyan - Sadewok)'}
+                      </span>
+                    </div>
+                  </div>
+                  {payload.invitation.musicUrl && (
+                    <audio controls src={payload.invitation.musicUrl} className="h-8 max-w-full sm:max-w-[220px]" />
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-800">
+                    <Upload size={14}/>
+                    <span>{uploadingTarget === 'music' ? 'Mengunggah…' : (payload.invitation.musicUrl ? 'Ganti File Lagu' : 'Upload Lagu Baru')}</span>
+                    <input
+                      type="file"
+                      accept="audio/*,.mp3,.m4a,.wav,.ogg"
+                      className="hidden"
+                      disabled={uploadingTarget === 'music'}
+                      onChange={(e) => void handleUploadMusic(e)}
+                    />
+                  </label>
+                  {payload.invitation.musicUrl && (
+                    <button
+                      type="button"
+                      onClick={() => void handleRemoveMusic()}
+                      className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800 px-3 py-2 rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-50"
+                    >
+                      <Trash2 size={13}/> Kembali ke Lagu Default Template
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-stone-500">
+                  Mendukung format MP3, M4A, WAV. Penggantian musik tersimpan secara persisten khusus untuk undangan ini.
+                </p>
+              </div>
+            </article>
+
+            {/* 7. Galeri Foto & Video Undangan */}
             <article className="space-y-3 rounded-xl border border-stone-200 p-4">
               <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                 <div>
@@ -890,9 +1006,30 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
                 </label>
               </div>
 
+              {/* Video Galeri Opsional */}
+              <div className="rounded-lg bg-stone-50 border border-stone-200 p-3 space-y-2">
+                <Field
+                  label="URL Video Galeri (Opsional, MP4 / Hosted)"
+                  value={payload.invitation.galleryVideoUrl || ''}
+                  onChange={(v) => patchInvitation('galleryVideoUrl', v)}
+                  placeholder="Contoh: https://.../video.mp4 (Kosongkan jika tanpa video)"
+                />
+                <p className="text-[11px] text-stone-500">
+                  Jika diisi, video tampil di atas galeri foto. Jika dikosongkan, video dummy otomatis dihilangkan dari undangan tanpa menyisakan ruang kosong.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void save()}
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-stone-50"
+                >
+                  <Save size={13}/> Simpan URL Video
+                </button>
+              </div>
+
               {(!payload.gallery || payload.gallery.length === 0) ? (
                 <p className="text-xs text-stone-500 py-3 text-center">
-                  Belum ada foto galeri kustom yang diunggah. Template menampilkan foto default.
+                  Belum ada foto galeri kustom yang diunggah.
                 </p>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

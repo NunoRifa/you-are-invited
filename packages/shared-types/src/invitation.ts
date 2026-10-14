@@ -22,6 +22,13 @@ export interface Invitation {
   heroPhotoUrl?: string | null;
   closingPhotoAssetId?: string | null;
   closingPhotoUrl?: string | null;
+  galleryVideoUrl?: string | null;
+  musicUrl?: string | null;
+  musicAsset?: {
+    id: string;
+    originalFilename: string;
+    url: string;
+  } | null;
   isPublished: boolean;
   createdAt: number;
   updatedAt: number;

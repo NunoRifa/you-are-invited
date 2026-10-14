@@ -19,23 +19,32 @@ assetsRouter.get('/:id', (c) => {
     return c.json({ error: 'Asset not found' }, 404);
   }
 
-  // Resolve disk path
-  let fullPath = asset.storagePath;
-  if (!path.isAbsolute(fullPath)) {
-    fullPath = path.resolve(process.cwd(), fullPath);
-  }
+  // Resolve disk path across multiple possible base directories
+  const filename = path.basename(asset.storagePath);
+  const candidates = [
+    path.resolve(process.cwd(), asset.storagePath),
+    path.resolve(process.cwd(), 'apps/api', asset.storagePath),
+    path.resolve(process.cwd(), '../', asset.storagePath),
+    path.resolve(process.cwd(), 'storage/uploads', asset.invitationId, filename),
+    path.resolve(process.cwd(), 'apps/api/storage/uploads', asset.invitationId, filename),
+    path.resolve(process.cwd(), '../storage/uploads', asset.invitationId, filename),
+    path.resolve(process.cwd(), 'storage/uploads', filename),
+    path.resolve(process.cwd(), 'apps/api/storage/uploads', filename),
+  ];
 
-  if (!fs.existsSync(fullPath)) {
-    // Check fallback in root storage/uploads directory
-    const altPath = path.resolve(process.cwd(), 'storage/uploads', path.basename(fullPath));
-    if (fs.existsSync(altPath)) {
-      fullPath = altPath;
-    } else {
-      return c.json({ error: 'Asset file not found on disk' }, 404);
+  let resolvedPath: string | null = null;
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      resolvedPath = candidate;
+      break;
     }
   }
 
-  const fileBuffer = fs.readFileSync(fullPath);
+  if (!resolvedPath) {
+    return c.json({ error: 'Asset file not found on disk' }, 404);
+  }
+
+  const fileBuffer = fs.readFileSync(resolvedPath);
   return new Response(fileBuffer, {
     headers: {
       'Content-Type': asset.mimeType || 'application/octet-stream',

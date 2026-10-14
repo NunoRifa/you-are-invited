@@ -39,10 +39,37 @@ html = html.replace(
 //    Menyembunyikan bagian yang datanya tidak diisi oleh klien (Galeri, Kisah Cinta, Hadiah, Live, Hashtag, dsb.)
 const clientCustomizer = `
       // --- Client Production Customizer (Auto-hide empty client sections) ---
-      // 1. Galeri
+      // 0. Background Music
+      if (payload.musicUrl) {
+        var songEl = document.getElementById('song');
+        if (songEl) {
+          var srcEl = songEl.querySelector('source');
+          if (srcEl) { srcEl.src = payload.musicUrl; } else { songEl.src = payload.musicUrl; }
+          songEl.load();
+        }
+      }
+
+      // 1. Galeri & Video
       var gallerySection = document.querySelector('[data-id="05364ca"]');
-      if (gallerySection && (!payload.gallery || payload.gallery.length === 0)) {
+      var videoWidget = document.querySelector('[data-id="c003900"]');
+      var galleryVideoUrl = payload.templateFields && payload.templateFields.gallery_video_url ? payload.templateFields.gallery_video_url.trim() : null;
+      var hasPhotos = payload.gallery && payload.gallery.length > 0;
+
+      if (galleryVideoUrl) {
+        if (videoWidget) {
+          var videoEl = videoWidget.querySelector('video');
+          if (videoEl) videoEl.src = galleryVideoUrl;
+        }
+      } else {
+        if (videoWidget) {
+          videoWidget.remove();
+        }
+      }
+
+      if (gallerySection && !hasPhotos && !galleryVideoUrl) {
         gallerySection.style.display = 'none';
+      } else if (gallerySection) {
+        gallerySection.style.display = '';
       }
 
       // 2. Cerita Cinta

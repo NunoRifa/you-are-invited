@@ -38,6 +38,8 @@ adminInvitationsRouter.get('/:id', (c) => {
 
   const heroField = fields.find((f) => f.fieldKey === 'hero_photo_asset_id');
   const closingField = fields.find((f) => f.fieldKey === 'closing_photo_asset_id');
+  const galleryVideoField = fields.find((f) => f.fieldKey === 'gallery_video_url');
+  const musicAsset = assets.find((a) => a.kind === 'audio');
 
   return c.json({
     invitation: {
@@ -47,6 +49,13 @@ adminInvitationsRouter.get('/:id', (c) => {
       heroPhotoUrl: heroField?.fieldValue ? `/api/assets/${heroField.fieldValue}` : null,
       closingPhotoAssetId: closingField?.fieldValue || null,
       closingPhotoUrl: closingField?.fieldValue ? `/api/assets/${closingField.fieldValue}` : null,
+      galleryVideoUrl: galleryVideoField?.fieldValue || null,
+      musicUrl: musicAsset ? `/api/assets/${musicAsset.id}` : null,
+      musicAsset: musicAsset ? {
+        id: musicAsset.id,
+        originalFilename: musicAsset.originalFilename,
+        url: `/api/assets/${musicAsset.id}`,
+      } : null,
     },
     couples: couples.map((cp) => ({
       ...cp,
@@ -82,22 +91,46 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     return c.json({ error: 'No file uploaded' }, 400);
   }
 
-  const uploadDir = path.resolve(process.cwd(), `storage/uploads/${invitationId}`);
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  // If uploading audio, remove any previous custom audio for this invitation
+  if (kind === 'audio') {
+    const existingAudios = db
+      .select()
+      .from(schema.invitationAssets)
+      .where(and(eq(schema.invitationAssets.invitationId, invitationId), eq(schema.invitationAssets.kind, 'audio')))
+      .all();
+    for (const oldAudio of existingAudios) {
+      const oldPath = path.resolve(process.cwd(), oldAudio.storagePath);
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch {}
+      }
+      db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, oldAudio.id)).run();
+    }
   }
 
   const assetId = `ast-${randomUUID()}`;
-  const originalFilename = file.name || 'image.jpg';
-  const ext = path.extname(originalFilename) || '.jpg';
+  const originalFilename = file.name || (kind === 'audio' ? 'music.mp3' : 'image.jpg');
+  const ext = path.extname(originalFilename) || (kind === 'audio' ? '.mp3' : '.jpg');
   const safeFilename = `${assetId}${ext}`;
-  const targetPath = path.join(uploadDir, safeFilename);
   const relativePath = `storage/uploads/${invitationId}/${safeFilename}`;
 
   const arrayBuffer = await file.arrayBuffer();
-  fs.writeFileSync(targetPath, Buffer.from(arrayBuffer));
+  const fileBytes = Buffer.from(arrayBuffer);
 
-  const mimeType = file.type || 'image/jpeg';
+  // Write to both potential storage locations so assets are always reachable
+  const targetDirs = [
+    path.resolve(process.cwd(), `storage/uploads/${invitationId}`),
+    path.resolve(process.cwd(), `apps/api/storage/uploads/${invitationId}`),
+    path.resolve(process.cwd(), `../storage/uploads/${invitationId}`),
+  ];
+  for (const dir of targetDirs) {
+    try {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, safeFilename), fileBytes);
+    } catch {}
+  }
+
+  const defaultMime = kind === 'audio' ? 'audio/mpeg' : (kind === 'font' ? 'font/woff2' : 'image/jpeg');
+  const mimeType = file.type || defaultMime;
   db.insert(schema.invitationAssets).values({
     id: assetId,
     invitationId,
@@ -115,6 +148,29 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     mimeType,
     originalFilename,
   }, 201);
+});
+
+// DELETE /api/admin/invitations/:id/music - Remove custom music and revert to template default
+adminInvitationsRouter.delete('/:id/music', (c) => {
+  const invitationId = c.req.param('id');
+  const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, invitationId)).get();
+  if (!inv) return c.json({ error: 'Invitation not found' }, 404);
+
+  const existingAudios = db
+    .select()
+    .from(schema.invitationAssets)
+    .where(and(eq(schema.invitationAssets.invitationId, invitationId), eq(schema.invitationAssets.kind, 'audio')))
+    .all();
+
+  for (const oldAudio of existingAudios) {
+    const oldPath = path.resolve(process.cwd(), oldAudio.storagePath);
+    if (fs.existsSync(oldPath)) {
+      try { fs.unlinkSync(oldPath); } catch {}
+    }
+    db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, oldAudio.id)).run();
+  }
+
+  return c.json({ success: true, message: 'Custom music removed, reverted to template default' });
 });
 
 // DELETE /api/admin/invitations/:id/assets/:assetId
@@ -361,7 +417,7 @@ adminInvitationsRouter.patch('/:id/livestream', async (c) => {
 adminInvitationsRouter.patch('/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json<any>();
-  const { heroPhotoAssetId, closingPhotoAssetId, ...invitationFields } = body;
+  const { heroPhotoAssetId, closingPhotoAssetId, galleryVideoUrl, ...invitationFields } = body;
 
   const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, id)).get();
   if (!inv) {
@@ -413,6 +469,31 @@ adminInvitationsRouter.patch('/:id', async (c) => {
           invitationId: id,
           fieldKey: 'closing_photo_asset_id',
           fieldValue: String(closingPhotoAssetId),
+        }).run();
+      }
+    }
+  }
+
+  if (galleryVideoUrl !== undefined) {
+    if (galleryVideoUrl === null || String(galleryVideoUrl).trim() === '') {
+      db.delete(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'gallery_video_url')))
+        .run();
+    } else {
+      const existing = db.select().from(schema.invitationTemplateFields)
+        .where(and(eq(schema.invitationTemplateFields.invitationId, id), eq(schema.invitationTemplateFields.fieldKey, 'gallery_video_url')))
+        .get();
+      if (existing) {
+        db.update(schema.invitationTemplateFields)
+          .set({ fieldValue: String(galleryVideoUrl).trim() })
+          .where(eq(schema.invitationTemplateFields.id, existing.id))
+          .run();
+      } else {
+        db.insert(schema.invitationTemplateFields).values({
+          id: `tf-galvid-${randomUUID()}`,
+          invitationId: id,
+          fieldKey: 'gallery_video_url',
+          fieldValue: String(galleryVideoUrl).trim(),
         }).run();
       }
     }

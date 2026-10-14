@@ -478,14 +478,14 @@ window.settingAutoplay = true;
          /* --- Mobile Fixes: Couple Profiles Safe Spacing & Layout --- */
          @media (max-width: 767px) {
             /* Mempelai Wanita: Batasi lebar agar tetap rapi di kolom kiri dan tidak menabrak bingkai foto */
-            .elementor-element-20d8c21,
+            /* .elementor-element-20d8c21,
             .elementor-element-3eb9824,
             .elementor-element-464729a,
             .elementor-element-20d8c21 > .elementor-widget-container,
             .elementor-element-3eb9824 > .elementor-widget-container,
             .elementor-element-464729a > .elementor-widget-container {
                max-width: 62% !important;
-            }
+            } */
             .elementor-element-464729a .elementor-widget-container {
                line-height: 1.4em !important;
             }
@@ -497,7 +497,7 @@ window.settingAutoplay = true;
             .elementor-element-09ba1c3 > .elementor-widget-container,
             .elementor-element-a2f50b3 > .elementor-widget-container,
             .elementor-element-d6f55af > .elementor-widget-container {
-               max-width: 65% !important;
+               /* max-width: 65% !important; */
                margin-left: auto !important;
             }
             .elementor-element-d6f55af .elementor-widget-container {
@@ -513,6 +513,166 @@ window.settingAutoplay = true;
                line-height: 1.6em !important;
                font-size: 13.5px !important;
             }
+         }
+
+         /* --- Raden Motion Gallery Grid & Item Layout --- */
+         .elementor-element-b6f6ff8 .elementor-gallery__container {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+         }
+
+         @media (min-width: 768px) {
+            .elementor-element-b6f6ff8 .elementor-gallery__container {
+               grid-template-columns: repeat(3, 1fr) !important;
+               gap: 16px !important;
+            }
+         }
+
+         .elementor-element-b6f6ff8 .e-gallery-item {
+            position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            aspect-ratio: 1 / 1 !important;
+            overflow: hidden !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+            background-color: #e5e5e5 !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+         }
+
+         .elementor-element-b6f6ff8 .e-gallery-image {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-size: cover !important;
+            background-position: center !important;
+            display: block !important;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+         }
+
+         .elementor-element-b6f6ff8 .e-gallery-item:hover .e-gallery-image {
+            transform: scale(1.08) !important;
+         }
+
+         .elementor-element-b6f6ff8 .elementor-gallery-item__overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%) !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s ease !important;
+            pointer-events: none !important;
+         }
+
+         .elementor-element-b6f6ff8 .e-gallery-item:hover .elementor-gallery-item__overlay {
+            opacity: 1 !important;
+         }
+
+         /* Standalone Premium Lightbox */
+         .standalone-lightbox-modal {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 999999 !important;
+            background: rgba(0, 0, 0, 0.94) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease !important;
+         }
+         .standalone-lightbox-modal.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+         }
+         .standalone-lightbox-content {
+            position: relative !important;
+            max-width: 92vw !important;
+            max-height: 85vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+         }
+         .standalone-lightbox-img {
+            max-width: 100% !important;
+            max-height: 80vh !important;
+            object-fit: contain !important;
+            border-radius: 6px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+            transform: scale(0.95);
+            transition: transform 0.25s ease !important;
+         }
+         .standalone-lightbox-modal.active .standalone-lightbox-img {
+            transform: scale(1);
+         }
+         .standalone-lightbox-close {
+            position: absolute !important;
+            top: 20px !important;
+            right: 20px !important;
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 24px !important;
+            line-height: 40px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            transition: background 0.2s ease !important;
+            z-index: 1000000 !important;
+         }
+         .standalone-lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+         }
+         .standalone-lightbox-prev,
+         .standalone-lightbox-next {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 44px !important;
+            height: 44px !important;
+            font-size: 24px !important;
+            line-height: 44px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            transition: background 0.2s ease !important;
+            z-index: 1000000 !important;
+         }
+         .standalone-lightbox-prev:hover,
+         .standalone-lightbox-next:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+         }
+         .standalone-lightbox-prev {
+            left: 20px !important;
+         }
+         .standalone-lightbox-next {
+            right: 20px !important;
+         }
+         .standalone-lightbox-caption {
+            color: #e5e5e5 !important;
+            font-size: 13px !important;
+            margin-top: 10px !important;
+            text-align: center !important;
+            font-family: inherit !important;
+         }
+         .standalone-lightbox-counter {
+            position: absolute !important;
+            top: 24px !important;
+            left: 24px !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 13px !important;
+            font-family: monospace !important;
          }
       </style>
       <style type="text/css">
@@ -7007,12 +7167,93 @@ window.settingAutoplay = true;
         setImage('[data-id="2126396"]', groom.photoUrl);
       }
 
+      // Background Music Dynamic Hydration
+      if (payload.musicUrl) {
+        var songEl = document.getElementById('song');
+        if (songEl) {
+          var srcEl = songEl.querySelector('source');
+          if (srcEl) {
+            srcEl.src = payload.musicUrl;
+          } else {
+            songEl.src = payload.musicUrl;
+          }
+          songEl.load();
+        }
+      }
+
+      // Standalone Gallery Lightbox Modal Setup
+      function setupGalleryLightbox(items) {
+        if (!items || items.length === 0) return;
+        var modal = document.getElementById('standalone-lightbox');
+        if (!modal) {
+          modal = document.createElement('div');
+          modal.id = 'standalone-lightbox';
+          modal.className = 'standalone-lightbox-modal';
+          modal.innerHTML =
+            '<div class="standalone-lightbox-counter" id="lg-counter-text">1 / 1</div>' +
+            '<button class="standalone-lightbox-close" id="lg-close-btn" aria-label="Tutup">&times;</button>' +
+            '<button class="standalone-lightbox-prev" id="lg-prev-btn" aria-label="Sebelumnya">&#10094;</button>' +
+            '<button class="standalone-lightbox-next" id="lg-next-btn" aria-label="Selanjutnya">&#10095;</button>' +
+            '<div class="standalone-lightbox-content">' +
+              '<img class="standalone-lightbox-img" id="lg-main-img" src="" alt="Galeri" />' +
+              '<div class="standalone-lightbox-caption" id="lg-caption-text"></div>' +
+            '</div>';
+          document.body.appendChild(modal);
+
+          var curIdx = 0;
+          function showItem(idx) {
+            if (idx < 0) idx = items.length - 1;
+            if (idx >= items.length) idx = 0;
+            curIdx = idx;
+            var itm = items[curIdx];
+            var img = document.getElementById('lg-main-img');
+            var cap = document.getElementById('lg-caption-text');
+            var count = document.getElementById('lg-counter-text');
+            if (img) img.src = itm.url;
+            if (cap) cap.textContent = itm.caption || ('Foto ' + (curIdx + 1));
+            if (count) count.textContent = (curIdx + 1) + ' / ' + items.length;
+          }
+
+          function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+
+          document.getElementById('lg-close-btn').onclick = closeModal;
+          document.getElementById('lg-prev-btn').onclick = function(e) { e.stopPropagation(); showItem(curIdx - 1); };
+          document.getElementById('lg-next-btn').onclick = function(e) { e.stopPropagation(); showItem(curIdx + 1); };
+          modal.onclick = function(e) { if (e.target === modal) closeModal(); };
+
+          document.addEventListener('keydown', function(e) {
+            if (!modal.classList.contains('active')) return;
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowLeft') showItem(curIdx - 1);
+            if (e.key === 'ArrowRight') showItem(curIdx + 1);
+          });
+
+          var touchStartX = 0;
+          modal.ontouchstart = function(e) { touchStartX = e.changedTouches[0].screenX; };
+          modal.ontouchend = function(e) {
+            var diff = e.changedTouches[0].screenX - touchStartX;
+            if (diff > 50) showItem(curIdx - 1);
+            else if (diff < -50) showItem(curIdx + 1);
+          };
+
+          window.openGalleryLightbox = function(index) {
+            showItem(index);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          };
+        }
+      }
+
       // Gallery Images Hydration
       var galleryWidget = document.querySelector('[data-id="b6f6ff8"]');
       if (galleryWidget && payload.gallery && payload.gallery.length > 0) {
         var galleryContainer = galleryWidget.querySelector('.elementor-gallery__container');
         if (galleryContainer) {
           galleryContainer.innerHTML = '';
+          setupGalleryLightbox(payload.gallery);
           payload.gallery.forEach(function(item, idx) {
             var a = document.createElement('a');
             a.className = 'e-gallery-item elementor-gallery-item elementor-animated-content';
@@ -7020,6 +7261,10 @@ window.settingAutoplay = true;
             a.setAttribute('data-elementor-open-lightbox', 'yes');
             a.setAttribute('data-elementor-lightbox-slideshow', 'b6f6ff8');
             a.setAttribute('data-elementor-lightbox-title', item.caption || ('Galeri ' + (idx + 1)));
+            a.onclick = function(e) {
+              e.preventDefault();
+              if (window.openGalleryLightbox) window.openGalleryLightbox(idx);
+            };
 
             var imgDiv = document.createElement('div');
             imgDiv.className = 'e-gallery-image elementor-gallery-item__image';
@@ -7027,11 +7272,6 @@ window.settingAutoplay = true;
             imgDiv.setAttribute('role', 'img');
             imgDiv.setAttribute('aria-label', item.caption || ('Galeri ' + (idx + 1)));
             imgDiv.style.backgroundImage = 'url("' + item.url + '")';
-            imgDiv.style.backgroundSize = 'cover';
-            imgDiv.style.backgroundPosition = 'center';
-            imgDiv.style.width = '100%';
-            imgDiv.style.height = '100%';
-            imgDiv.style.display = 'block';
 
             var overlay = document.createElement('div');
             overlay.className = 'elementor-gallery-item__overlay';
@@ -7276,10 +7516,30 @@ window.settingAutoplay = true;
 
       
       // --- Client Production Customizer (Auto-hide empty client sections) ---
-      // 1. Galeri
+      // 1. Galeri & Video
       var gallerySection = document.querySelector('[data-id="05364ca"]');
-      if (gallerySection && (!payload.gallery || payload.gallery.length === 0)) {
+      var videoWidget = document.querySelector('[data-id="c003900"]');
+      var galleryVideoUrl = payload.templateFields && payload.templateFields.gallery_video_url ? payload.templateFields.gallery_video_url.trim() : null;
+      var hasPhotos = payload.gallery && payload.gallery.length > 0;
+
+      if (galleryVideoUrl) {
+        if (videoWidget) {
+          var videoEl = videoWidget.querySelector('video');
+          if (videoEl) {
+            videoEl.src = galleryVideoUrl;
+          }
+        }
+      } else {
+        // Jika tidak ada video dari klien, hapus seluruh widget video dari DOM (termasuk dummy reno.mov)
+        if (videoWidget) {
+          videoWidget.remove();
+        }
+      }
+
+      if (gallerySection && !hasPhotos && !galleryVideoUrl) {
         gallerySection.style.display = 'none';
+      } else if (gallerySection) {
+        gallerySection.style.display = '';
       }
 
       // 2. Cerita Cinta
