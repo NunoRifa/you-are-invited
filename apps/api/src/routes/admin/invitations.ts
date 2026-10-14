@@ -2,9 +2,23 @@ import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import fs from 'node:fs';
 import { Hono } from 'hono';
-import { db } from '../../db/client.js';
+import { db, sqlite } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
 import { eq, desc, and } from 'drizzle-orm';
+
+const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
+const AUDIO_MIME_TYPES: Record<string, string[]> = {
+  '.mp3': ['audio/mpeg', 'audio/mp3'],
+  '.m4a': ['audio/mp4', 'audio/x-m4a'],
+  '.wav': ['audio/wav', 'audio/x-wav'],
+  '.ogg': ['audio/ogg', 'application/ogg'],
+};
+const AUDIO_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
+  '.mp3': (bytes) => bytes.subarray(0, 3).toString() === 'ID3' || (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0),
+  '.m4a': (bytes) => bytes.subarray(4, 8).toString() === 'ftyp',
+  '.wav': (bytes) => bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WAVE',
+  '.ogg': (bytes) => bytes.subarray(0, 4).toString() === 'OggS',
+};
 
 export const adminInvitationsRouter = new Hono();
 
@@ -87,59 +101,78 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
   const file = body['file'];
   const kind = (body['kind'] as 'image' | 'audio' | 'font') || 'image';
 
+  if (!['image', 'audio', 'font'].includes(kind)) return c.json({ error: 'Unsupported asset kind' }, 400);
   if (!file || typeof file === 'string') {
     return c.json({ error: 'No file uploaded' }, 400);
   }
 
-  // If uploading audio, remove any previous custom audio for this invitation
+  const originalFilename = file.name || (kind === 'audio' ? 'music.mp3' : 'image.jpg');
+  const ext = (path.extname(originalFilename) || (kind === 'audio' ? '.mp3' : '.jpg')).toLowerCase();
+  const mimeType = (file.type || '').toLowerCase();
+
   if (kind === 'audio') {
-    const existingAudios = db
-      .select()
-      .from(schema.invitationAssets)
-      .where(and(eq(schema.invitationAssets.invitationId, invitationId), eq(schema.invitationAssets.kind, 'audio')))
-      .all();
-    for (const oldAudio of existingAudios) {
-      const oldPath = path.resolve(process.cwd(), oldAudio.storagePath);
-      if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch {}
-      }
-      db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, oldAudio.id)).run();
+    if (file.size > MAX_AUDIO_BYTES) {
+      return c.json({ error: 'Audio file exceeds the 20 MiB limit' }, 413);
+    }
+    if (!AUDIO_MIME_TYPES[ext]?.includes(mimeType)) {
+      return c.json({ error: 'Unsupported audio format. Use MP3, M4A, WAV, or OGG.' }, 415);
+    }
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const fileBytes = Buffer.from(arrayBuffer);
+  if (kind === 'audio') {
+    if (fileBytes.byteLength > MAX_AUDIO_BYTES) {
+      return c.json({ error: 'Audio file exceeds the 20 MiB limit' }, 413);
+    }
+    if (!AUDIO_SIGNATURES[ext](fileBytes)) {
+      return c.json({ error: 'File content is not a supported audio format' }, 415);
     }
   }
 
   const assetId = `ast-${randomUUID()}`;
-  const originalFilename = file.name || (kind === 'audio' ? 'music.mp3' : 'image.jpg');
-  const ext = path.extname(originalFilename) || (kind === 'audio' ? '.mp3' : '.jpg');
   const safeFilename = `${assetId}${ext}`;
   const relativePath = `storage/uploads/${invitationId}/${safeFilename}`;
+  const defaultMime = kind === 'audio' ? 'audio/mpeg' : (kind === 'font' ? 'font/woff2' : 'image/jpeg');
+  const normalizedMime = mimeType || defaultMime;
+  const uploadDir = path.resolve(process.cwd(), `storage/uploads/${invitationId}`);
+  const targetPath = path.join(uploadDir, safeFilename);
 
-  const arrayBuffer = await file.arrayBuffer();
-  const fileBytes = Buffer.from(arrayBuffer);
+  const existingAudios = kind === 'audio'
+    ? db.select().from(schema.invitationAssets)
+      .where(and(eq(schema.invitationAssets.invitationId, invitationId), eq(schema.invitationAssets.kind, 'audio')))
+      .all()
+    : [];
 
-  // Write to both potential storage locations so assets are always reachable
-  const targetDirs = [
-    path.resolve(process.cwd(), `storage/uploads/${invitationId}`),
-    path.resolve(process.cwd(), `apps/api/storage/uploads/${invitationId}`),
-    path.resolve(process.cwd(), `../storage/uploads/${invitationId}`),
-  ];
-  for (const dir of targetDirs) {
-    try {
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, safeFilename), fileBytes);
-    } catch {}
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    fs.writeFileSync(targetPath, fileBytes, { flag: 'wx' });
+
+    sqlite.transaction(() => {
+      db.insert(schema.invitationAssets).values({
+        id: assetId,
+        invitationId,
+        kind,
+        storagePath: relativePath,
+        mimeType: normalizedMime,
+        originalFilename,
+        createdAt: Date.now(),
+      }).run();
+      for (const oldAudio of existingAudios) {
+        db.delete(schema.invitationAssets).where(eq(schema.invitationAssets.id, oldAudio.id)).run();
+      }
+    })();
+  } catch (error) {
+    try { fs.unlinkSync(targetPath); } catch {}
+    console.error('[asset-upload] Failed to persist uploaded asset', error);
+    return c.json({ error: 'Failed to save uploaded file. Existing music was not changed.' }, 500);
   }
 
-  const defaultMime = kind === 'audio' ? 'audio/mpeg' : (kind === 'font' ? 'font/woff2' : 'image/jpeg');
-  const mimeType = file.type || defaultMime;
-  db.insert(schema.invitationAssets).values({
-    id: assetId,
-    invitationId,
-    kind,
-    storagePath: relativePath,
-    mimeType,
-    originalFilename,
-    createdAt: Date.now(),
-  }).run();
+  // The transaction has committed; remove old files only now.
+  for (const oldAudio of existingAudios) {
+    const oldPath = path.resolve(process.cwd(), oldAudio.storagePath);
+    try { fs.unlinkSync(oldPath); } catch {}
+  }
 
   return c.json({
     id: assetId,

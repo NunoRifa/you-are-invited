@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { bodyLimit } from 'hono/body-limit';
 import { serve } from '@hono/node-server';
 import { invitationsRouter } from './routes/invitations.js';
 import { wishesRouter } from './routes/wishes.js';
@@ -60,6 +61,12 @@ app.use('/api/admin/*', async (c, next) => {
   if (!requireAdminSession(c.req.header('Cookie'))) return c.json({ error: 'Unauthenticated' }, 401);
   return next();
 });
+
+// Bound only the asset upload endpoint; reserve 1 MiB for multipart headers/metadata.
+app.use('/api/admin/invitations/:id/assets', bodyLimit({
+  maxSize: 21 * 1024 * 1024,
+  onError: (c) => c.json({ error: 'Upload request exceeds the 21 MiB limit' }, 413),
+}));
 app.route('/api/admin', adminAuthRouter);
 app.route('/api/admin/invitations', adminInvitationsRouter);
 app.route('/api/admin/invitations', adminWishesRouter);

@@ -138,6 +138,8 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       credentials: 'include',
       body: formData,
     });
+    if (res.status === 413) throw new Error('Server menolak ukuran upload. Batas request 21 MiB; periksa konfigurasi proxy bila file lebih kecil.');
+    if (res.status === 415) throw new Error('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
     if (!res.ok) throw new Error(kind === 'audio' ? 'Gagal mengunggah file musik.' : 'Gagal mengunggah file gambar.');
     return await res.json();
   };
@@ -145,6 +147,23 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const handleUploadMusic = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const audioTypes: Record<string, string[]> = {
+      '.mp3': ['audio/mpeg', 'audio/mp3'],
+      '.m4a': ['audio/mp4', 'audio/x-m4a'],
+      '.wav': ['audio/wav', 'audio/x-wav'],
+      '.ogg': ['audio/ogg', 'application/ogg'],
+    };
+    const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    if (file.size > 20 * 1024 * 1024) {
+      setNotice('Ukuran lagu melebihi batas 20 MiB. Pilih file yang lebih kecil.');
+      e.target.value = '';
+      return;
+    }
+    if (!audioTypes[extension]?.includes(file.type.toLowerCase())) {
+      setNotice('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
+      e.target.value = '';
+      return;
+    }
     setUploadingTarget('music');
     setNotice('Mengunggah lagu latar belakang…');
     try {
