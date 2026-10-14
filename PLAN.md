@@ -1,4 +1,4 @@
-# Investigation Plan: Production Music Upload Returns 413
+# Investigation Plan: Production Music Upload Returns 413 / 415
 
 ## 1. Root Cause Analysis
 
@@ -134,6 +134,43 @@ No schema migration or new environment secret is expected.
 | Production request-size origin | Pending | Production response headers and logs required |
 | Production upload checks | Pending | Deploy and test required |
 | CSP header source | Pending | Production response headers / hosting config required |
-| Database migration | Not required | Existing invitation_assets schema |
+## 11. Production Audio Upload — HTTP 415 Investigation & Resolution (2026-10-14)
 
-**Manual production evidence needed if 413 remains after deploy:** failing response headers/body, active web container `nginx -T` output for the upload location (redact secrets), Nginx error-log lines at request time, API logs at the same timestamp, and whether Cloudflare/proxy is enabled. Never share cookies or secret values.
+### 1. Ringkasan Masalah dan Kronologi
+1. Awalnya upload MP3 berhasil secara lokal, namun gagal di production dengan HTTP 413 (Content Too Large) akibat batas default Nginx (1 MiB).
+2. Perbaikan HTTP 413 diterapkan (scoped Nginx `client_max_body_size 21m`, Hono `bodyLimit 21m`, dan validasi MIME/ekstensi 20 MiB).
+3. Setelah deploy ulang ke production, file MP3 klien `KUSUMA_WIJAYA_PAWESTRI.mp3` (~4 MB) gagal dengan HTTP 415 (Unsupported Media Type).
+
+### 2. Hasil Investigasi Frontend & Backend
+- **Frontend**: Pada `apps/web/src/routes/admin/editor.tsx`, daftar MIME audio sebelumnya terlalu sempit (`audio/mpeg`, `audio/mp3`) dan menolak MIME type yang dikirimkan oleh browser Windows/browser tertentu (`application/octet-stream` atau `audio/x-mpeg`). Pesan error HTTP 415 juga dipetakan secara generik tanpa menampilkan alasan spesifik dari server.
+- **Backend**: Pada `apps/api/src/routes/admin/invitations.ts`, pengecekan file signature audio sebelumnya hanya menerima `ID3` persis di byte 0 atau MPEG sync word persis di 2 byte pertama (`bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0`). File MP3 yang diawali dengan metadata ID3v2 tag non-standar, padding, atau ID3v1 tag di akhir file mengalami *false negative* dan ditolak dengan status 415.
+
+### 3. Root Cause Terkonfirmasi
+1. **Validasi Signature Terlalu Kaku**: Pengecekan magic byte MP3 hanya memeriksa 2-3 byte pertama tanpa melakukan pemindaian MPEG sync word (`0xFFE`/`0xFFF`) pada buffer awal (hingga 8 KiB) dan tanpa memeriksa penanda `TAG` (ID3v1) di akhir file.
+2. **Inkonsistensi MIME Type Antar-Platform**: Windows Chromium/browser sering mengirimkan MIME `application/octet-stream` atau `audio/x-mpeg` untuk file audio tertentu, yang sebelumnya langsung ditolak oleh backend sebelum memeriksa konten file.
+
+### 4. Perbaikan yang Telah Diimplementasikan
+1. **Peningkatan Deteksi MP3 (`apps/api/src/routes/admin/invitations.ts`)**:
+   - Pengecekan header `ID3v2` di byte awal.
+   - Pemindaian frame sync MPEG (`0xFF` diikuti bit `111` dengan validasi MPEG layer valid) dalam 8192 byte pertama.
+   - Pengecekan tag `ID3v1` (`TAG`) pada 128 byte terakhir file.
+   - Pengecekan signature tetap menolak file non-audio (misal file text/executable yang di-rename menjadi `.mp3`).
+2. **Toleransi MIME Standar & Spesifik**:
+   - Menambahkan variasi MIME type sah untuk MP3 (`audio/mpeg`, `audio/mp3`, `audio/x-mpeg`, `audio/x-mp3`) serta mengizinkan `application/octet-stream` jika ekstensi adalah audio sah dan file signature valid.
+   - Menambahkan kode error terstruktur (`unsupported_audio_mime`, `invalid_audio_signature`).
+3. **Penyempurnaan Error Message di Admin Dashboard (`apps/web/src/routes/admin/editor.tsx`)**:
+   - Menampilkan detail pesan error spesifik jika server mengembalikan `unsupported_audio_mime` atau `invalid_audio_signature`.
+4. **Pengujian Regresi**:
+   - Menambahkan pengujian otomatis di `apps/api/src/routes/admin/assets-upload.test.ts` untuk memvalidasi:
+     - MP3 dengan header `ID3v2`.
+     - MP3 murni dengan MPEG frame sync (tanpa ID3).
+     - MP3 yang dikirim dengan MIME `application/octet-stream`.
+     - Penolakan file teks/biner palsu yang di-rename menjadi `.mp3`.
+     - Penolakan file melebihi batas 20 MiB.
+     - Keutuhan file audio lama jika upload gagal (disk failure / validation failure).
+
+### 5. Hasil Uji Lokal
+- `npm run test --workspace=@you-are-invited/api`: **30 passed, 5 skipped (Turnstile live tests)**.
+- `npm run build --workspace=@you-are-invited/api`: **Sukses**.
+- `npm run build --workspace=@you-are-invited/web`: **Sukses**.
+

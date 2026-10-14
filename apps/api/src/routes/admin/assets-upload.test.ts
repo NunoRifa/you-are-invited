@@ -80,6 +80,19 @@ describe('admin asset uploads', () => {
     expect(existsSync(oldPath)).toBe(true);
     expect(fs.writeFileSync).toBe(originalWrite);
 
+    // Test MPEG frame sync MP3 (without ID3 tag, sync word 0xFFFB) replaces safely
+    const mpegSyncMp3 = Buffer.concat([Buffer.from([0xff, 0xfb, 0x90, 0x64]), Buffer.alloc(1000)]);
+    const mpegRes = await upload('raw-mpeg.mp3', 'audio/mpeg', mpegSyncMp3);
+    expect(mpegRes.status).toBe(201);
+    const mpegData = await mpegRes.json() as { id: string };
+    expect(audioRows().map((row) => row.id)).toEqual([mpegData.id]);
+
+    // Test MP3 sent as application/octet-stream by Windows/Linux browser replaces safely
+    const octetMp3 = await upload('stream.mp3', 'application/octet-stream', Buffer.from('ID3-stream-test'));
+    expect(octetMp3.status).toBe(201);
+    const octetData = await octetMp3.json() as { id: string };
+    expect(audioRows().map((row) => row.id)).toEqual([octetData.id]);
+
     const replacement = await upload('new.mp3', 'audio/mpeg', Buffer.from('ID3-new-song'));
     expect(replacement.status).toBe(201);
     const next = await replacement.json() as { id: string };

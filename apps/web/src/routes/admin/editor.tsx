@@ -139,7 +139,20 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       body: formData,
     });
     if (res.status === 413) throw new Error('Server menolak ukuran upload. Batas request 21 MiB; periksa konfigurasi proxy bila file lebih kecil.');
-    if (res.status === 415) throw new Error('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
+    if (res.status === 415) {
+      try {
+        const errJson = await res.json();
+        if (errJson?.code === 'unsupported_audio_mime') {
+          throw new Error('Tipe MIME file audio tidak dikenali browser/server. Gunakan file audio standar (MP3, M4A, WAV, OGG).');
+        }
+        if (errJson?.code === 'invalid_audio_signature') {
+          throw new Error('Isi file tidak terdeteksi sebagai audio yang valid. Pastikan file bukan hasil rename dari ekstensi lain.');
+        }
+      } catch (e) {
+        if (e instanceof Error && e.message.includes('file')) throw e;
+      }
+      throw new Error('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
+    }
     if (!res.ok) throw new Error(kind === 'audio' ? 'Gagal mengunggah file musik.' : 'Gagal mengunggah file gambar.');
     return await res.json();
   };
@@ -148,10 +161,10 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     const file = e.target.files?.[0];
     if (!file) return;
     const audioTypes: Record<string, string[]> = {
-      '.mp3': ['audio/mpeg', 'audio/mp3'],
-      '.m4a': ['audio/mp4', 'audio/x-m4a'],
-      '.wav': ['audio/wav', 'audio/x-wav'],
-      '.ogg': ['audio/ogg', 'application/ogg'],
+      '.mp3': ['audio/mpeg', 'audio/mp3', 'audio/x-mpeg', 'audio/x-mp3', 'application/octet-stream'],
+      '.m4a': ['audio/mp4', 'audio/x-m4a', 'audio/m4a', 'application/octet-stream'],
+      '.wav': ['audio/wav', 'audio/x-wav', 'audio/wave', 'application/octet-stream'],
+      '.ogg': ['audio/ogg', 'application/ogg', 'application/octet-stream'],
     };
     const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
     if (file.size > 20 * 1024 * 1024) {
@@ -159,7 +172,8 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       e.target.value = '';
       return;
     }
-    if (!audioTypes[extension]?.includes(file.type.toLowerCase())) {
+    const detectedType = file.type ? file.type.toLowerCase() : 'application/octet-stream';
+    if (!audioTypes[extension]?.includes(detectedType)) {
       setNotice('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
       e.target.value = '';
       return;

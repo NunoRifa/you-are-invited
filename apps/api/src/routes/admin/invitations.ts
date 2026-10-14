@@ -8,16 +8,40 @@ import { eq, desc, and } from 'drizzle-orm';
 
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const AUDIO_MIME_TYPES: Record<string, string[]> = {
-  '.mp3': ['audio/mpeg', 'audio/mp3'],
-  '.m4a': ['audio/mp4', 'audio/x-m4a'],
-  '.wav': ['audio/wav', 'audio/x-wav'],
+  '.mp3': ['audio/mpeg', 'audio/mp3', 'audio/x-mpeg', 'audio/x-mp3'],
+  '.m4a': ['audio/mp4', 'audio/x-m4a', 'audio/m4a'],
+  '.wav': ['audio/wav', 'audio/x-wav', 'audio/wave'],
   '.ogg': ['audio/ogg', 'application/ogg'],
 };
+
+function isValidMp3(bytes: Buffer): boolean {
+  if (bytes.length < 4) return false;
+  // ID3v2 header
+  if (bytes.subarray(0, 3).toString() === 'ID3') return true;
+
+  // Search through first 8 KiB for an MPEG sync word (0xFFE or 0xFFF)
+  const maxSearch = Math.min(bytes.length - 1, 8192);
+  for (let i = 0; i < maxSearch; i++) {
+    if (bytes[i] === 0xff && (bytes[i + 1] & 0xe0) === 0xe0) {
+      // Validate valid MPEG layer (bits 1-2 cannot be 00)
+      const layer = (bytes[i + 1] >> 1) & 0x03;
+      if (layer !== 0) return true;
+    }
+  }
+
+  // ID3v1 tag at EOF (last 128 bytes)
+  if (bytes.length >= 128 && bytes.subarray(bytes.length - 128, bytes.length - 125).toString() === 'TAG') {
+    return true;
+  }
+
+  return false;
+}
+
 const AUDIO_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
-  '.mp3': (bytes) => bytes.subarray(0, 3).toString() === 'ID3' || (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0),
-  '.m4a': (bytes) => bytes.subarray(4, 8).toString() === 'ftyp',
-  '.wav': (bytes) => bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WAVE',
-  '.ogg': (bytes) => bytes.subarray(0, 4).toString() === 'OggS',
+  '.mp3': isValidMp3,
+  '.m4a': (bytes) => bytes.length >= 8 && bytes.subarray(4, 8).toString() === 'ftyp',
+  '.wav': (bytes) => bytes.length >= 12 && bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WAVE',
+  '.ogg': (bytes) => bytes.length >= 4 && bytes.subarray(0, 4).toString() === 'OggS',
 };
 
 export const adminInvitationsRouter = new Hono();
@@ -112,10 +136,13 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
 
   if (kind === 'audio') {
     if (file.size > MAX_AUDIO_BYTES) {
-      return c.json({ error: 'Audio file exceeds the 20 MiB limit' }, 413);
+      return c.json({ error: 'Audio file exceeds the 20 MiB limit', code: 'audio_size_exceeded' }, 413);
     }
-    if (!AUDIO_MIME_TYPES[ext]?.includes(mimeType)) {
-      return c.json({ error: 'Unsupported audio format. Use MP3, M4A, WAV, or OGG.' }, 415);
+    const allowedMimes = AUDIO_MIME_TYPES[ext];
+    // Allow standard audio MIME types, plus application/octet-stream if file extension is audio (some OS/browsers send octet-stream)
+    const isValidMime = allowedMimes?.includes(mimeType) || (mimeType === 'application/octet-stream' && allowedMimes !== undefined);
+    if (!isValidMime) {
+      return c.json({ error: 'Unsupported audio format. Use MP3, M4A, WAV, or OGG.', code: 'unsupported_audio_mime' }, 415);
     }
   }
 
@@ -123,10 +150,11 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
   const fileBytes = Buffer.from(arrayBuffer);
   if (kind === 'audio') {
     if (fileBytes.byteLength > MAX_AUDIO_BYTES) {
-      return c.json({ error: 'Audio file exceeds the 20 MiB limit' }, 413);
+      return c.json({ error: 'Audio file exceeds the 20 MiB limit', code: 'audio_size_exceeded' }, 413);
     }
-    if (!AUDIO_SIGNATURES[ext](fileBytes)) {
-      return c.json({ error: 'File content is not a supported audio format' }, 415);
+    const verifySignature = AUDIO_SIGNATURES[ext];
+    if (!verifySignature || !verifySignature(fileBytes)) {
+      return c.json({ error: 'File content is not a supported audio format', code: 'invalid_audio_signature' }, 415);
     }
   }
 
