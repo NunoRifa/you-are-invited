@@ -527,3 +527,188 @@ The previous paragraph records the state at investigation time. The user then ap
 
 **Remaining verification:** Sign in to the local admin editor for `inv-anggi-ivan`, confirm the three recovered photos and empty descriptions are loaded from the API, enter the client's actual descriptions, click **Simpan Kisah Cinta**, reload the dashboard, and verify the text persists. Reload `/i/anggi-ivan?to=Nuno+Rifa`, scroll to the section so its lazy images load, and check portrait/landscape display, the browser console, gallery, music, RSVP, and another invitation. No production data, migration, or deployment was changed or run.
 
+---
+
+## Comprehensive UI/UX, Responsive & Accessibility Audit — anggi-ivan
+
+**Audit date:** 2026-10-19. **Status:** the client approved implementation after the audit; the implementation record appears below. This section records the current local page, which now contains all three real Love Story descriptions and images entered by the client. Earlier investigation notes above describe an earlier data state and remain as historical evidence.
+
+### 1. Scope, method, and evidence boundaries
+
+- Target: `http://localhost:5173/i/anggi-ivan?to=Nuno+Rifa`; scoped application file: `apps/web/public/production/anggi-ivan/index.html`. Read `PRD.md`, `CLAUDE.md`, and this plan. The requested client-specific audit does not authorize editing the shared template or application code yet.
+- Used real headless Chromium through Playwright CLI. At each requested viewport: reload, wait for public content, try the opening control, scroll the full document, and inspect DOM geometry, horizontal scroll width, visible image load state, Love Story cards, and gallery item count. Also used browser clicks, touch emulation, keyboard input, computed styles, console/page-error collection, request-failure inspection, and Resource Timing. Screenshots and reproducible browser scripts are in `output/playwright/`.
+- This is browser emulation, not testing on physical phones. Runtime API mocking for empty/partial Love Story and runtime substitution of a landscape image were confined to the audit browser session; neither changed source, database, nor production content. Actual gallery data contained six portrait images. A temporary CSS `zoom: 2` check was only a surrogate and does **not** prove WCAG 200% text resize compliance. No Lighthouse score was generated.
+- WCAG 2.2 AA reference points: [Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum) is 24 × 24 CSS px with documented exceptions; [Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) is 4.5:1 for normal text and 3:1 for large text; [Resize Text](https://www.w3.org/WAI/WCAG21/Understanding/resize-text) and [Reflow](https://www.w3.org/WAI/WCAG21/Understanding/reflow) apply. The [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) calls for focus to stay in a modal and Escape to close it. WCAG has no universal 16px minimum; suggested font sizes below are usability recommendations unless a measured contrast or functional failure is cited.
+
+### 2. Viewport coverage
+
+| Viewport | Browser result after full-page scroll | Specific issue |
+|---|---|---|
+| 320 × 568 | No document horizontal scroll; 3 Love Story cards and 6 gallery items | Music control is clipped at right edge; small text |
+| 360 × 640 | No document horizontal scroll; 3 cards and 6 gallery items | Small text |
+| 375 × 667 | No document horizontal scroll; 3 cards and 6 gallery items | Small text |
+| 390 × 844 | No document horizontal scroll; 3 cards and 6 gallery items | Lightbox focus escape, small text, RSVP issues |
+| 430 × 932 | No document horizontal scroll; 3 cards and 6 gallery items | Small text |
+| 667 × 375 | No document horizontal scroll; **cover cannot be opened by normal tap/click** | Opening button is below fixed, scroll-locked viewport |
+| 768 × 1024 | No document horizontal scroll; 3 cards and 6 gallery items | Keyboard/RSVP issues persist |
+| 1024 × 768 | No document horizontal scroll; 3 cards and 6 gallery items | Keyboard/RSVP issues persist |
+| 1366 × 768 | No document horizontal scroll; 3 cards and 6 gallery items | Keyboard/RSVP issues persist |
+| 1920 × 1080 | No document horizontal scroll; 3 cards and 6 gallery items | Keyboard/RSVP issues persist |
+
+The 667 × 375 row completed geometry inspection but its cover click timed out; the covered document was still scroll-inspected by script. Tests of the open invitation at that size used a session first opened in portrait and then rotated, so they do not prove the initial landscape opening flow. Offscreen descendants of the dismissed cover and the floating music widget were excluded from document-overflow claims because `documentElement.scrollWidth` remained equal to the viewport width.
+
+### 3. Section-by-section findings and successful checks
+
+| Actual section/feature | Observed browser behavior | Follow-up |
+|---|---|---|
+| Cover/opening | Opens on portrait/mobile/tablet/desktop; opening button 163 × 38 CSS px at 390; audio starts following gesture. At 667 × 375 the fixed cover places button at y≈513–551 with a 375px viewport while body overflow is hidden. | BUG-001; inspect short-height layout and focus |
+| Hero, quote, countdown, couple profiles | Visible after opening. Countdown seconds changed during observation. Natural scrolling activates reveal animations; an offscreen screenshot captured before the reveal is **not** evidence of missing content. | Preserve visual identity; check long names/text in regression |
+| Akad Nikah and Resepsi | Event date/time/location and map controls render. Akad time computes to 14px/21px; address 12px/16.8px; map link text 11px with approximately 114 × 23.8px box at 390. | BUG-007; same review for parallel Resepsi fields |
+| Gallery | Six current photos, all portrait. Grid rendered at ten widths. At 390, first 854 × 1280 image displayed ≈342 × 512 with `object-fit: contain`; other 2773 × 4160 files displayed ≈359 × 538. Touch X worked at 320 × 568, 390 × 844, and after rotation to 667 × 375. | BUG-002, BUG-013 |
+| Love Story | Current API populated all three ordered cards with client content. At 390 the section is max 500px wide, photos retain natural proportions, descriptions of 488/267/546 characters remain separated with no horizontal scroll. Empty mocked data hid the section; a text-only mocked story rendered without broken image; blank + valid mocked stories rendered only the valid card. No exception in these mocks. | BUG-008; preserve conditional rendering in regression |
+| RSVP and wishes | Empty submit gave a clear validation message and made no POST. Current empty wishes notice rendered. Form controls rely on placeholders; displayed comment-count link navigated away to Vite's catalog page. | BUG-003, BUG-005, BUG-006, BUG-009 |
+| Wedding Gift | Toggle opened account content; copy showed “✓ Berhasil Disalin”. No backend write was made. | BUG-009 for small supporting text; preserve toggle/copy |
+| Music | Pointer click toggled play/pause; audio also started after opening click. Floating `div` lacks keyboard semantics and is partly offscreen at 320. | BUG-004, BUG-010 |
+| Footer and navigation | Footer rendered. Two map links point to external URLs; external destinations were not opened. No Wedding Hashtag section was found. | Preserve existing routes and external links |
+
+Additional gallery tests: next changed counter 1/6 → 2/6; previous returned to 1/6. X, backdrop, and Escape **while focus was inside the dialog** all closed it. Six repeated open/close cycles restored `body` overflow to `auto` without page exceptions. Close is 48 × 48px, within the viewport and hit-tested above the overlay at 320/390/667. A landscape 4160 × 3120 invitation-owned image temporarily substituted into the open modal displayed at ≈342 × 256 (390 × 844) and ≈377 × 283 (667 × 375), remained contained, and X closed it. This is a proxy; no actual landscape photo is currently in the gallery. Evidence: `output/playwright/gallery-modal-390-delayed.png`, `gallery-landscape-proxy-667.png`, `anggi-audit-interactions.js`, `anggi-audit-touch.js`, and `anggi-audit-landscape-proxy.js`.
+
+No uncaught page JavaScript exception was observed in the scripted flows. Console had two Meta Pixel permission warnings. Some canceled media requests occurred during reload/close and should not be classified as HTTP failures. Resource Timing did record a 24,894,750-byte transfer for the hero MP4, which matches the approximately 24.9 MB local file; this is measured transfer size, **not** a Lighthouse score or proven interaction delay. Reduced-motion emulation disabled CSS fade animation but the muted hero video continued playing after opening.
+
+### 4. Prioritized issue register, root cause, fix, and acceptance criteria
+
+`Evidence` paths below are relative to repository root. Root cause is confirmed from the browser behavior plus cited source unless expressly labeled an inference. All proposed changes are scoped to `anggi-ivan`; no fix is implemented by this audit.
+
+#### BUG-001 — P0 — Cover button inaccessible in mobile landscape
+
+- **Section / viewport / problem:** opening cover, 667 × 375; normal Playwright click timed out because the button's bounding box was y≈513–551, outside the 375px fixed cover. Body scrolling is locked, so the guest cannot reach the main invitation in this orientation.
+- **Expected / evidence:** opening control remains reachable and operable at short heights. `output/playwright/cover-667x375.png`; `anggi-audit-matrix.js`; browser bounding boxes and click timeout.
+- **Root cause / affected file:** fixed `.modalx`/`.content-modalx` cover content exceeds viewport, with `body` overflow hidden at `apps/web/public/production/anggi-ivan/index.html:5233-5303` (especially `:5300`). Short-height scrolling or compacting is absent.
+- **Proposed fix / acceptance:** add scoped short-height cover layout and internal vertical scroll (or equivalent) while keeping the cover aesthetic and body lock. At 667 × 375 from a fresh load, button can be seen/reached by touch and keyboard and opens invitation; no clipped essential text; verify 320 × 568 and other sizes still open correctly.
+
+#### BUG-002 — P1 — Gallery dialog lets keyboard focus leave the modal
+
+- **Section / viewport / problem:** gallery, reproduced at 390 × 844 with keyboard; after close → previous → next, further Tab moved focus to content behind the active dialog. Escape then did not close because key handling listens on the modal only.
+- **Expected / evidence:** Tab and Shift+Tab remain among modal controls; Escape closes from every focused modal control and focus returns to the opening gallery item. `output/playwright/anggi-audit-interactions.js` browser key trace; working X/backdrop screenshots show pointer behavior is separate.
+- **Root cause / affected file:** `setupGalleryLightbox()` at `apps/web/public/production/anggi-ivan/index.html:6797-6893`; keydown bound at `:6855-6863`, no focus containment. Existing focus restoration at `:6836-6843` can be reused.
+- **Proposed fix / acceptance:** implement a focus cycle and robust Escape handling only while active; ensure cleanup does not add duplicate listeners on gallery refresh. Test forward/reverse Tab, Escape from each button, focus restoration, arrow navigation, pointer/touch X/backdrop, and body-scroll restoration.
+
+#### BUG-003 — P1 — RSVP comment-count link exits the invitation
+
+- **Section / viewport / problem:** RSVP at 390 × 844 and all widths; clicking visible comments link navigated to `/template-assets/webinvite.id/raden-motion/?post_id=...`, where Vite showed the application catalog instead of wishes.
+- **Expected / evidence:** control stays on invitation and reveals/navigates to current wishes. Browser navigation trace; static `href` at `apps/web/public/production/anggi-ivan/index.html:3980-3988`.
+- **Root cause / affected file:** leftover WordPress-export link points to a route that the current Vite app does not handle. The client-side wishes section is already present nearby and dynamic comments are hydrated later in `index.html:7238-7255`.
+- **Proposed fix / acceptance:** replace link with an in-page anchor/button and current count from real wishes state; do not restore stale hardcoded “4 Comments”. Click and keyboard activation keep URL on `/i/anggi-ivan` and move to/reveal wishes. Verify empty and populated states.
+
+#### BUG-004 — P1 — Music control is inaccessible by keyboard and clipped on 320px
+
+- **Section / viewport / problem:** floating music at 320 × 568 and keyboard at all widths; actual `#audio-container` is a `div` with no role or tab stop. At 320 its 25px-wide box begins x≈301, leaving ≈19px visible; pointer toggle worked but keyboard cannot reach it.
+- **Expected / evidence:** visible, comfortably tappable play/pause control with accessible name/state and keyboard operation. Browser rect, hit area, role/tabIndex, click trace; source `apps/web/public/production/anggi-ivan/index.html:5143-5151` and `:5190-5193`.
+- **Root cause / affected file:** legacy widget markup and click-only binding plus edge positioning from its template styles. Exact CSS cascade should be rechecked before editing because the widget is positioned by vendor CSS.
+- **Proposed fix / acceptance:** scoped semantic button or equivalent keyboard semantics, dynamic Play/Pause name/state, and 44 × 44px practical hit area inside safe right inset. At 320 and 390 it remains fully visible, does not cover essential buttons, and Space/Enter/click/tap all toggle the same audio without breaking open-cover autoplay policy.
+
+#### BUG-005 — P1 — RSVP fields lack persistent accessible labels; placeholder contrast fails
+
+- **Section / viewport / problem:** RSVP form at all widths; `#author`, `#cui-textarea-62777`, and `#konfirmasi` have no associated `<label>`/ARIA name (select surfaced as an unnamed combobox). Name/message depend on placeholders, which disappear on entry. Computed `#bbb` on white is ≈1.92:1, below WCAG AA normal-text 4.5:1.
+- **Expected / evidence:** persistent visible labels, programmatic names, legible placeholder/helper text, and errors associated with fields. Browser accessibility/contrast inspection in `output/playwright/anggi-audit-accessibility.js`; markup `apps/web/public/production/anggi-ivan/index.html:4047-4132`. Placeholder color comes from shared minified `apps/web/public/template-assets/webinvite.id/wp-content/litespeed/css/c589d9794a40e358f1240a9ca156fe73.css` (`::-webkit-input-placeholder{color:#BBB!important}`); do not edit shared asset.
+- **Root cause / affected file:** imported form retained placeholder-only field identification and shared low-contrast rule. Existing inline validation is functional but not tied to field IDs.
+- **Proposed fix / acceptance:** add visible `<label for>` elements and `aria-describedby`/`aria-invalid` when appropriate; scoped stronger placeholder/help color after vendor CSS. Keyboard and screen-reader inspection announces every field and error; placeholder contrast meets 4.5:1 when it carries instructions; layout fits 320px without overlap.
+
+#### BUG-006 — P1 — Focus indication missing on key RSVP controls
+
+- **Section / viewport / problem:** RSVP comment link and name input; computed style before/after focus was unchanged (`outline: none`, no box shadow, same border/background). Keyboard user cannot reliably locate focus. Some other controls, including select/gallery, still show browser focus.
+- **Expected / evidence:** visible focus ring with sufficient contrast/area on all interactive controls. Browser focus-style comparison in `output/playwright/anggi-audit-accessibility.js`; source controls `apps/web/public/production/anggi-ivan/index.html:3983` and `:4055`, vendor cascade.
+- **Root cause / affected file:** imported widget styles suppress default outline without local replacement. Exact winner in cascade should be identified during implementation.
+- **Proposed fix / acceptance:** add scoped `:focus-visible` treatment to link, fields, gallery, cover, gift, and music, preserving current visual style. Tab through page at 320/390/desktop; focused item is evident and not obscured. Measure against WCAG 2.2 focus appearance/visibility criteria rather than claiming an unmeasured numerical failure.
+
+#### BUG-007 — P1 — Essential event details are visually too small on mobile
+
+- **Section / viewport / problem:** Akad/Resepsi at 320–430px; at 390, Akad time is 14px/21px, location description 12px/16.8px, location link text 11px and ≈23.8px control height. Users must read these details to attend. This is a **usability finding**, not an automatic WCAG font-size violation; the link also needs target-size review against WCAG 24px/exceptions.
+- **Expected / evidence:** time/address/location action remain easy to scan and operate at 320px, in context of decorative headings. Computed styles from `output/playwright/anggi-audit-visual.js`, natural-scroll screenshot `output/playwright/akad-390-natural-scroll.png`; markup `apps/web/public/production/anggi-ivan/index.html:3241-3255`, `:3281-3310`, and parallel Resepsi `:3456-3509`.
+- **Root cause / affected file:** imported Elementor typography sets key details at 11–14px on mobile; fixed `<br>` in address may constrain wrapping. Exact CSS winning selector should be inspected before scoped override.
+- **Proposed fix / acceptance:** **proposal only**: time 16–18px, address 15–16px with 1.5–1.6 line-height, map link label 14–16px and target around 44px high. Match both event cards selectively; preserve hierarchy and client-specific design. At 320, 390, 667 landscape and 200% actual text zoom, content remains readable without clipping or horizontal scroll. Do not enlarge all fonts uniformly; prior client ownership of Akad font edits is respected until explicit implementation approval/coordination.
+
+#### BUG-008 — P2 — Love Story long descriptions are dense on narrow phones
+
+- **Section / viewport / problem:** Love Story at 320–430px; real descriptions are 488/267/546 characters, computed 14px/25.2px. No clipping/overlap occurred and calculated solid text/background contrast is ≈8:1. This is a readability improvement, not a confirmed WCAG failure.
+- **Expected / evidence:** comfortable long-form reading without excessive line length or unbalanced spacing. `output/playwright/love-story-390x844.png`, `anggi-audit-visual.js`; `apps/web/public/production/anggi-ivan/index.html:764-778`, markup `:3865-3875`, renderer `:6666-6720`.
+- **Root cause / affected file:** mobile override preserves 14px despite long paragraph content; current `max-width:46ch`, `overflow-wrap:anywhere`, and `pre-wrap` otherwise work.
+- **Proposed fix / acceptance:** trial 15–16px and line-height ≈1.55–1.7 within 46ch, adjust card spacing only if needed. Maintain portrait/landscape `contain`, story order, dynamic content, empty/partial hiding, and no overflow at 320/390/desktop.
+
+#### BUG-009 — P2 — Secondary RSVP/Gift instructions and empty state need clearer hierarchy
+
+- **Section / viewport / problem:** 320–430px; RSVP intro computes to 11px/16.5px, Gift intro 13px/19.5px, “Klik Wedding Gift” 10px/12px; empty wishes text is 13px `#888` over a patterned/translucent area. Empty-state contrast over that image was **not numerically established**; record it as visual concern only.
+- **Expected / evidence:** supporting instructions remain readable without overwhelming section headings. `output/playwright/section-7-390.png`, `section-8-390.png`, computed styles; `apps/web/public/production/anggi-ivan/index.html:3954-3963`, `:4453-4483`, `:7247-7253`.
+- **Root cause / affected file:** inherited legacy Elementor sizes and inline generated empty-state styling.
+- **Proposed fix / acceptance:** scoped responsive sizes around 14–16px for informative instructions and ≥14px for secondary labels, with tuned line-height/contrast; test actual text over worst background pixels before claiming WCAG compliance. Ensure 320px Gift toggle/form stays unclipped.
+
+#### BUG-010 — P2 — Heavy motion asset and redundant initial audio request
+
+- **Section / viewport / problem:** hero/mobile performance; Resource Timing reported 24,894,750 transferred bytes for `raden-02-vid-motion-1.mp4` (local file ≈24.9 MB). Initial legacy MP3 request was canceled after invitation music URL replacement; this may waste network work. No measured Lighthouse score or first-interaction latency is available.
+- **Expected / evidence:** similar visual motion with proportionate mobile transfer; one intentional soundtrack request. Browser Resource Timing and request log; `apps/web/public/production/anggi-ivan/index.html:2482-2492`, `:5147-5150`, `:5624`, `:6788-6793`.
+- **Root cause / affected file:** unoptimized source video and an eager placeholder audio `<source>` that is later overwritten by payload music. Savings from removing placeholder request are inferred until measured on throttled network.
+- **Proposed fix / acceptance:** prepare compressed mobile rendition/poster and load video according to policy/network conditions; initialize only the chosen soundtrack source without duplicate fetch. Compare byte transfer, poster/visual fidelity, playback, gallery, and music before/after on throttled mobile; avoid invented performance scores.
+
+#### BUG-011 — P2 — Some background images still depend on an external host
+
+- **Section / viewport / problem:** hero/RSVP backgrounds at all widths; browser requested `https://webinvite.id/.../BG-Raden.jpg` and `.../bawah-123.png` although local asset copies exist. No current load failure was recorded; risk is external availability/privacy/latency.
+- **Expected / evidence:** invitation serves its own scoped visual assets. Browser Network requests; selectors `.elementor-element-7a9442c` and `.elementor-element-fc5855b .cui-wrapper` in shared minified `apps/web/public/template-assets/webinvite.id/wp-content/litespeed/css/c589d9794a40e358f1240a9ca156fe73.css` (minified line ≈271).
+- **Root cause / affected file:** original template export embedded absolute vendor URLs in shared CSS. No need to edit shared file.
+- **Proposed fix / acceptance:** add client-scoped local URL overrides in `apps/web/public/production/anggi-ivan/index.html`, verify exact visual match and 200 responses for local assets, no webinvite.id background requests for this invitation, no effect on other clients.
+
+#### BUG-012 — P2 — Reduced-motion preference still plays hero video
+
+- **Section / viewport / problem:** hero with emulated `prefers-reduced-motion: reduce`; CSS reveal animation was disabled, which is good, but muted hero video still played (`paused:false` after cover opening).
+- **Expected / evidence:** users requesting reduced motion can view a stable hero poster while still accessing all content. Browser emulation in `output/playwright/anggi-audit-special.js`; video markup `apps/web/public/production/anggi-ivan/index.html:2482-2492`, click-to-play `:5624`. [Animation from Interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions) is WCAG AAA, so this is a design/accessibility recommendation, **not** a claimed AA violation.
+- **Root cause / affected file:** JS play path does not inspect motion preference.
+- **Proposed fix / acceptance:** respect the media query in video startup and show a suitable existing poster; normal preference retains video. In reduced-motion emulation, video stays paused and content/cover remain usable.
+
+#### BUG-013 — P3 — Gallery captions expose technical asset slugs
+
+- **Section / viewport / problem:** gallery at all widths; current public captions such as `anggi-ivan-g1` appear in modal and label the gallery image. They do not describe the photo meaningfully.
+- **Expected / evidence:** human-readable gallery caption/accessible name when editorial content is supplied, or concise neutral fallback. Browser modal/snapshot; `apps/web/public/production/anggi-ivan/index.html:6823-6834`, `:6904-6920`.
+- **Root cause / affected file:** renderer trusts asset caption from public payload and only falls back when empty. No fabricated client caption should be introduced.
+- **Proposed fix / acceptance:** allow admin to set real descriptive captions or replace technical slugs with neutral sequence labels in this client renderer; keep gallery order and image URLs intact. Check screen-reader output and visible modal text.
+
+### 5. File impact and implementation order after approval
+
+1. **P0 / safe entry:** `apps/web/public/production/anggi-ivan/index.html` cover styles/markup/handler (`:5233-5303`); make initial landscape opening reachable. Retest cover across ten viewports before proceeding.
+2. **P1 / keyboard and navigation:** same file gallery lightbox (`:6797-6893`), stale comments link (`:3980-3988`), music widget (`:5143-5193`), RSVP form (`:4047-4132`), and scoped focus styles. Maintain current click/touch behavior.
+3. **P1/P2 / typography:** client-scoped selectors for event details, Love Story (`:764-778`), RSVP/Gift instructions, and wishes empty state. First inspect actual winning vendor selectors and contrast on backgrounds; do not edit shared CSS. Coordinate prior request for the client to set Akad sizes personally before changing those two values.
+4. **P2/P3 / assets and preferences:** same client HTML for video/audio loading, reduced-motion behavior, local background overrides, gallery fallback caption. Existing assets under `apps/web/public/template-assets/` may be referenced; creating optimized video rendition is optional after visual/byte comparison. The shared minified CSS is **read-only evidence**, not a proposed change target. `PLAN.md` already holds this audit; no API/database migration or deployment is required for these UI fixes.
+5. **Automation:** `output/playwright/anggi-audit-*.js` are audit artifacts, not application files. After approval, add narrowly scoped Playwright regression coverage if project test setup supports the invitation route; do not claim automated tests passed until executed. No test or application file was changed in this planning step.
+
+### 6. Regression test plan and acceptance gate
+
+- Re-run all ten viewport sizes from a **fresh** invitation load. At each: open cover, scroll every section, compare `scrollWidth` to viewport, inspect clipping/overlap/whitespace, visual hierarchy, fixed music placement, image proportions, and computed hit targets. Capture 320/390/667/768/1366/1920 screenshots. For 667 × 375, test the initial cover interaction without first opening portrait.
+- Gallery: use actual portrait/high-resolution photos plus a controlled landscape proxy until the client has an actual landscape gallery photo; open, next/previous, X, backdrop, Escape, six repeated cycles, body scroll, Tab/Shift+Tab containment, focus return, touch at 320/390 and rotation to landscape. Confirm no console errors and image `contain`/viewport bounds.
+- Love Story: confirm current three titles, descriptions, images, and order against public data; test long copy, portrait/landscape proportions, empty and partial mock API results, no broken image/empty cards, and no other invitation impact.
+- RSVP/Wishes/Gift: keyboard labels/focus, validation errors, empty and populated wishes count/link, submit flow in an isolated test environment only (avoid writing production), gift toggle/copy, external maps opening, countdown update. Preserve current gallery, RSVP, copy, music, and opening behavior.
+- Accessibility: verify contrast against actual solid and image backgrounds; target ≥24 × 24 CSS px or WCAG exception and aim ≈44 × 44 for touch; programmatic labels, visible focus, modal focus trap/restoration, reduced-motion behavior, and **real** 200% browser text resizing/reflow at 320 CSS px. Browser CSS zoom surrogate cannot substitute for that check.
+- Performance: record Resource Timing / network transfer before and after media changes under comparable throttling; check failed requests, layout shift, redundant media loads, and repeated modal/listener behavior. Run Lighthouse only if available and record the actual environment and score. Test on a physical Android/iOS device when available; Chromium emulation alone does not validate Safari safe areas or real touch latency.
+- **Acceptance gate:** each BUG-001–BUG-013 meets its acceptance statement above, no P0/P1 remains, visual identity of `anggi-ivan` remains intact, other invitations remain unaffected, no JS page errors appear in tested flows, and no database migration/deployment is performed as part of this audit. Implementation begins only after client approval of this plan.
+
+### 7. Approved implementation record (2026-10-19)
+
+After the client approved the audit plan, changes were confined to `apps/web/public/production/anggi-ivan/index.html`. No shared template stylesheet, API, database record, migration, or deployment was changed. Browser scripts and screenshots under `output/playwright/` are local evidence artifacts.
+
+| Issue | Implementation and observed result |
+|---|---|
+| BUG-001 | Cover now supports internal scrolling and uses a compact photo/gradient layout at short landscape heights. At **667 × 375 from a fresh load**, opening button bottom is 365px in a 375px viewport, and click succeeds. Keyboard Tab focuses the button; Enter opens the invitation, marks the dismissed cover inert/ARIA-hidden, restores body scrolling, and focuses the invitation content. `output/playwright/cover-fixed-667-final.png`. |
+| BUG-002 | Active gallery modal cycles Tab/Shift+Tab across its three controls, catches Escape while active, restores focus and body scroll. Repeated X, backdrop, next/previous, Escape, and touch close checks passed. |
+| BUG-003 | Comment count links to `#cui-box` within `/i/anggi-ivan`; count still hydrates from `wishSummary.total`. Browser click stayed on the same invitation with the expected hash. |
+| BUG-004 | Music control has button semantics, Tab access, Enter/Space activation, changing label/pressed state, and a fully visible 44 × 44px hit box at 320px. Browser Enter paused and Space resumed the same audio. |
+| BUG-005 | Name, message, and attendance controls have persistent visible labels. Placeholder computes to `rgb(102,102,102)` instead of `#bbb`; empty submit focuses the invalid field and reports its message, then clears `aria-invalid` as the user types. No RSVP POST was issued during validation checks. |
+| BUG-006 | Comment link has a measured 3px keyboard focus outline. Legacy input CSS still suppresses the input's own outline, so the field wrapper now displays a measured 3px `:focus-within` outline; this is the visible focus indicator. |
+| BUG-007 | Location action text now computes to 14px and the settled button height to 44px. **Akad time and address font sizes remain 14px and 12px on mobile by the client's earlier explicit instruction to change those personally.** The same instruction applies to their typography recommendation; this part of the acceptance gate remains for the client. |
+| BUG-008 | Love Story descriptions are 15px/25.5px on mobile and 16px on desktop, retaining the original width cap, images, order, and conditional renderer. A settled screenshot (`output/playwright/love-story-fixed-settled.png`) shows no overlap; a screenshot taken during animation had appeared translucent and was not treated as a persistent defect. |
+| BUG-009 | RSVP/Gift instruction text computes to 15px; Gift prompt to 15px; empty wishes notice to 14px with a darker color. Actual contrast over every possible image pixel remains unmeasured. |
+| BUG-010 | Hero video now uses `preload="none"`; the gallery's unused 39MB `reno.mov` placeholder no longer has a `src`; default music source is chosen only after public payload hydration, avoiding the initial replaced MP3 request. Before cover opening, browser Resource Timing showed no matching media requests. The normal-motion hero still plays after opening. When `navigator.connection.saveData` is true, the video stays paused/hidden and the still background is shown; verified with a browser-only override. **The hero MP4 remains ≈24.9 MB in full and needs a separately prepared/comparatively checked compressed rendition; no FFmpeg executable was found on PATH or in this workspace.** |
+| BUG-011 | Both formerly external backgrounds now resolve to local `/template-assets/...` URLs. Browser Resource Timing recorded local `BG-Raden.jpg` and `bawah-123.png`, with no matching external host requests in the checked session. |
+| BUG-012 | Under emulated reduced motion, hero video remained paused and hidden while the local still background rendered; normal-motion browser check showed the video playing after opening. |
+| BUG-013 | Technical `anggi-ivan-gN` captions now become neutral “Foto galeri N” labels/alt text. Future descriptive client captions still pass through unchanged. |
+
+**Regression evidence:** `output/playwright/anggi-fix-check.js`, `anggi-fix-scroll.js`, `anggi-fix-rsvp.js`, `anggi-fix-media.js`, `anggi-fix-style.js`, and existing touch/interaction/conditional scripts. A full natural scroll at all ten requested viewports found `documentElement.scrollWidth === innerWidth`, three Love Story cards, six gallery entries, no visible broken images, and no uncaught page errors. Touch emulation at 320 × 568, 390 × 844, and rotated 667 × 375 kept the 48 × 48px gallery X reachable and restored page overflow to `auto`. Empty, text-only, and mixed-empty Love Story API responses were mocked in browser only and rendered according to their rules. RSVP empty validation and Wedding Gift expansion passed; a real RSVP POST, admin save, other client invitation, physical devices, actual 200% browser text zoom, and Lighthouse were not tested in this implementation pass.
+
+**Remaining work:** client sets the two reserved Akad font sizes; create and visually compare a smaller hero video rendition before replacing the 24.9 MB source; measure contrast across the RSVP image background and test physical Safari/Android and genuine 200% text zoom when available. No production write, migration, or deployment was performed.
+

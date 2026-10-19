@@ -1,0 +1,124 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e20]:
+      - generic [ref=e26]:
+        - generic [ref=e29]:
+          - img "Bismillah.png"
+        - generic [ref=e31]:
+          - paragraph [ref=e32]: Assalamu’alaikum Wr. Wb, Dengan memohon rahmat dan ridho Allah SWT, Kami Mengundang Bapak/Ibu/Saudara/i, untuk menghadiri acara pernikahan kami.
+          - paragraph [ref=e33]: Dengan memohon rahmat dan ridho Allah SWT, Kami Mengundang Bapak/Ibu/Saudara/i, untuk menghadiri acara pernikahan kami.
+        - paragraph [ref=e36]: Anggi
+        - paragraph [ref=e39]: Anggi Azoka Dea Prabowo
+        - paragraph [ref=e41]: Putri Pertama dari Bapak Prabowo Budi Susilo dan Ibu Dewi Anggrayani, S.Pd
+      - generic [ref=e46]:
+        - generic [ref=e48]: "&"
+        - paragraph [ref=e55]: Ivan
+        - paragraph [ref=e58]: Ivan Budi Rianto
+        - paragraph [ref=e60]: Putra Pertama dari Bapak Budiyanto dan Ibu Ratna Andriati (Almh)
+        - generic [ref=e62]:
+          - img "Candi bawah 1"
+    - generic [ref=e71]:
+      - generic [ref=e76]:
+        - generic [ref=e79]:
+          - img "Wayang raden"
+        - heading "Sabtu" [level=2] [ref=e82]
+        - heading "7 November 2026" [level=2] [ref=e85]
+        - 'heading "Pukul : 10:00 - Selesai" [level=2] [ref=e88]'
+        - link "Lihat Lokasi" [ref=e98] [cursor=pointer]:
+          - /url: https://share.google/2GHXfyXwbhgy04fGi
+        - generic:
+          - generic:
+            - img "Bunga bawah"
+      - generic [ref=e107]:
+        - generic [ref=e110]:
+          - img "Wayang raden"
+        - heading "Sabtu" [level=2] [ref=e113]
+        - heading "7 November 2026" [level=2] [ref=e116]
+        - 'heading "Pukul : 13:00 - 15.00 WIB" [level=2] [ref=e119]'
+        - link "Lihat Lokasi" [ref=e129] [cursor=pointer]:
+          - /url: https://share.google/2GHXfyXwbhgy04fGi
+        - generic:
+          - generic:
+            - img "Bunga bawah"
+    - generic [ref=e138]:
+      - generic [ref=e141]:
+        - img "Tes 1"
+      - generic [ref=e146]:
+        - img "Bunga bawah"
+    - region [ref=e147]:
+      - generic [ref=e148]:
+        - heading "Kisah Cinta" [level=2] [ref=e149]
+        - generic [ref=e150]:
+          - article [ref=e151]:
+            - img "Awal Bertemu"
+            - heading "Awal Bertemu" [level=3] [ref=e152]
+            - paragraph [ref=e153]: Berawal dari tahun 2015, saat kami masih duduk di bangku SMP. Kedekatan sederhana yang awalnya hanya bercandaan, perlahan tumbuh menjadi kisah cinta yang tak pernah kami sangka akan bertahan hingga dewasa. Sepuluh tahun kami lalui bersama, tumbuh dengan kesibukan dan perjalanan masing-masing, hingga akhirnya kami menyadari bahwa kami ingin terus berjalan berdampingan. Tepat pada 6 Maret 2025, di anniversary ke-10 kami, Ivan mengajak Anggi untuk melangkah ke jenjang yang lebih serius.
+          - article [ref=e154]:
+            - img "Acara Lamaran"
+            - heading "Acara Lamaran" [level=3] [ref=e155]
+            - paragraph [ref=e156]: Setelah sepuluh tahun menapaki perjalanan cinta bersama, pada 9 Mei 2026, Ivan dan Anggi mengikat sebuah janji melalui prosesi lamaran. Dengan penuh haru dan bahagia, kami melangkah menuju babak baru, membawa doa, restu keluarga, dan harapan untuk masa depan bersama.
+          - article [ref=e157]:
+            - img "Acara Pernikahan"
+            - heading "Acara Pernikahan" [level=3] [ref=e158]
+            - paragraph [ref=e159]: Setelah perjalanan cinta yang panjang, melewati suka dan duka serta tumbuh bersama selama bertahun-tahun, akhirnya kami sampai pada langkah baru yang telah lama dinantikan, yaitu mengikat janji suci pernikahan. Dengan penuh rasa syukur, kami memohon doa restu agar perjalanan baru ini senantiasa diberkahi dan dipenuhi cinta hingga akhir hayat. Kami mengundang keluarga, sahabat, dan orang-orang terkasih untuk hadir serta menjadi bagian dari hari bahagia kami. Kehadiran dan doa restu Anda akan menjadi kebahagiaan yang sangat berarti bagi kami.
+    - generic [ref=e170]:
+      - heading "Rsvp" [level=2] [ref=e173]
+      - heading "Ucapan" [level=2] [ref=e176]
+      - generic [ref=e179]:
+        - link "0 Ucapan" [ref=e182] [cursor=pointer]:
+          - /url: "#cui-box"
+        - generic [ref=e183]:
+          - generic [ref=e184]:
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - generic [ref=e189]: "0"
+                - generic [ref=e190]: Hadir
+              - generic [ref=e191]:
+                - generic [ref=e192]: "0"
+                - generic [ref=e193]: Tidak hadir
+              - generic [ref=e194]:
+                - generic [ref=e195]: "0"
+                - generic [ref=e196]: Masih Ragu
+            - generic [ref=e200]:
+              - paragraph [ref=e201]:
+                - generic [ref=e202]: Nama *
+                - textbox "Nama" [ref=e203]
+              - generic [ref=e204]:
+                - generic [ref=e205]: Ucapan *
+                - textbox "Ucapan" [ref=e206]
+              - generic [ref=e207]:
+                - generic [ref=e208]: Konfirmasi Kehadiran
+                - combobox "Konfirmasi Kehadiran" [ref=e209]:
+                  - option "Konfirmasi Kehadiran" [disabled] [selected]
+                  - option "Hadir"
+                  - option "Tidak Hadir"
+                  - option "Masih Ragu"
+              - paragraph [ref=e211]:
+                - button "Kirim" [ref=e212] [cursor=pointer]
+          - list [ref=e214]:
+            - listitem [ref=e215]: Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
+    - generic [ref=e226]:
+      - generic [ref=e229]:
+        - img "Wayang raden"
+      - paragraph [ref=e232]: Wedding Gift
+      - heading "Klik Wedding Gift" [level=2] [ref=e235]
+      - button "Wedding Gift" [ref=e239] [cursor=pointer]
+    - generic [ref=e251]:
+      - img "Rumah bawah"
+    - generic [ref=e259]:
+      - paragraph [ref=e264]: Designed By You Are Invited 🤍
+      - button "Putar musik" [ref=e266] [cursor=pointer]
+      - dialog "Pembuka undangan" [ref=e271]:
+        - generic [ref=e274]:
+          - generic [ref=e275]: The Wedding Of
+          - generic [ref=e276]: Anggi & Ivan
+          - generic [ref=e277]: "Kepada yth :"
+          - generic [ref=e278]: Nuno Rifa
+          - button [ref=e280] [cursor=pointer]
+  - dialog "Galeri foto":
+    - generic: 1 / 1
+    - button "Tutup": ×
+    - button "Sebelumnya": ❮
+    - button "Selanjutnya": ❯
+    - generic:
+      - img "Galeri"

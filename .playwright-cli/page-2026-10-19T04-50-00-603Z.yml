@@ -1,0 +1,117 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e20]:
+      - generic [ref=e26]:
+        - generic [ref=e29]:
+          - img "Bismillah.png"
+        - generic [ref=e31]:
+          - paragraph [ref=e32]: Assalamu’alaikum Wr. Wb, Dengan memohon rahmat dan ridho Allah SWT, Kami Mengundang Bapak/Ibu/Saudara/i, untuk menghadiri acara pernikahan kami.
+          - paragraph [ref=e33]: Dengan memohon rahmat dan ridho Allah SWT, Kami Mengundang Bapak/Ibu/Saudara/i, untuk menghadiri acara pernikahan kami.
+        - paragraph [ref=e36]: Anggi
+        - paragraph [ref=e39]: Anggi Azoka Dea Prabowo
+        - paragraph [ref=e42]: Putri Pertama dari Bapak Prabowo Budi Susilo dan Ibu Dewi Anggrayani, S.Pd
+      - generic [ref=e47]:
+        - generic [ref=e49]: "&"
+        - paragraph [ref=e56]: Ivan
+        - paragraph [ref=e59]: Ivan Budi Rianto
+        - paragraph [ref=e62]: Putra Pertama dari Bapak Budiyanto dan Ibu Ratna Andriati (Almh)
+        - generic [ref=e64]:
+          - img "Candi bawah 1"
+    - generic [ref=e73]:
+      - generic [ref=e78]:
+        - generic [ref=e81]:
+          - img "Wayang raden"
+        - heading "Sabtu" [level=2] [ref=e84]
+        - heading "7 November 2026" [level=2] [ref=e87]
+        - 'heading "Pukul : 10:00 - Selesai" [level=2] [ref=e90]'
+        - link "Lihat Lokasi" [ref=e100] [cursor=pointer]:
+          - /url: https://share.google/2GHXfyXwbhgy04fGi
+        - generic:
+          - generic:
+            - img "Bunga bawah"
+      - generic [ref=e109]:
+        - generic [ref=e112]:
+          - img "Wayang raden"
+        - heading "Sabtu" [level=2] [ref=e115]
+        - heading "7 November 2026" [level=2] [ref=e118]
+        - 'heading "Pukul : 13:00 - 15.00 WIB" [level=2] [ref=e121]'
+        - link "Lihat Lokasi" [ref=e131] [cursor=pointer]:
+          - /url: https://share.google/2GHXfyXwbhgy04fGi
+        - generic:
+          - generic:
+            - img "Bunga bawah"
+    - generic [ref=e140]:
+      - generic [ref=e143]:
+        - img "Tes 1"
+      - generic [ref=e148]:
+        - img "Bunga bawah"
+    - region [ref=e149]:
+      - generic [ref=e150]:
+        - heading "Kisah Cinta" [level=2] [ref=e151]
+        - generic [ref=e152]:
+          - article [ref=e153]:
+            - img "Awal Bertemu"
+            - heading "Awal Bertemu" [level=3] [ref=e154]
+            - paragraph [ref=e155]: Berawal dari tahun 2015, saat kami masih duduk di bangku SMP. Kedekatan sederhana yang awalnya hanya bercandaan, perlahan tumbuh menjadi kisah cinta yang tak pernah kami sangka akan bertahan hingga dewasa. Sepuluh tahun kami lalui bersama, tumbuh dengan kesibukan dan perjalanan masing-masing, hingga akhirnya kami menyadari bahwa kami ingin terus berjalan berdampingan. Tepat pada 6 Maret 2025, di anniversary ke-10 kami, Ivan mengajak Anggi untuk melangkah ke jenjang yang lebih serius.
+          - article [ref=e156]:
+            - img "Acara Lamaran"
+            - heading "Acara Lamaran" [level=3] [ref=e157]
+            - paragraph [ref=e158]: Setelah sepuluh tahun menapaki perjalanan cinta bersama, pada 9 Mei 2026, Ivan dan Anggi mengikat sebuah janji melalui prosesi lamaran. Dengan penuh haru dan bahagia, kami melangkah menuju babak baru, membawa doa, restu keluarga, dan harapan untuk masa depan bersama.
+          - article [ref=e159]:
+            - img "Acara Pernikahan"
+            - heading "Acara Pernikahan" [level=3] [ref=e160]
+            - paragraph [ref=e161]: Setelah perjalanan cinta yang panjang, melewati suka dan duka serta tumbuh bersama selama bertahun-tahun, akhirnya kami sampai pada langkah baru yang telah lama dinantikan, yaitu mengikat janji suci pernikahan. Dengan penuh rasa syukur, kami memohon doa restu agar perjalanan baru ini senantiasa diberkahi dan dipenuhi cinta hingga akhir hayat. Kami mengundang keluarga, sahabat, dan orang-orang terkasih untuk hadir serta menjadi bagian dari hari bahagia kami. Kehadiran dan doa restu Anda akan menjadi kebahagiaan yang sangat berarti bagi kami.
+    - generic [ref=e172]:
+      - heading "Rsvp" [level=2] [ref=e175]
+      - heading "Ucapan" [level=2] [ref=e178]
+      - generic [ref=e181]:
+        - link "0 Comments" [ref=e184] [cursor=pointer]:
+          - /url: /template-assets/webinvite.id/raden-motion/?post_id=62777&comments=4&get=30&order=DESC
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]: "0"
+                - generic [ref=e192]: Hadir
+              - generic [ref=e193]:
+                - generic [ref=e194]: "0"
+                - generic [ref=e195]: Tidak hadir
+              - generic [ref=e196]:
+                - generic [ref=e197]: "0"
+                - generic [ref=e198]: Masih Ragu
+            - generic [ref=e202]:
+              - paragraph [ref=e203]:
+                - textbox "Nama" [ref=e204]
+              - textbox "Ucapan" [ref=e206]
+              - combobox [ref=e208]:
+                - option "Konfirmasi Kehadiran" [disabled] [selected]
+                - option "Hadir"
+                - option "Tidak Hadir"
+                - option "Masih Ragu"
+              - paragraph [ref=e210]:
+                - button "Kirim" [ref=e211] [cursor=pointer]
+          - list [ref=e213]:
+            - listitem [ref=e214]: Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
+    - generic [ref=e225]:
+      - generic [ref=e228]:
+        - img "Wayang raden"
+      - paragraph [ref=e231]: Wedding Gift
+      - heading "Klik Wedding Gift" [level=2] [ref=e234]
+      - button "Wedding Gift" [ref=e238] [cursor=pointer]
+    - generic [ref=e250]:
+      - img "Rumah bawah"
+    - generic [ref=e258]:
+      - paragraph [ref=e263]: Designed By You Are Invited 🤍
+      - generic [ref=e273]:
+        - generic [ref=e274]: The Wedding Of
+        - generic [ref=e275]: Anggi & Ivan
+        - generic [ref=e276]: "Kepada yth :"
+        - generic [ref=e277]: Nuno Rifa
+        - button [ref=e279] [cursor=pointer]
+  - dialog "Galeri foto":
+    - generic: 1 / 1
+    - button "Tutup": ×
+    - button "Sebelumnya": ❮
+    - button "Selanjutnya": ❯
+    - generic:
+      - img "Galeri"

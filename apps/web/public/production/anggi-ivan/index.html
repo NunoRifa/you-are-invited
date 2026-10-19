@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="id">
    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
    <head>
@@ -8,6 +8,9 @@
 window.wp = window.wp || { i18n: { setLocaleData: function() {}, __: function(s) { return s; } } };
 window._ = window._ || {};
 window.settingAutoplay = true;
+if (navigator.connection && navigator.connection.saveData) {
+   document.documentElement.classList.add('anggi-save-data');
+}
 </script>
 
       <script data-no-optimize="1">
@@ -2425,6 +2428,198 @@ window.settingAutoplay = true;
             opacity: 1;
          }
       </style>
+       <style id="anggi-ivan-ux-fixes">
+          /* Keep the opening action reachable when the viewport is short. */
+          .modalx .content-modalx {
+             top: 0 !important;
+             height: 100vh !important;
+             height: 100dvh !important;
+             overflow-y: auto !important;
+             overscroll-behavior: contain;
+          }
+          .modalx .info_modalx {
+             box-sizing: border-box;
+             height: auto !important;
+             min-height: 100%;
+             padding: 16px 12px max(24px, env(safe-area-inset-bottom));
+          }
+
+          /* Use the invitation's own copies of the original backgrounds. */
+          /* .elementor-62777 .elementor-element.elementor-element-7a9442c:not(.elementor-motion-effects-element-type-background),
+          .elementor-62777 .elementor-element.elementor-element-7a9442c > .elementor-motion-effects-container > .elementor-motion-effects-layer {
+             background-image: url('/template-assets/webinvite.id/wp-content/uploads/2025/10/BG-Raden.jpg') !important;
+          } */
+          .elementor-62777 .elementor-element.elementor-element-fc5855b .cui-wrapper {
+             background-image: url('/template-assets/webinvite.id/wp-content/uploads/2025/10/bawah-123.png') !important;
+          }
+
+          #audio-container.audio-box {
+             box-sizing: border-box !important;
+             position: fixed !important;
+             left: auto !important;
+             right: max(12px, env(safe-area-inset-right)) !important;
+             bottom: max(12px, env(safe-area-inset-bottom)) !important;
+             width: 44px !important;
+             height: 44px !important;
+             min-width: 44px !important;
+             min-height: 44px !important;
+             display: flex !important;
+             align-items: center;
+             justify-content: center;
+             cursor: pointer;
+             z-index: 1000 !important;
+             touch-action: manipulation;
+          }
+          #audio-container .elementor-icon-wrapper {
+             margin: 0 !important;
+          }
+
+          .anggi-field-label {
+             display: block !important;
+             margin: 0 0 6px;
+             color: #4e1f00;
+             font: 500 14px/1.5 'Poppins', Arial, sans-serif;
+          }
+          #commentform-62777 input::placeholder,
+          #commentform-62777 textarea::placeholder {
+             color: #666 !important;
+             opacity: 1 !important;
+          }
+          #commentform-62777 [aria-invalid="true"] {
+             border-color: #b42318 !important;
+          }
+          .elementor-62777 :is(a, button, input, select, textarea):focus-visible,
+          #commentform-62777 :is(#author, #cui-textarea-62777, #konfirmasi, #submit-62777):focus-visible,
+          #audio-container:focus-visible,
+          .standalone-lightbox-modal button:focus-visible {
+             outline: 3px solid #a64d18 !important;
+             outline-offset: 3px !important;
+             box-shadow: 0 0 0 2px #fff !important;
+          }
+          .standalone-lightbox-modal button:focus-visible {
+             outline-color: #fff !important;
+             box-shadow: 0 0 0 3px #4e1f00 !important;
+          }
+          #commentform-62777 :is(.comment-form-author, .cui-wrap-textarea, .cui-wrap-select):focus-within {
+             outline: 3px solid #a64d18 !important;
+             outline-offset: 3px !important;
+             border-radius: 4px;
+          }
+
+          #anggi-ivan-love-story .anggi-love-story-description {
+             font-size: 16px;
+             line-height: 1.65;
+          }
+          .elementor-62777 .elementor-element.elementor-element-9deac50,
+          .elementor-62777 .elementor-element.elementor-element-011fd0c {
+             font-size: 15px !important;
+             line-height: 1.6 !important;
+          }
+          .elementor-62777 .elementor-element.elementor-element-4854ef2 .elementor-heading-title {
+             font-size: 15px !important;
+             line-height: 1.4 !important;
+          }
+          #cui-container-comment-62777 [data-empty-wishes="true"] {
+             color: #4e1f00 !important;
+             font-size: 14px !important;
+             line-height: 1.5 !important;
+          }
+          .elementor-62777 .elementor-element.elementor-element-2f59679 a,
+          .elementor-62777 .elementor-element.elementor-element-36a639a a {
+             display: inline-flex !important;
+             align-items: center;
+             justify-content: center;
+             min-height: 44px;
+             padding: 8px 16px !important;
+             font-size: 14px !important;
+             line-height: 1.2 !important;
+          }
+         .motionSection {
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+         }
+
+         .motionSection > .elementor-background-video-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+         }
+
+         .motionSection
+         .elementor-background-video-container
+         > video.elementor-background-video-hosted {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            max-height: none !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            transform: none !important;
+         }
+          @media (max-width: 767px) {
+             #anggi-ivan-love-story .anggi-love-story-description {
+                font-size: 15px;
+                line-height: 1.7;
+             }
+          }
+          @media (max-height: 480px) and (min-width: 600px) {
+             .modalx .info_modalx {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                min-height: 0;
+                padding: 38px 12px 10px;
+                background: linear-gradient(transparent, rgba(37, 18, 9, .9) 35%);
+             }
+             .modalx .info_modalx > div:not(.wdp-button-wrapper) {
+                animation: none !important;
+                transform: none !important;
+                filter: none !important;
+                opacity: 1 !important;
+             }
+             .modalx .info_modalx > .img { display: none; }
+             .modalx .wdp-txt-the-wedding {
+                margin: 0 !important;
+                font-size: 14px !important;
+                line-height: 1.2 !important;
+             }
+             .modalx .wdp-mempelai {
+                margin: 3px 0 !important;
+                font-size: clamp(30px, 6vw, 40px) !important;
+                line-height: 1.05 !important;
+             }
+             .modalx .wdp-dear,
+             .modalx .wdp-name {
+                margin: 0 !important;
+                font-size: 13px !important;
+                line-height: 1.25 !important;
+             }
+             .modalx .wdp-button-wrapper {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+             }
+             .modalx .wdp-button-wrapper button {
+                min-height: 44px;
+                margin: 6px auto 0 !important;
+             }
+          }
+          @media (prefers-reduced-motion: reduce) {
+             .motionSection .elementor-background-video-container video {
+                display: none !important;
+             }
+          }
+          .anggi-save-data .motionSection .elementor-background-video-container video {
+             display: none !important;
+          }
+       </style>
       <meta
          name="viewport"
          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -2486,7 +2681,7 @@ window.settingAutoplay = true;
                               class="elementor-background-video-hosted"
                               role="presentation"
                               src="/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
-                              preload="metadata"
+                              preload="none"
                               muted
                               playsinline
                            ></video>
@@ -3684,7 +3879,7 @@ window.settingAutoplay = true;
                                        >
                                           <video
                                              class="elementor-video"
-                                             src="/template-assets/webinvite.id/wp-content/uploads/2025/06/reno.mov"
+                                              preload="none"
                                              autoplay=""
                                              loop=""
                                              controls=""
@@ -3982,9 +4177,9 @@ window.settingAutoplay = true;
                                                 <a
                                                    id="cui-link-62777"
                                                    class="cui-link cui-icon-link cui-icon-link-true"
-                                                   href="/template-assets/webinvite.id/raden-motion/?post_id=62777&amp;comments=4&amp;get=30&amp;order=DESC"
-                                                   title="4 Comment"
-                                                   ><span>4</span> Comments</a
+                                                   href="#cui-box"
+                                                   title="Lihat ucapan tamu"
+                                                   ><span>0</span> Ucapan</a
                                                 >
                                              </div>
                                           </div>
@@ -4052,13 +4247,15 @@ window.settingAutoplay = true;
                                                             <p
                                                                class="comment-form-author cui-field-1"
                                                             >
-                                                               <input
+                                                                <label class="anggi-field-label" for="author">Nama <span aria-hidden="true">*</span></label>
+                                                                <input
                                                                   id="author"
                                                                   name="author"
                                                                   type="text"
                                                                   aria-required="true"
                                                                   class="cui-input"
                                                                   placeholder="Nama"
+                                                                   aria-describedby="cui-comment-status-62777"
                                                                /><span
                                                                   class="cui-required"
                                                                   >*</span
@@ -4073,12 +4270,14 @@ window.settingAutoplay = true;
                                                             <div
                                                                class="cui-wrap-textarea"
                                                             >
-                                                               <textarea
+                                                                <label class="anggi-field-label" for="cui-textarea-62777">Ucapan <span aria-hidden="true">*</span></label>
+                                                                <textarea
                                                                   id="cui-textarea-62777"
                                                                   class="waci_comment cui-textarea autosize-textarea"
                                                                   name="comment"
                                                                   aria-required="true"
                                                                   placeholder="Ucapan"
+                                                                   aria-describedby="cui-comment-status-62777"
                                                                   rows="2"
                                                                ></textarea
                                                                ><span
@@ -4100,7 +4299,8 @@ window.settingAutoplay = true;
                                                             <div
                                                                class="cui-clearfix cui-wrap-select cui-field-wrap cui-select-attending"
                                                             >
-                                                               <select
+                                                                <label class="anggi-field-label" for="konfirmasi">Konfirmasi Kehadiran</label>
+                                                                <select
                                                                   class="waci_comment cui-select"
                                                                   name="konfirmasi"
                                                                   id="konfirmasi"
@@ -4197,7 +4397,10 @@ window.settingAutoplay = true;
                                              </div>
                                              <div
                                                 id="cui-comment-status-62777"
-                                                class="cui-comment-status"
+                                                 class="cui-comment-status"
+                                                 role="status"
+                                                 aria-live="polite"
+                                                 aria-atomic="true"
                                              ></div>
                                              <div id="cui-box" class="cui-box" style="display: block !important; max-height: 30vh; overflow-y: auto;">
                                                 <ul
@@ -5143,12 +5346,12 @@ window.settingAutoplay = true;
                                        <div
                                           id="audio-container"
                                           class="audio-box"
+                                           role="button"
+                                           tabindex="0"
+                                           aria-label="Putar musik"
+                                           aria-pressed="false"
                                        >
-                                          <audio id="song">
-                                             <source
-                                                src="/template-assets/webinvite.id/wp-content/uploads/2025/07/Kabagyan-Sadewok-Official-Music-Video-mp3cut.net_.mp3"
-                                             />
-                                          </audio>
+                                           <audio id="song" preload="none"></audio>
                                           <div
                                              class="elementor-icon-wrapper"
                                              id="unmute-sound"
@@ -5187,10 +5390,43 @@ window.settingAutoplay = true;
                                           </div>
                                        </div>
                                        <script>
-                                          (function($){var audioEl=document.getElementById("song");var hasWelcomeWidget=document.getElementById("wdp-button-wrapper")!==null;var isEditor=typeof elementorFrontend!=='undefined'&&elementorFrontend.isEditMode();if(window.settingAutoplay&&!hasWelcomeWidget&&!isEditor){if(audioEl){audioEl.play().catch(function(err){})}}
-                                          if(audioEl&&!audioEl.paused){$("#unmute-sound").hide();$("#mute-sound").show()}else{$("#mute-sound").hide();$("#unmute-sound").show()}
-                                          if(audioEl){audioEl.addEventListener('play',function(){$("#unmute-sound").hide();$("#mute-sound").show()});audioEl.addEventListener('pause',function(){$("#mute-sound").hide();$("#unmute-sound").show()})}
-                                          $("#audio-container").click(function(u){var currentAudio=document.getElementById("song");if(currentAudio){if(!currentAudio.paused){window.userPaused=!0;currentAudio.pause()}else{window.userPaused=!1;currentAudio.play().catch(function(e){console.log(e)})}}})})(jQuery)
+                                           (function($) {
+                                              var audioEl = document.getElementById('song');
+                                              var control = document.getElementById('audio-container');
+                                              var hasWelcomeWidget = document.getElementById('wdp-button-wrapper') !== null;
+                                              var isEditor = typeof elementorFrontend !== 'undefined' && elementorFrontend.isEditMode();
+                                              function updateMusicControl() {
+                                                 var playing = !!audioEl && !audioEl.paused;
+                                                 $('#unmute-sound').toggle(!playing);
+                                                 $('#mute-sound').toggle(playing);
+                                                 control.setAttribute('aria-pressed', String(playing));
+                                                 control.setAttribute('aria-label', playing ? 'Jeda musik' : 'Putar musik');
+                                              }
+                                              if (audioEl) {
+                                                 audioEl.addEventListener('play', updateMusicControl);
+                                                 audioEl.addEventListener('pause', updateMusicControl);
+                                              }
+                                              updateMusicControl();
+                                              if (window.settingAutoplay && !hasWelcomeWidget && !isEditor && audioEl) {
+                                                 audioEl.play().catch(function() {});
+                                              }
+                                              $(control).on('click', function() {
+                                                 if (!audioEl) return;
+                                                 if (audioEl.paused) {
+                                                    window.userPaused = false;
+                                                    audioEl.play().catch(function() {});
+                                                 } else {
+                                                    window.userPaused = true;
+                                                    audioEl.pause();
+                                                 }
+                                              });
+                                              control.addEventListener('keydown', function(event) {
+                                                 if (event.key === 'Enter' || event.key === ' ') {
+                                                    event.preventDefault();
+                                                    control.click();
+                                                 }
+                                              });
+                                           })(jQuery)
                                        </script>
                                        <script>
                                           const audioElement=document.getElementById("song");document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(audioElement&&!audioElement.paused){audioElement.pause()}
@@ -5230,7 +5466,7 @@ window.settingAutoplay = true;
                                              background-image: url("/template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-cover.jpg") !important;
                                           }
 </style>
-                                       <div class="modalx" data-sampul="">
+                                       <div class="modalx" data-sampul="" role="dialog" aria-modal="true" aria-label="Pembuka undangan">
                                           <div class="overlayy"></div>
                                           <div class="content-modalx">
                                              <div class="info_modalx">
@@ -5581,7 +5817,7 @@ window.settingAutoplay = true;
       </style>
       <script>
          const tombolBukaUndangan = document.querySelector('.wdp-button-wrapper');
-		 const selectedDataVid = "/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
+		   const selectedDataVid = "/template-assets/webinvite.id/wp-content/uploads/2025/11/raden-02-vid-motion-1.mp4"
          let iframeOrVideoLoaded = !1
       </script>
       <script>
@@ -5621,7 +5857,7 @@ window.settingAutoplay = true;
          let lockSection=(""==="yes")?true:!1;if(lockSection)document.body.classList.add('locked-section');document.querySelector('.motionSection .elementor-background-video-container video').onended=(event)=>{removeOverflow()}
          document.querySelector('.motionSection .elementor-background-video-container video').onpause=(event)=>{removeOverflow()}
          function removeOverflow(){if(lockSection)document.body.classList.remove('locked-section');}
-         const secMotionExist="exist";document.querySelector('.wdp-button-wrapper').addEventListener('click',()=>{if(secMotionExist==="exist"){setTimeout(()=>{if(selectedDataVid!=="no"&&selectedDataVid!==""){document.querySelector('.motionSection .elementor-background-video-container video').play()}},100)}
+          const secMotionExist="exist";document.querySelector('.wdp-button-wrapper').addEventListener('click',()=>{if(secMotionExist==="exist"){setTimeout(()=>{if(selectedDataVid!=="no"&&selectedDataVid!==""&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.documentElement.classList.contains('anggi-save-data')){document.querySelector('.motionSection .elementor-background-video-container video').play().catch(()=>{})}},100)}
          setTimeout(()=>{document.querySelector('.motionText').style.display="flex"},5087)})
       </script>
       <style>
@@ -6431,14 +6667,36 @@ window.settingAutoplay = true;
   }
   window.addEventListener("load", setupScrollAnimations);
 
-  // Guarantee body overflow: auto and cover removal on click
+   // Keep keyboard focus on the opening control while the cover is active.
+   document.addEventListener('keydown', function(e) {
+     var cover = document.querySelector('.modalx');
+     if (!cover || cover.classList.contains('removeCover') || cover.classList.contains('removeModals')) return;
+     if (e.key === 'Tab') {
+       var openButton = cover.querySelector('.wdp-button-wrapper button');
+       if (openButton) {
+         e.preventDefault();
+         openButton.focus();
+       }
+     }
+   });
+
+   // Guarantee body overflow: auto and cover removal on click
   document.addEventListener("click", function(e) {
     var btn = e.target && (e.target.closest(".wdp-button-wrapper button") || e.target.closest(".openInvi"));
     if (btn) {
       setTimeout(function() {
         document.body.style.overflow = "auto";
         var m = document.querySelector(".modalx");
-        if (m) m.classList.add("removeCover");
+         if (m) {
+           m.classList.add("removeCover");
+           m.setAttribute('aria-hidden', 'true');
+           m.inert = true;
+         }
+         var invitationContent = document.querySelector('.motionSection');
+         if (invitationContent) {
+           invitationContent.tabIndex = -1;
+           invitationContent.focus({ preventScroll: true });
+         }
         setupScrollAnimations();
       }, 50);
     }
@@ -6780,20 +7038,17 @@ window.settingAutoplay = true;
       }
 
       // Background Music Dynamic Hydration
-      if (payload.musicUrl) {
-        var songEl = document.getElementById('song');
-        if (songEl) {
-          var srcEl = songEl.querySelector('source');
-          if (srcEl) {
-            srcEl.src = payload.musicUrl;
-          } else {
-            songEl.src = payload.musicUrl;
-          }
-          songEl.load();
-        }
+      var songEl = document.getElementById('song');
+      if (songEl) {
+        songEl.src = payload.musicUrl || '/template-assets/webinvite.id/wp-content/uploads/2025/07/Kabagyan-Sadewok-Official-Music-Video-mp3cut.net_.mp3';
+        songEl.load();
       }
 
       // Standalone Gallery Lightbox Modal Setup
+      function galleryCaption(item, index) {
+        var caption = String(item && item.caption || '').trim();
+        return caption && !/^anggi[-_]ivan[-_]g\d+$/i.test(caption) ? caption : 'Foto galeri ' + (index + 1);
+      }
       function setupGalleryLightbox(items) {
         if (!items || items.length === 0) return;
         var modal = document.getElementById('standalone-lightbox');
@@ -6828,8 +7083,12 @@ window.settingAutoplay = true;
             var img = document.getElementById('lg-main-img');
             var cap = document.getElementById('lg-caption-text');
             var count = document.getElementById('lg-counter-text');
-            if (img) img.src = itm.url;
-            if (cap) cap.textContent = itm.caption || ('Foto ' + (curIdx + 1));
+            var caption = galleryCaption(itm, curIdx);
+            if (img) {
+              img.src = itm.url;
+              img.alt = caption;
+            }
+            if (cap) cap.textContent = caption;
             if (count) count.textContent = (curIdx + 1) + ' / ' + items.length;
           }
 
@@ -6852,14 +7111,35 @@ window.settingAutoplay = true;
           document.getElementById('lg-next-btn').onclick = function(e) { e.preventDefault(); e.stopPropagation(); showItem(curIdx + 1); };
           modal.onclick = function(e) { if (e.target === modal) closeModal(); };
 
-          modal.addEventListener('keydown', function(e) {
+          document.addEventListener('keydown', function(e) {
             if (!modal.classList.contains('active')) return;
             if (e.key === 'Escape') {
               e.preventDefault();
               closeModal();
+              return;
             }
-            if (e.key === 'ArrowLeft') showItem(curIdx - 1);
-            if (e.key === 'ArrowRight') showItem(curIdx + 1);
+            if (e.key === 'Tab') {
+              var controls = [
+                document.getElementById('lg-close-btn'),
+                document.getElementById('lg-prev-btn'),
+                document.getElementById('lg-next-btn')
+              ];
+              var current = controls.indexOf(document.activeElement);
+              if (current === -1 || (e.shiftKey && current === 0) || (!e.shiftKey && current === controls.length - 1)) {
+                e.preventDefault();
+                controls[e.shiftKey ? controls.length - 1 : 0].focus();
+              }
+              return;
+            }
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+              e.preventDefault();
+              showItem(curIdx + (e.key === 'ArrowLeft' ? -1 : 1));
+            }
+          }, true);
+          document.addEventListener('focusin', function(e) {
+            if (modal.classList.contains('active') && !modal.contains(e.target)) {
+              document.getElementById('lg-close-btn').focus({ preventScroll: true });
+            }
           });
 
           var touchStartX = 0;
@@ -6907,7 +7187,7 @@ window.settingAutoplay = true;
             a.href = item.url;
             a.setAttribute('data-elementor-open-lightbox', 'yes');
             a.setAttribute('data-elementor-lightbox-slideshow', 'b6f6ff8');
-            a.setAttribute('data-elementor-lightbox-title', item.caption || ('Galeri ' + (idx + 1)));
+            a.setAttribute('data-elementor-lightbox-title', galleryCaption(item, idx));
             a.onclick = function(e) {
               e.preventDefault();
               if (window.openGalleryLightbox) window.openGalleryLightbox(idx);
@@ -6917,7 +7197,7 @@ window.settingAutoplay = true;
             imgDiv.className = 'e-gallery-image elementor-gallery-item__image';
             imgDiv.setAttribute('data-thumbnail', item.url);
             imgDiv.setAttribute('role', 'img');
-            imgDiv.setAttribute('aria-label', item.caption || ('Galeri ' + (idx + 1)));
+            imgDiv.setAttribute('aria-label', galleryCaption(item, idx));
             imgDiv.style.backgroundImage = 'url("' + item.url + '")';
 
             var overlay = document.createElement('div');
@@ -7248,7 +7528,7 @@ window.settingAutoplay = true;
           if (!append && ul.children.length === 0) {
             var empty = document.createElement('li');
             empty.setAttribute('data-empty-wishes', 'true');
-            empty.style.cssText = 'text-align: center; color: #888; padding: 20px; font-size: 13px; list-style: none;';
+            empty.style.cssText = 'text-align: center; padding: 20px; list-style: none;';
             empty.textContent = 'Belum ada ucapan. Jadilah yang pertama memberikan doa restu!';
             ul.appendChild(empty);
           }
@@ -7346,6 +7626,10 @@ window.settingAutoplay = true;
       var form = document.querySelector('form[id^="commentform"]');
       var statusEl = document.querySelector('#cui-comment-status-62777');
       if (form) {
+        form.querySelectorAll('#author, #cui-textarea-62777, #konfirmasi').forEach(function(field) {
+          field.addEventListener('input', function() { field.removeAttribute('aria-invalid'); });
+          field.addEventListener('change', function() { field.removeAttribute('aria-invalid'); });
+        });
         form.onsubmit = function(e) {
           e.preventDefault();
           var authorEl = form.querySelector('[name="author"], #author');
@@ -7356,8 +7640,14 @@ window.settingAutoplay = true;
           var author = authorEl ? authorEl.value.trim() : '';
           var msg = msgEl ? msgEl.value.trim() : '';
           var statusVal = statusSelect ? statusSelect.value : 'Hadir';
+          if (authorEl) authorEl.removeAttribute('aria-invalid');
+          if (msgEl) msgEl.removeAttribute('aria-invalid');
 
           if (!author || author.length < 2) {
+            if (authorEl) {
+              authorEl.setAttribute('aria-invalid', 'true');
+              authorEl.focus();
+            }
             if (statusEl) {
               statusEl.innerHTML = '<p class="cui-ajax-error" style="color: #d90a11; font-weight: bold; padding: 8px 0;">Mohon masukkan nama Anda (minimal 2 karakter).</p>';
               statusEl.style.display = 'block';
@@ -7365,6 +7655,10 @@ window.settingAutoplay = true;
             return;
           }
           if (!msg || msg.length < 2) {
+            if (msgEl) {
+              msgEl.setAttribute('aria-invalid', 'true');
+              msgEl.focus();
+            }
             if (statusEl) {
               statusEl.innerHTML = '<p class="cui-ajax-error" style="color: #d90a11; font-weight: bold; padding: 8px 0;">Mohon masukkan ucapan Anda (minimal 2 karakter).</p>';
               statusEl.style.display = 'block';
