@@ -774,6 +774,30 @@ if (navigator.connection && navigator.connection.saveData) {
             overflow-wrap: anywhere;
             white-space: pre-wrap;
          }
+         /* Match the template's 0.8s fade-up timing for dashboard-rendered stories. */
+         #anggi-ivan-love-story .anggi-love-story-reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                        opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+         }
+         #anggi-ivan-love-story .anggi-love-story-reveal.active {
+            opacity: 1;
+            transform: none;
+         }
+         #anggi-ivan-love-story .anggi-love-story-title.anggi-love-story-reveal {
+            transition-delay: 90ms;
+         }
+         #anggi-ivan-love-story .anggi-love-story-description.anggi-love-story-reveal {
+            transition-delay: 180ms;
+         }
+         @media (prefers-reduced-motion: reduce) {
+            #anggi-ivan-love-story .anggi-love-story-reveal {
+               opacity: 1 !important;
+               transform: none !important;
+               transition: none !important;
+            }
+         }
          @media (max-width: 767px) {
             #anggi-ivan-love-story { padding: 46px 20px; }
             #anggi-ivan-love-story .anggi-love-story-heading { margin-bottom: 28px; }
@@ -6921,10 +6945,43 @@ if (navigator.connection && navigator.connection.saveData) {
       function each(sel, fn) {
         Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
       }
+      var loveStoryRevealObserver = null;
+      function revealLoveStoryOnScroll(section) {
+        if (!window.IntersectionObserver ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        var targets = [section.querySelector('.anggi-love-story-heading')].concat(
+          Array.prototype.slice.call(section.querySelectorAll(
+            '.anggi-love-story-photo, .anggi-love-story-title, .anggi-love-story-description'
+          ))
+        ).filter(Boolean);
+        var observer = null;
+        try {
+          observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('active');
+              observer.unobserve(entry.target);
+            });
+          }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+          loveStoryRevealObserver = observer;
+          targets.forEach(function(el) { el.classList.add('anggi-love-story-reveal'); });
+          targets.forEach(function(el) { observer.observe(el); });
+        } catch (error) {
+          if (observer) observer.disconnect();
+          loveStoryRevealObserver = null;
+          targets.forEach(function(el) { el.classList.remove('anggi-love-story-reveal'); });
+        }
+      }
       function renderLoveStory(items) {
         var section = document.getElementById('anggi-ivan-love-story');
         var list = section && section.querySelector('.anggi-love-story-list');
         if (!section || !list) return;
+        if (loveStoryRevealObserver) loveStoryRevealObserver.disconnect();
+        loveStoryRevealObserver = null;
+        var sectionHeading = section.querySelector('.anggi-love-story-heading');
+        if (sectionHeading) sectionHeading.classList.remove('anggi-love-story-reveal', 'active');
+        section.style.display = 'none';
         list.replaceChildren();
         if (!Array.isArray(items)) {
           section.style.display = 'none';
@@ -6969,13 +7026,17 @@ if (navigator.connection && navigator.connection.saveData) {
 
           if (image) {
             image.addEventListener('error', function() {
+              if (loveStoryRevealObserver) loveStoryRevealObserver.unobserve(image);
               image.remove();
               if (!description) card.remove();
               if (!list.querySelector('.anggi-love-story-card')) section.style.display = 'none';
             }, { once: true });
           }
         });
-        section.style.display = visibleCount > 0 ? '' : 'none';
+        if (visibleCount > 0) {
+          revealLoveStoryOnScroll(section);
+          section.style.display = '';
+        }
       }
       function setImage(sel, url) {
         if (!url) return;

@@ -712,3 +712,23 @@ After the client approved the audit plan, changes were confined to `apps/web/pub
 
 **Remaining work:** client sets the two reserved Akad font sizes; create and visually compare a smaller hero video rendition before replacing the 24.9 MB source; measure contrast across the RSVP image background and test physical Safari/Android and genuine 200% text zoom when available. No production write, migration, or deployment was performed.
 
+## Love Story Scroll Reveal — anggi-ivan (2026-10-19)
+
+### Analysis and root cause
+
+- The template already animates other sections with `.muncul`, `.zoom`, `.elementor-invisible`, `.active`, and `IntersectionObserver`: for example the couple widgets, Akad/Resepsi event widgets, and Gallery heading. The local `.muncul` fade uses a 0.8s `cubic-bezier(0.25, 1, 0.5, 1)` transition and a 40px vertical offset. Observed items keep `.active`, so the reveal runs once. The template has both a LiteSpeed event observer and `setupScrollAnimations()` for initial DOM elements.
+- `renderLoveStory(payload.loveStory)` creates the story images, headings, and descriptions only after the public invitation payload arrives. Static inspection of the prior code showed that its markup had no animation class and the existing observer selectors did not register those new nodes. This is the code-level cause of the missing animation; it does not indicate a data or CSS visibility problem.
+
+### Implementation
+
+- Changed only `apps/web/public/production/anggi-ivan/index.html`. Added a section-scoped fade-up state that follows the template's 0.8s easing with a smaller 24px offset and short 90/180ms title/description delays. Existing colors, type, layout, image sizing, and other section animations remain as before.
+- `revealLoveStoryOnScroll(section)` registers one section-scoped `IntersectionObserver` **after** `renderLoveStory()` inserts dashboard-backed cards. It observes the section heading and each image/title/description separately, activates each once upon entry, and unobserves activated nodes. The previous observer is disconnected before a rerender; removed failed images are unobserved. This avoids extra library dependencies and repeated global animation registration.
+- Reveal classes are added only when `IntersectionObserver` is available and motion reduction is off. Observer setup errors remove the classes so content remains visible. `prefers-reduced-motion: reduce` also forces visible, motion-free content through scoped CSS. Empty/invalid stories retain the previous conditional section hiding.
+
+### Browser verification
+
+- Local `/i/anggi-ivan?to=Nuno+Rifa` returned HTTP 200. Playwright loaded three dashboard-backed stories in the expected order. At 390 × 844, before scroll all ten reveal targets were inactive; near section entry the heading activated while the image and later cards remained inactive; a further scroll activated the first image and title while its description and later cards still waited. At the section end all ten were visible at opacity 1.
+- After refresh, incremental scroll at 320 × 568, 375 × 667, 430 × 932, 1024 × 768, and 1366 × 768 activated all 10/10 targets with no horizontal overflow. A 768 × 1024 run also reached 10/10. Directly jumping over the section can leave skipped elements inactive until they enter the viewport; the intended natural-scroll path was tested separately.
+- With emulated reduced motion and a reload at 390 × 844, three cards remained rendered, zero reveal classes were applied, the heading had opacity 1, and there was no horizontal overflow. Browser console reported zero errors during these checks. Physical devices, network throttling, and screenshot-based visual comparison were not tested in this pass.
+- `git diff --check` passed. No database write, migration, additional dependency, or deployment was performed.
+
