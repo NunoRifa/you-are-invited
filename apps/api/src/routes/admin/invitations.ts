@@ -5,6 +5,7 @@ import { Hono } from 'hono';
 import { db, sqlite } from '../../db/client.js';
 import * as schema from '../../db/schema.js';
 import { eq, desc, and } from 'drizzle-orm';
+import { defaultLoveStoryItems, LOVE_STORY_FIELD_KEY, parseLoveStoryFieldValue, parseLoveStoryItems } from '../../lib/love-story.js';
 
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const AUDIO_MIME_TYPES: Record<string, string[]> = {
@@ -77,7 +78,20 @@ adminInvitationsRouter.get('/:id', (c) => {
   const heroField = fields.find((f) => f.fieldKey === 'hero_photo_asset_id');
   const closingField = fields.find((f) => f.fieldKey === 'closing_photo_asset_id');
   const galleryVideoField = fields.find((f) => f.fieldKey === 'gallery_video_url');
+  const loveStoryField = fields.find((f) => f.fieldKey === LOVE_STORY_FIELD_KEY);
   const musicAsset = assets.find((a) => a.kind === 'audio');
+  const storedLoveStory = parseLoveStoryFieldValue(loveStoryField?.fieldValue);
+  const loveStory = (storedLoveStory || (inv.slug === 'anggi-ivan' ? defaultLoveStoryItems() : []))
+    .map((item) => {
+      const photo = item.photoAssetId
+        ? assets.find((asset) => asset.id === item.photoAssetId && asset.kind === 'image')
+        : undefined;
+      return {
+        ...item,
+        photoAssetId: photo?.id || null,
+        photoUrl: photo ? `/api/assets/${photo.id}` : null,
+      };
+    });
 
   return c.json({
     invitation: {
@@ -112,6 +126,7 @@ adminInvitationsRouter.get('/:id', (c) => {
       ...g,
       url: `/api/assets/${g.assetId}`,
     })),
+    loveStory,
   });
 });
 
@@ -478,11 +493,38 @@ adminInvitationsRouter.patch('/:id/livestream', async (c) => {
 adminInvitationsRouter.patch('/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json<any>();
-  const { heroPhotoAssetId, closingPhotoAssetId, galleryVideoUrl, ...invitationFields } = body;
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return c.json({ error: 'Invalid invitation update payload' }, 400);
+  }
+  const { heroPhotoAssetId, closingPhotoAssetId, galleryVideoUrl, loveStory, ...invitationFields } = body;
 
   const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, id)).get();
   if (!inv) {
     return c.json({ error: 'Invitation not found' }, 404);
+  }
+
+  let validatedLoveStory = null;
+  if (loveStory !== undefined) {
+    if (inv.slug !== 'anggi-ivan') {
+      return c.json({ error: 'Love Story editing is not enabled for this invitation' }, 400);
+    }
+    validatedLoveStory = parseLoveStoryItems(loveStory);
+    if (!validatedLoveStory) {
+      return c.json({ error: 'Love Story must contain the three valid ordered story items' }, 400);
+    }
+    for (const item of validatedLoveStory) {
+      if (!item.photoAssetId) continue;
+      const asset = db.select().from(schema.invitationAssets)
+        .where(and(
+          eq(schema.invitationAssets.id, item.photoAssetId),
+          eq(schema.invitationAssets.invitationId, id),
+          eq(schema.invitationAssets.kind, 'image'),
+        ))
+        .get();
+      if (!asset) {
+        return c.json({ error: 'Love Story photos must be image assets belonging to this invitation' }, 400);
+      }
+    }
   }
 
   if (heroPhotoAssetId !== undefined) {
@@ -568,6 +610,36 @@ adminInvitationsRouter.patch('/:id', async (c) => {
       })
       .where(eq(schema.invitations.id, id))
       .run();
+  }
+
+  if (validatedLoveStory) {
+    const currentFields = db.select().from(schema.invitationTemplateFields)
+      .where(and(
+        eq(schema.invitationTemplateFields.invitationId, id),
+        eq(schema.invitationTemplateFields.fieldKey, LOVE_STORY_FIELD_KEY),
+      ))
+      .all();
+    const fieldValue = JSON.stringify(validatedLoveStory.map(({ photoUrl: _photoUrl, ...item }) => item));
+    sqlite.transaction(() => {
+      if (currentFields[0]) {
+        db.update(schema.invitationTemplateFields)
+          .set({ fieldValue })
+          .where(eq(schema.invitationTemplateFields.id, currentFields[0].id))
+          .run();
+        for (const duplicate of currentFields.slice(1)) {
+          db.delete(schema.invitationTemplateFields)
+            .where(eq(schema.invitationTemplateFields.id, duplicate.id))
+            .run();
+        }
+      } else {
+        db.insert(schema.invitationTemplateFields).values({
+          id: `tf-love-story-${randomUUID()}`,
+          invitationId: id,
+          fieldKey: LOVE_STORY_FIELD_KEY,
+          fieldValue,
+        }).run();
+      }
+    })();
   }
 
   return c.json({ success: true });

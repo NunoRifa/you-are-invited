@@ -1,6 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff, Upload, Image, X, Music, Volume2 } from 'lucide-react';
 import { bankProviders, getBankProvider, otherProviderName } from '../../features/gift/bank-providers.js';
+import type { LoveStoryItem } from '@you-are-invited/shared-types';
+
+const createDefaultLoveStory = (): LoveStoryItem[] => [
+  { id: 'first-meeting', title: 'Awal Bertemu', description: '', photoAssetId: null, photoUrl: null, sortOrder: 0 },
+  { id: 'engagement', title: 'Acara Lamaran', description: '', photoAssetId: null, photoUrl: null, sortOrder: 1 },
+  { id: 'wedding', title: 'Acara Pernikahan', description: '', photoAssetId: null, photoUrl: null, sortOrder: 2 },
+];
+
+const loveStoryForSave = (items: LoveStoryItem[]) => items
+  .map(({ photoUrl: _photoUrl, ...item }) => item)
+  .sort((a, b) => a.sortOrder - b.sortOrder);
+
+async function apiError(response: Response, fallback: string): Promise<Error> {
+  try {
+    const body = await response.json() as { error?: string };
+    if (body.error) return new Error(`${body.error} (HTTP ${response.status})`);
+  } catch {
+    // Keep the HTTP status when the backend does not return JSON.
+  }
+  return new Error(`${fallback} (HTTP ${response.status})`);
+}
 
 interface EditorPayload {
   invitation: {
@@ -77,6 +98,8 @@ interface EditorPayload {
     sortOrder: number;
     url: string;
   }>;
+  templateFields?: Array<{ fieldKey: string; fieldValue: string }>;
+  loveStory: LoveStoryItem[];
 }
 
 const tabs = ['Umum', 'Mempelai', 'Foto & Media', 'Acara', 'Wedding Gift', 'Ucapan'];
@@ -86,6 +109,8 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loveStoryDirty, setLoveStoryDirty] = useState(false);
+  const loveStoryRevision = useRef(0);
   const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [previewVersion, setPreviewVersion] = useState(0);
@@ -96,7 +121,11 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       const response = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include' });
       if (response.status === 401) { onLogout(); throw new Error('Sesi admin tidak valid. Silakan login kembali.'); }
       if (!response.ok) throw new Error('Gagal memuat undangan. Pastikan API tersedia.');
-      setPayload(await response.json());
+      const data = await response.json() as EditorPayload;
+      setPayload({ ...data, loveStory: Array.isArray(data.loveStory) ? data.loveStory : createDefaultLoveStory() });
+      loveStoryRevision.current = 0;
+      setLoveStoryDirty(false);
+      setActiveTab('Umum');
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'Gagal memuat data.');
     } finally {
@@ -110,17 +139,73 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     setPayload((current) => current ? { ...current, invitation: { ...current.invitation, [field]: value } } : current);
   };
 
+  const verifyLoveStorySaved = async (expected: LoveStoryItem[]) => {
+    const response = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include', cache: 'no-store' });
+    if (!response.ok) throw await apiError(response, 'Kisah Cinta mungkin tersimpan, tetapi pembacaan ulang gagal.');
+    const saved = await response.json() as EditorPayload;
+    const hasStoredField = saved.templateFields?.some((field) => field.fieldKey === 'love_story_items');
+    if (!hasStoredField || !Array.isArray(saved.loveStory)
+      || JSON.stringify(loveStoryForSave(saved.loveStory)) !== JSON.stringify(loveStoryForSave(expected))) {
+      throw new Error('Kisah Cinta belum terkonfirmasi tersimpan di database. Perubahan tetap tersedia di editor ini.');
+    }
+  };
+
+  const markLoveStoryDirty = () => {
+    loveStoryRevision.current += 1;
+    setLoveStoryDirty(true);
+  };
+
+  const saveLoveStoryOnly = async () => {
+    if (!payload || saving || uploadingTarget) return;
+    const expected = payload.loveStory;
+    const revision = loveStoryRevision.current;
+    setSaving(true);
+    setNotice('Menyimpan Kisah Cinta…');
+    try {
+      const response = await fetch(`/api/admin/invitations/${invitationId}`, {
+        method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loveStory: loveStoryForSave(expected) }),
+      });
+      if (!response.ok) throw await apiError(response, 'Gagal menyimpan Kisah Cinta.');
+      await verifyLoveStorySaved(expected);
+      if (revision === loveStoryRevision.current) {
+        setLoveStoryDirty(false);
+        setNotice('Kisah Cinta tersimpan dan sudah dibaca ulang dari database.');
+      } else {
+        setNotice('Sebagian perubahan baru belum tersimpan. Klik Simpan Kisah Cinta lagi.');
+      }
+      setPreviewVersion((version) => version + 1);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal menyimpan Kisah Cinta.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const save = async () => {
-    if (!payload) return;
+    if (!payload || saving || uploadingTarget) return;
+    const expected = payload.loveStory;
+    const revision = loveStoryRevision.current;
     setSaving(true);
     setNotice('');
     try {
       const response = await fetch(`/api/admin/invitations/${invitationId}`, {
         method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload.invitation),
+        body: JSON.stringify(payload.invitation.slug === 'anggi-ivan'
+          ? {
+              ...payload.invitation,
+              loveStory: loveStoryForSave(expected),
+            }
+          : payload.invitation),
       });
-      if (!response.ok) throw new Error('Gagal menyimpan perubahan.');
-      setNotice('Perubahan tersimpan.');
+      if (!response.ok) throw await apiError(response, 'Gagal menyimpan perubahan.');
+      if (payload.invitation.slug === 'anggi-ivan') await verifyLoveStorySaved(expected);
+      if (revision === loveStoryRevision.current) setLoveStoryDirty(false);
+      setNotice(payload.invitation.slug !== 'anggi-ivan'
+        ? 'Perubahan tersimpan.'
+        : revision === loveStoryRevision.current
+          ? 'Perubahan tersimpan dan Kisah Cinta sudah dibaca ulang dari database.'
+          : 'Sebagian perubahan Kisah Cinta yang lebih baru belum tersimpan.');
       setPreviewVersion((version) => version + 1);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'Gagal menyimpan.');
@@ -151,10 +236,63 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       } catch (e) {
         if (e instanceof Error && e.message.includes('file')) throw e;
       }
-      throw new Error('Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.');
+      throw new Error(kind === 'audio'
+        ? 'Format audio tidak didukung. Gunakan MP3, M4A, WAV, atau OGG.'
+        : 'Format gambar tidak didukung. Gunakan JPEG, PNG, atau WebP.');
     }
     if (!res.ok) throw new Error(kind === 'audio' ? 'Gagal mengunggah file musik.' : 'Gagal mengunggah file gambar.');
     return await res.json();
+  };
+
+  const updateLoveStory = (index: number, changes: Partial<LoveStoryItem>) => {
+    markLoveStoryDirty();
+    setPayload((current) => current ? {
+      ...current,
+      loveStory: current.loveStory.map((item, itemIndex) => itemIndex === index ? { ...item, ...changes } : item),
+    } : current);
+  };
+
+  const moveLoveStory = (index: number, direction: -1 | 1) => {
+    if (!payload || index + direction < 0 || index + direction >= payload.loveStory.length) return;
+    markLoveStoryDirty();
+    setPayload((current) => {
+      if (!current) return current;
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= current.loveStory.length) return current;
+      const loveStory = [...current.loveStory];
+      [loveStory[index], loveStory[nextIndex]] = [loveStory[nextIndex], loveStory[index]];
+      return { ...current, loveStory: loveStory.map((item, sortOrder) => ({ ...item, sortOrder })) };
+    });
+  };
+
+  const handleLoveStoryPhoto = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const storyId = payload?.loveStory[index]?.id;
+    if (!storyId) return;
+    if (!file.type.startsWith('image/')) {
+      setNotice('Pilih file gambar untuk foto Kisah Cinta.');
+      e.target.value = '';
+      return;
+    }
+    setUploadingTarget(`love-story-${storyId}`);
+    setNotice('Mengunggah foto Kisah Cinta…');
+    try {
+      const uploaded = await uploadAssetFile(file, 'image');
+      setPayload((current) => current ? {
+        ...current,
+        loveStory: current.loveStory.map((item) => item.id === storyId
+          ? { ...item, photoAssetId: uploaded.id, photoUrl: uploaded.url }
+          : item),
+      } : current);
+      markLoveStoryDirty();
+      setNotice('Foto diunggah. Klik Simpan untuk menerapkan perubahan ke undangan.');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal mengunggah foto Kisah Cinta.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
   };
 
   const handleUploadMusic = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -608,6 +746,7 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const sortedCouples = [...payload.couples].sort((a, b) => (a.role === 'bride' ? -1 : 1));
   const bride = payload.couples.find((c) => c.role === 'bride');
   const groom = payload.couples.find((c) => c.role === 'groom');
+  const editorTabs = payload.invitation.slug === 'anggi-ivan' ? [...tabs, 'Kisah Cinta'] : tabs;
 
   return <main className="min-h-screen bg-stone-100 text-stone-900">
     <header className="flex items-center justify-between gap-4 border-b border-stone-200 bg-white px-5 py-4">
@@ -616,13 +755,13 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
         {notice && <span role="status" className="mr-2 text-xs text-stone-600">{notice}</span>}
         <button onClick={() => { void onLogout(); }} className="rounded-lg border border-stone-300 px-3 py-2 text-sm">Keluar</button>
         <button onClick={() => { void load(); setPreviewVersion((v) => v + 1); }} className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"><RefreshCw size={15}/>Muat Ulang</button>
-        <button onClick={() => void save()} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"><Save size={15}/>{saving ? 'Menyimpan…' : 'Simpan'}</button>
+        <button onClick={() => void save()} disabled={saving || Boolean(uploadingTarget)} className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"><Save size={15}/>{saving ? 'Menyimpan…' : 'Simpan'}</button>
       </div>
     </header>
     <div className="grid min-h-[calc(100vh-65px)] lg:grid-cols-[minmax(380px,480px)_1fr]">
       <section className="border-r border-stone-200 bg-white">
         <div className="border-b border-stone-200 px-6 py-5"><p className="text-xs uppercase tracking-widest text-stone-500">Editor Undangan</p><h1 className="mt-1 text-xl font-semibold">{payload.invitation.title}</h1></div>
-        <nav aria-label="Bagian undangan" className="flex gap-1 overflow-x-auto border-b border-stone-200 px-4 py-3">{tabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-md px-3 py-2 text-xs font-medium ${activeTab === tab ? 'bg-amber-100 text-amber-950 font-semibold' : 'text-stone-600 hover:bg-stone-100'}`}>{tab}</button>)}</nav>
+        <nav aria-label="Bagian undangan" className="flex gap-1 overflow-x-auto border-b border-stone-200 px-4 py-3">{editorTabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-md px-3 py-2 text-xs font-medium ${activeTab === tab ? 'bg-amber-100 text-amber-950 font-semibold' : 'text-stone-600 hover:bg-stone-100'}`}>{tab}</button>)}</nav>
         <div className="space-y-4 p-6">
           {activeTab === 'Umum' && <>
             <Field label="Judul undangan" value={payload.invitation.title} onChange={(v) => patchInvitation('title', v)} />
@@ -1089,6 +1228,50 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
                 </div>
               )}
             </article>
+          </>}
+
+          {activeTab === 'Kisah Cinta' && payload.invitation.slug === 'anggi-ivan' && <>
+            <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+              <h2 className="text-sm font-semibold text-amber-950">Kisah Cinta</h2>
+              <p className="mt-1 text-xs leading-relaxed text-stone-600">Isi cerita dan foto asli klien. Deskripsi yang kosong tidak akan ditampilkan di undangan publik.</p>
+              <p className={`mt-2 text-xs font-semibold ${loveStoryDirty ? 'text-amber-800' : 'text-emerald-800'}`}>
+                {loveStoryDirty ? 'Perubahan Kisah Cinta belum tersimpan.' : 'Tidak ada perubahan Kisah Cinta yang menunggu disimpan.'}
+              </p>
+              <button type="button" onClick={() => void saveLoveStoryOnly()} disabled={saving || Boolean(uploadingTarget)} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-800 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                <Save size={14}/>{saving ? 'Menyimpan…' : 'Simpan Kisah Cinta'}
+              </button>
+            </div>
+            {payload.loveStory.map((item, index) => (
+              <article key={item.id} className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-2">
+                  <h3 className="text-sm font-semibold text-stone-800">Cerita {index + 1}</h3>
+                  <div className="flex gap-1">
+                    <button type="button" disabled={index === 0} onClick={() => moveLoveStory(index, -1)} className="rounded-md border border-stone-300 px-2 py-1 text-xs disabled:opacity-40" aria-label={`Pindahkan ${item.title} ke atas`}>Naik</button>
+                    <button type="button" disabled={index === payload.loveStory.length - 1} onClick={() => moveLoveStory(index, 1)} className="rounded-md border border-stone-300 px-2 py-1 text-xs disabled:opacity-40" aria-label={`Pindahkan ${item.title} ke bawah`}>Turun</button>
+                  </div>
+                </div>
+                <Field label="Judul cerita" value={item.title} onChange={(value) => updateLoveStory(index, { title: value })} placeholder="Judul cerita" />
+                <Field label="Deskripsi cerita" value={item.description} onChange={(value) => updateLoveStory(index, { description: value })} placeholder="Masukkan deskripsi dari klien" multiline />
+                {item.photoUrl && (
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-2">
+                    <img src={item.photoUrl} alt={`Foto ${item.title}`} className="mx-auto max-h-64 max-w-full object-contain" />
+                  </div>
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber-800 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-900">
+                    <Upload size={14}/>
+                    <span>{uploadingTarget === `love-story-${item.id}` ? 'Mengunggah…' : item.photoUrl ? 'Ganti Foto' : 'Upload Foto'}</span>
+                    <input type="file" accept="image/*" className="hidden" disabled={Boolean(uploadingTarget)} onChange={(event) => void handleLoveStoryPhoto(index, event)} />
+                  </label>
+                  {item.photoAssetId && (
+                    <button type="button" onClick={() => updateLoveStory(index, { photoAssetId: null, photoUrl: null })} className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                      <Trash2 size={13}/>Hapus foto
+                    </button>
+                  )}
+                </div>
+              </article>
+            ))}
+            <p className="text-xs text-stone-500">Foto yang baru diunggah baru tampil di undangan setelah Kisah Cinta berhasil disimpan. Urutan tampil mengikuti tombol Naik/Turun.</p>
           </>}
 
           {activeTab === 'Acara' && <>

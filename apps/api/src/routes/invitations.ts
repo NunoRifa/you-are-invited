@@ -3,6 +3,7 @@ import { db } from '../db/client.js';
 import * as schema from '../db/schema.js';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import type { PublicInvitationPayload, WishSummary, Wish } from '@you-are-invited/shared-types';
+import { LOVE_STORY_FIELD_KEY, parseLoveStoryFieldValue } from '../lib/love-story.js';
 
 export const invitationsRouter = new Hono();
 
@@ -68,8 +69,27 @@ invitationsRouter.get('/:slug', (c) => {
 
   const templateFieldsRecord: Record<string, string> = {};
   for (const f of templateFieldsList) {
+    if (f.fieldKey === LOVE_STORY_FIELD_KEY) continue;
     templateFieldsRecord[f.fieldKey] = f.fieldValue;
   }
+  const loveStoryField = templateFieldsList.find((field) => field.fieldKey === LOVE_STORY_FIELD_KEY);
+  const storedLoveStory = parseLoveStoryFieldValue(loveStoryField?.fieldValue) || [];
+  const loveStory = storedLoveStory.map((item) => {
+    const photo = item.photoAssetId
+      ? db.select().from(schema.invitationAssets)
+        .where(and(
+          eq(schema.invitationAssets.id, item.photoAssetId),
+          eq(schema.invitationAssets.invitationId, inv.id),
+          eq(schema.invitationAssets.kind, 'image'),
+        ))
+        .get()
+      : undefined;
+    return {
+      ...item,
+      photoAssetId: photo?.id || null,
+      photoUrl: photo ? `/api/assets/${photo.id}` : null,
+    };
+  });
 
   // Public wish list and RSVP counters include every stored wish, including hidden rows.
   const allWishes = db
@@ -167,6 +187,7 @@ invitationsRouter.get('/:slug', (c) => {
       description: s.description,
       sortOrder: s.sortOrder,
     })),
+    loveStory,
     giftAccounts: giftList.map((g) => ({
       id: g.id,
       invitationId: g.invitationId,

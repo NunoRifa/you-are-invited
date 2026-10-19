@@ -79,6 +79,17 @@ export interface StoryItem {
   sortOrder: number;
 }
 
+export type LoveStoryKey = 'first-meeting' | 'engagement' | 'wedding';
+
+export interface LoveStoryItem {
+  id: LoveStoryKey;
+  title: string;
+  description: string;
+  photoAssetId: string | null;
+  photoUrl?: string | null;
+  sortOrder: number;
+}
+
 export interface Wish {
   id: string;
   invitationId: string;
@@ -149,6 +160,7 @@ export interface PublicInvitationPayload {
   events: EventItem[];
   gallery: GalleryImage[];
   story: StoryItem[];
+  loveStory: LoveStoryItem[];
   giftAccounts: GiftAccount[];
   livestream?: LivestreamInfo | null;
   templateFields: Record<string, string>;

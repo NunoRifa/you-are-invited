@@ -579,6 +579,12 @@ window.settingAutoplay = true;
             position: fixed !important;
             inset: 0 !important;
             z-index: 999999 !important;
+            box-sizing: border-box !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)) !important;
+            overflow: hidden !important;
             background: rgba(0, 0, 0, 0.94) !important;
             display: flex !important;
             align-items: center !important;
@@ -593,36 +599,60 @@ window.settingAutoplay = true;
          }
          .standalone-lightbox-content {
             position: relative !important;
-            max-width: 92vw !important;
-            max-height: 85vh !important;
+            width: 100% !important;
+            max-width: min(92vw, 1200px) !important;
+            max-height: calc(100vh - 96px) !important;
+            max-height: calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
+            justify-content: center !important;
          }
          .standalone-lightbox-img {
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
             max-width: 100% !important;
-            max-height: 80vh !important;
+            max-height: calc(100vh - 140px) !important;
+            max-height: calc(100dvh - 140px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
             object-fit: contain !important;
+            object-position: center !important;
             border-radius: 6px !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
             transform: scale(0.95);
             transition: transform 0.25s ease !important;
+         }
+         @media (max-height: 480px) {
+            .standalone-lightbox-content {
+               max-height: calc(100vh - 72px) !important;
+               max-height: calc(100dvh - 72px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            }
+            .standalone-lightbox-img {
+               max-height: calc(100vh - 92px) !important;
+               max-height: calc(100dvh - 92px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            }
          }
          .standalone-lightbox-modal.active .standalone-lightbox-img {
             transform: scale(1);
          }
          .standalone-lightbox-close {
             position: absolute !important;
-            top: 20px !important;
-            right: 20px !important;
+            top: calc(12px + env(safe-area-inset-top)) !important;
+            right: calc(12px + env(safe-area-inset-right)) !important;
             color: #fff !important;
             background: rgba(255, 255, 255, 0.15) !important;
             border: none !important;
             border-radius: 50% !important;
-            width: 40px !important;
-            height: 40px !important;
-            font-size: 24px !important;
-            line-height: 40px !important;
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+            padding: 0 !important;
+            font-size: 28px !important;
+            line-height: 48px !important;
+            touch-action: manipulation !important;
             text-align: center !important;
             cursor: pointer !important;
             transition: background 0.2s ease !important;
@@ -654,10 +684,17 @@ window.settingAutoplay = true;
             background: rgba(255, 255, 255, 0.3) !important;
          }
          .standalone-lightbox-prev {
-            left: 20px !important;
+            left: calc(12px + env(safe-area-inset-left)) !important;
+            touch-action: manipulation !important;
          }
          .standalone-lightbox-next {
-            right: 20px !important;
+            right: calc(12px + env(safe-area-inset-right)) !important;
+            touch-action: manipulation !important;
+         }
+         .standalone-lightbox-close,
+         .standalone-lightbox-prev,
+         .standalone-lightbox-next {
+            -webkit-tap-highlight-color: transparent !important;
          }
          .standalone-lightbox-caption {
             color: #e5e5e5 !important;
@@ -673,6 +710,72 @@ window.settingAutoplay = true;
             color: rgba(255, 255, 255, 0.7) !important;
             font-size: 13px !important;
             font-family: monospace !important;
+         }
+         #anggi-ivan-love-story {
+            box-sizing: border-box;
+            padding: clamp(48px, 8vw, 88px) 18px;
+            background: #f8f3ee;
+         }
+         #anggi-ivan-love-story .anggi-love-story-inner {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+         }
+         #anggi-ivan-love-story .anggi-love-story-heading {
+            margin: 0 0 36px;
+            color: #4e1f00;
+            font-family: "Madina", "Alice", serif;
+            font-size: clamp(36px, 9vw, 52px);
+            font-weight: 500;
+            line-height: 1.15;
+         }
+         #anggi-ivan-love-story .anggi-love-story-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(38px, 7vw, 58px);
+         }
+         #anggi-ivan-love-story .anggi-love-story-card {
+            width: 100%;
+            min-width: 0;
+            text-align: center;
+         }
+         #anggi-ivan-love-story .anggi-love-story-photo {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 68vh;
+            max-height: min(68dvh, 720px);
+            margin: 0 auto 20px;
+            border-radius: 14px;
+            object-fit: contain;
+            box-shadow: 0 10px 28px rgba(78, 31, 0, 0.16);
+         }
+         #anggi-ivan-love-story .anggi-love-story-title {
+            margin: 0 0 10px;
+            color: #4e1f00;
+            font-family: "Alice", Georgia, serif;
+            font-size: clamp(23px, 6vw, 29px);
+            font-weight: 500;
+            line-height: 1.35;
+         }
+         #anggi-ivan-love-story .anggi-love-story-description {
+            max-width: 46ch;
+            margin: 0 auto;
+            color: #5b4639;
+            font-family: "Poppins", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+         }
+         @media (max-width: 767px) {
+            #anggi-ivan-love-story { padding: 46px 20px; }
+            #anggi-ivan-love-story .anggi-love-story-heading { margin-bottom: 28px; }
+            #anggi-ivan-love-story .anggi-love-story-photo { max-height: 62vh; max-height: 62dvh; margin-bottom: 16px; }
+            #anggi-ivan-love-story .anggi-love-story-description { font-size: 14px; }
          }
       </style>
       <style type="text/css">
@@ -3760,353 +3863,19 @@ window.settingAutoplay = true;
             </div>
          </section>
          <section
-            class="wpr-jarallax elementor-section elementor-top-section elementor-element elementor-element-633fe11 elementor-section-height-min-height elementor-section-items-stretch wpr-jarallax-yes elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
-            speed-data="0.4"
-            bg-image=""
-            bg-image-mobile=""
-            scroll-effect="scroll"
-            data-id="633fe11"
-            data-element_type="section"
-            data-e-type="section"
-            data-settings='{"background_background":"classic","animation":"none"}'
+            id="anggi-ivan-love-story"
+            class="elementor-section elementor-top-section elementor-element anggi-ivan-love-story"
+            data-id="anggi-ivan-love-story"
+            aria-labelledby="anggi-ivan-love-story-heading"
+            style="display: none"
          >
-            <div class="elementor-container elementor-column-gap-no">
-               <div
-                  class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-7175d27"
-                  data-id="7175d27"
-                  data-element_type="column"
-                  data-e-type="column"
-                  data-settings='{"background_background":"classic","animation":"none","animation_mobile":"none"}'
-               >
-                  <div
-                     class="elementor-widget-wrap elementor-element-populated"
-                  >
-                     <div class="elementor-background-overlay"></div>
-                     <div
-                        class="elementor-element elementor-element-1bc0627 elementor-widget elementor-widget-image"
-                        data-id="1bc0627"
-                        data-element_type="widget"
-                        data-e-type="widget"
-                        data-settings='{"_animation_mobile":"fadeInDown"}'
-                        data-widget_type="image.default"
-                     >
-                        <div class="elementor-widget-container">
-                           <img
-                              data-lazyloaded="1"
-                              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDM2IiB2aWV3Qm94PSIwIDAgODAwIDQzNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgc3R5bGU9ImZpbGw6I2NmZDRkYjtmaWxsLW9wYWNpdHk6IDAuMTsiLz48L3N2Zz4="
-                              loading="lazy"
-                              decoding="async"
-                              width="800"
-                              height="436"
-                              data-src="/template-assets/webinvite.id/wp-content/uploads/2025/08/Fairytale.png"
-                              class="attachment-large size-large wp-image-52854"
-                              alt="Fairytale"
-                              data-srcset="/template-assets/webinvite.id/wp-content/uploads/2025/08/Fairytale.png 864w, /template-assets/webinvite.id/wp-content/uploads/2025/08/Fairytale-300x164.png 300w, /template-assets/webinvite.id/wp-content/uploads/2025/08/Fairytale-768x419.png 768w"
-                              data-sizes="(max-width: 800px) 100vw, 800px"
-                           />
-                        </div>
-                     </div>
-                     <div
-                        class="elementor-element elementor-element-f9dee38 elementor-widget elementor-widget-image"
-                        data-id="f9dee38"
-                        data-element_type="widget"
-                        data-e-type="widget"
-                        data-settings='{"_animation_mobile":"fadeInDown"}'
-                        data-widget_type="image.default"
-                     >
-                        <div class="elementor-widget-container">
-                           <img
-                              data-lazyloaded="1"
-                              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MDkiIGhlaWdodD0iMzQ5IiB2aWV3Qm94PSIwIDAgNzA5IDM0OSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgc3R5bGU9ImZpbGw6I2NmZDRkYjtmaWxsLW9wYWNpdHk6IDAuMTsiLz48L3N2Zz4="
-                              loading="lazy"
-                              decoding="async"
-                              width="709"
-                              height="349"
-                              data-src="/template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541.png"
-                              class="attachment-large size-large wp-image-61182"
-                              alt="Tes 2"
-                              data-srcset="/template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541.png 709w, /template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541-300x148.png 300w"
-                              data-sizes="(max-width: 709px) 100vw, 709px"
-                           />
-                        </div>
-                     </div>
-                     <div
-                        class="elementor-element elementor-element-c0b2381 zoom elementor-widget elementor-widget-text-editor"
-                        data-id="c0b2381"
-                        data-element_type="widget"
-                        data-e-type="widget"
-                        data-settings='{"_animation_mobile":"none"}'
-                        data-widget_type="text-editor.default"
-                     >
-                        <div class="elementor-widget-container">
-                           <p>Cerita Cinta</p>
-                        </div>
-                     </div>
-                     <section
-                        class="elementor-section elementor-inner-section elementor-element elementor-element-e7a6e98 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-jarallax-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
-                        data-id="e7a6e98"
-                        data-element_type="section"
-                        data-e-type="section"
-                        data-settings='{"animation_mobile":"fadeInUp"}'
-                     >
-                        <div
-                           class="elementor-container elementor-column-gap-default"
-                        >
-                           <div
-                              class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-4fde442"
-                              data-id="4fde442"
-                              data-element_type="column"
-                              data-e-type="column"
-                              data-settings='{"background_background":"classic","animation_mobile":"none","animation":"none"}'
-                           >
-                              <div
-                                 class="elementor-widget-wrap elementor-element-populated"
-                              >
-                                 <div
-                                    class="elementor-background-overlay"
-                                 ></div>
-                                 <div
-                                    class="elementor-element elementor-element-54e147f elementor-widget elementor-widget-image"
-                                    data-id="54e147f"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    id="zoom"
-                                    data-settings='{"_animation_mobile":"zoomIn"}'
-                                    data-widget_type="image.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <img
-                                          data-lazyloaded="1"
-                                          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjE1MzYiIHZpZXdCb3g9IjAgMCAxMDI0IDE1MzYiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHN0eWxlPSJmaWxsOiNjZmQ0ZGI7ZmlsbC1vcGFjaXR5OiAwLjE7Ii8+PC9zdmc+"
-                                          loading="lazy"
-                                          decoding="async"
-                                          width="1024"
-                                          height="1536"
-                                          data-src="/template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-3-1.jpg"
-                                          class="attachment-full size-full wp-image-60459"
-                                          alt="Raden 3"
-                                          data-srcset="/template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-3-1.jpg 1024w, /template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-3-1-200-300.jpg 200w, /template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-3-1-683-1024.jpg 683w, /template-assets/you-are-invited.my.id/anggi-ivan-fmsbyt/Ivan-3-1-768-1152.jpg 768w"
-                                          data-sizes="(max-width: 1024px) 100vw, 1024px"
-                                       />
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-166363d animated-slow zoom elementor-invisible elementor-widget elementor-widget-heading"
-                                    data-id="166363d"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation":"fadeInUp","_animation_mobile":"none"}'
-                                    data-widget_type="heading.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <h2
-                                          class="elementor-heading-title elementor-size-default"
-                                       >
-                                          "Datangnya cinta adalah takdir,
-                                          <br />dia datang tak pernah terduga"
-                                       </h2>
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-4522435 zoom elementor-widget elementor-widget-toggle"
-                                    data-id="4522435"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation_mobile":"none"}'
-                                    data-widget_type="toggle.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <div class="elementor-toggle">
-                                          <div class="elementor-toggle-item">
-                                             <div
-                                                id="elementor-tab-title-7241"
-                                                class="elementor-tab-title"
-                                                data-tab="1"
-                                                role="button"
-                                                aria-controls="elementor-tab-content-7241"
-                                                aria-expanded="false"
-                                             >
-                                                <span
-                                                   class="elementor-toggle-icon elementor-toggle-icon-left"
-                                                   aria-hidden="true"
-                                                >
-                                                   <span
-                                                      class="elementor-toggle-icon-closed"
-                                                      ><svg
-                                                         class="e-font-icon-svg e-fas-caret-right"
-                                                         viewBox="0 0 192 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
-                                                         ></path></svg
-                                                   ></span>
-                                                   <span
-                                                      class="elementor-toggle-icon-opened"
-                                                      ><svg
-                                                         class="elementor-toggle-icon-opened e-font-icon-svg e-fas-caret-up"
-                                                         viewBox="0 0 320 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z"
-                                                         ></path></svg
-                                                   ></span>
-                                                </span>
-                                                <a
-                                                   class="elementor-toggle-title"
-                                                   tabindex="0"
-                                                   >Awal Bertemu</a
-                                                >
-                                             </div>
-                                             <div
-                                                id="elementor-tab-content-7241"
-                                                class="elementor-tab-content elementor-clearfix"
-                                                data-tab="1"
-                                                role="region"
-                                                aria-labelledby="elementor-tab-title-7241"
-                                             >
-                                                <p>15 April 2022</p>
-                                                <p>
-                                                   Lorem ipsum dolor sit amet,
-                                                   consectetur adipiscing elit.
-                                                   Ut elit tellus, luctus nec
-                                                   ullamcorper mattis, pulvinar
-                                                   dapibus leo.
-                                                </p>
-                                             </div>
-                                          </div>
-                                          <div class="elementor-toggle-item">
-                                             <div
-                                                id="elementor-tab-title-7242"
-                                                class="elementor-tab-title"
-                                                data-tab="2"
-                                                role="button"
-                                                aria-controls="elementor-tab-content-7242"
-                                                aria-expanded="false"
-                                             >
-                                                <span
-                                                   class="elementor-toggle-icon elementor-toggle-icon-left"
-                                                   aria-hidden="true"
-                                                >
-                                                   <span
-                                                      class="elementor-toggle-icon-closed"
-                                                      ><svg
-                                                         class="e-font-icon-svg e-fas-caret-right"
-                                                         viewBox="0 0 192 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
-                                                         ></path></svg
-                                                   ></span>
-                                                   <span
-                                                      class="elementor-toggle-icon-opened"
-                                                      ><svg
-                                                         class="elementor-toggle-icon-opened e-font-icon-svg e-fas-caret-up"
-                                                         viewBox="0 0 320 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z"
-                                                         ></path></svg
-                                                   ></span>
-                                                </span>
-                                                <a
-                                                   class="elementor-toggle-title"
-                                                   tabindex="0"
-                                                   >Lamaran</a
-                                                >
-                                             </div>
-                                             <div
-                                                id="elementor-tab-content-7242"
-                                                class="elementor-tab-content elementor-clearfix"
-                                                data-tab="2"
-                                                role="region"
-                                                aria-labelledby="elementor-tab-title-7242"
-                                             >
-                                                <p>15 April 2023</p>
-                                                <p>
-                                                   Lorem ipsum dolor sit amet,
-                                                   consectetur adipiscing elit.
-                                                   Ut elit tellus, luctus nec
-                                                   ullamcorper mattis, pulvinar
-                                                   dapibus leo.
-                                                </p>
-                                             </div>
-                                          </div>
-                                          <div class="elementor-toggle-item">
-                                             <div
-                                                id="elementor-tab-title-7243"
-                                                class="elementor-tab-title"
-                                                data-tab="3"
-                                                role="button"
-                                                aria-controls="elementor-tab-content-7243"
-                                                aria-expanded="false"
-                                             >
-                                                <span
-                                                   class="elementor-toggle-icon elementor-toggle-icon-left"
-                                                   aria-hidden="true"
-                                                >
-                                                   <span
-                                                      class="elementor-toggle-icon-closed"
-                                                      ><svg
-                                                         class="e-font-icon-svg e-fas-caret-right"
-                                                         viewBox="0 0 192 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
-                                                         ></path></svg
-                                                   ></span>
-                                                   <span
-                                                      class="elementor-toggle-icon-opened"
-                                                      ><svg
-                                                         class="elementor-toggle-icon-opened e-font-icon-svg e-fas-caret-up"
-                                                         viewBox="0 0 320 512"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                         <path
-                                                            d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z"
-                                                         ></path></svg
-                                                   ></span>
-                                                </span>
-                                                <a
-                                                   class="elementor-toggle-title"
-                                                   tabindex="0"
-                                                   >Resepsi</a
-                                                >
-                                             </div>
-                                             <div
-                                                id="elementor-tab-content-7243"
-                                                class="elementor-tab-content elementor-clearfix"
-                                                data-tab="3"
-                                                role="region"
-                                                aria-labelledby="elementor-tab-title-7243"
-                                             >
-                                                <p>15 April 2025</p>
-                                                <p>
-                                                   Lorem ipsum dolor sit amet,
-                                                   consectetur adipiscing elit.
-                                                   Ut elit tellus, luctus nec
-                                                   ullamcorper mattis, pulvinar
-                                                   dapibus leo.
-                                                </p>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </section>
-                  </div>
-               </div>
+            <div class="anggi-love-story-inner">
+               <h2 id="anggi-ivan-love-story-heading" class="anggi-love-story-heading">Kisah Cinta</h2>
+               <div class="anggi-love-story-list" aria-live="polite"></div>
             </div>
          </section>
          <section
-            class="elementor-section elementor-top-section elementor-element elementor-element-8d03c85 elementor-section-height-min-height elementor-section-items-stretch elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-jarallax-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
+            class="elementor-section elementor-top-section elementor-element elementor-element-8d03c85 elementor-section-height-min-height elementor-section-items-stretch elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-jarallax-no wpr-parallax-no wpr-sticky-section-no wpr-equal-height-no"
             data-id="8d03c85"
             data-element_type="section"
             data-e-type="section"
@@ -4449,219 +4218,6 @@ window.settingAutoplay = true;
                                           .replace(/Hadir/g,"Hadir").replace(/Tidak hadir/g,"Tidak Hadir").replace(/Masih Ragu/g,"Masih Ragu");document.getElementById('invitation-count-62777').innerHTML=pos1;var txt2=document.getElementById('commentform-62777').innerHTML;var pos2=txt2
                                           .replace(/Nama/g,"Nama").replace(/Ucapan/g,"Ucapan").replace(/Konfirmasi Kehadiran/g,"Konfirmasi Kehadiran").replace(/Datang/g,"Hadir").replace(/Absen/g,"Tidak Hadir").replace(/Mungkin/g,"Masih Ragu").replace(/Kirim/g,"Kirim");document.getElementById('commentform-62777').innerHTML=pos2
                                        </script>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </section>
-                  </div>
-               </div>
-            </div>
-         </section>
-         <section
-            class="elementor-section elementor-top-section elementor-element elementor-element-70f3774 elementor-section-height-min-height elementor-section-items-stretch elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-jarallax-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
-            data-id="70f3774"
-            data-element_type="section"
-            data-e-type="section"
-            data-settings='{"background_background":"slideshow","animation_mobile":"none","background_slideshow_gallery":[],"background_slideshow_loop":"yes","background_slideshow_slide_duration":5000,"background_slideshow_slide_transition":"fade","background_slideshow_transition_duration":500}'
-         >
-            <div class="elementor-background-overlay"></div>
-            <div class="elementor-container elementor-column-gap-no">
-               <div
-                  class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-6c594a5"
-                  data-id="6c594a5"
-                  data-element_type="column"
-                  data-e-type="column"
-                  data-settings='{"background_background":"classic","animation_mobile":"none"}'
-               >
-                  <div
-                     class="elementor-widget-wrap elementor-element-populated"
-                  >
-                     <div class="elementor-background-overlay"></div>
-                     <section
-                        class="elementor-section elementor-inner-section elementor-element elementor-element-ab2f956 elementor-section-height-min-height elementor-section-content-middle elementor-section-boxed elementor-section-height-default wpr-particle-no wpr-jarallax-no wpr-parallax-no wpr-sticky-section-no wpr-column-slider-no wpr-equal-height-no"
-                        data-id="ab2f956"
-                        data-element_type="section"
-                        data-e-type="section"
-                        data-settings='{"animation_mobile":"fadeInUp","background_background":"classic"}'
-                     >
-                        <div class="elementor-background-overlay"></div>
-                        <div
-                           class="elementor-container elementor-column-gap-no"
-                        >
-                           <div
-                              class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-7f9f357"
-                              data-id="7f9f357"
-                              data-element_type="column"
-                              data-e-type="column"
-                              data-settings='{"background_background":"classic","animation_mobile":"zoomIn"}'
-                           >
-                              <div
-                                 class="elementor-widget-wrap elementor-element-populated"
-                              >
-                                 <div
-                                    class="elementor-background-overlay"
-                                 ></div>
-                                 <div
-                                    class="elementor-element elementor-element-9877960 elementor-widget elementor-widget-image"
-                                    data-id="9877960"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation_mobile":"fadeInDown"}'
-                                    data-widget_type="image.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <img
-                                          data-lazyloaded="1"
-                                          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MDkiIGhlaWdodD0iMzQ5IiB2aWV3Qm94PSIwIDAgNzA5IDM0OSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgc3R5bGU9ImZpbGw6I2NmZDRkYjtmaWxsLW9wYWNpdHk6IDAuMTsiLz48L3N2Zz4="
-                                          loading="lazy"
-                                          decoding="async"
-                                          width="709"
-                                          height="349"
-                                          data-src="/template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541.png"
-                                          class="attachment-large size-large wp-image-61182"
-                                          alt="Tes 2"
-                                          data-srcset="/template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541.png 709w, /template-assets/webinvite.id/wp-content/uploads/2025/10/tes-2-e1762477015541-300x148.png 300w"
-                                          data-sizes="(max-width: 709px) 100vw, 709px"
-                                       />
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-ffc5bb4 zoom elementor-widget elementor-widget-text-editor"
-                                    data-id="ffc5bb4"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation_mobile":"none"}'
-                                    data-widget_type="text-editor.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <p>Wedding Hashtag</p>
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-8540e43 zoom elementor-widget elementor-widget-gallery"
-                                    data-id="8540e43"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"gap_mobile":{"unit":"px","size":0,"sizes":[]},"aspect_ratio":"1:1","columns":1,"_animation_mobile":"none","lazyload":"yes","gallery_layout":"grid","columns_tablet":2,"columns_mobile":1,"gap":{"unit":"px","size":10,"sizes":[]},"gap_tablet":{"unit":"px","size":10,"sizes":[]},"link_to":"file","overlay_background":"yes","content_hover_animation":"fade-in"}'
-                                    data-widget_type="gallery.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <div
-                                          class="elementor-gallery__container"
-                                       >
-                                          <a
-                                             class="e-gallery-item elementor-gallery-item elementor-animated-content"
-                                             href="/template-assets/webinvite.id/wp-content/uploads/2025/06/Hashtag-07.jpg"
-                                             data-elementor-open-lightbox="yes"
-                                             data-elementor-lightbox-slideshow="8540e43"
-                                             data-elementor-lightbox-title="Hashtag 07"
-                                             data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6NTA5LCJ1cmwiOiJodHRwczpcL1wvd2ViaW52aXRlLmlkXC93cC1jb250ZW50XC91cGxvYWRzXC8yMDI1XC8wNlwvSGFzaHRhZy0wNy5qcGciLCJzbGlkZXNob3ciOiI4NTQwZTQzIn0%3D"
-                                          >
-                                             <div
-                                                class="e-gallery-image elementor-gallery-item__image"
-                                                data-thumbnail="/template-assets/webinvite.id/wp-content/uploads/2025/06/Hashtag-07.jpg"
-                                                data-width="1755"
-                                                data-height="1755"
-                                                aria-label="Hashtag 07"
-                                                role="img"
-                                             ></div>
-                                             <div
-                                                class="elementor-gallery-item__overlay"
-                                             ></div>
-                                          </a>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-fba397f animated-slow zoom elementor-invisible elementor-widget elementor-widget-text-editor"
-                                    data-id="fba397f"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation":"fadeInUp","_animation_mobile":"none"}'
-                                    data-widget_type="text-editor.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <p>
-                                          Abadikan moment kamu ketika menghadiri
-                                          acara pernikahan kami, dengan
-                                          menggunakan <br />wedding hashtag
-                                          dibawah
-                                       </p>
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-68329c0 elementor-mobile-align-center elementor-align-center zoom elementor-widget elementor-widget-weddingpress-copy-text"
-                                    data-id="68329c0"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation_mobile":"none"}'
-                                    data-widget_type="weddingpress-copy-text.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <div class="elementor-image img"></div>
-                                       <div class="head-title"></div>
-                                       <div class="elementor-button-wrapper">
-                                          <div
-                                             class="copy-content spancontent"
-                                             style="display: none"
-                                          >
-                                             #TiovanallywithNiko
-                                          </div>
-                                          <a
-                                             style="cursor: pointer"
-                                             class="elementor-button wdp-copy-btn"
-                                             role="button"
-                                             data-message="berhasil disalin"
-                                             data-clipboard-text="#TiovanallywithNiko"
-                                          >
-                                             <div
-                                                class="elementor-button-content-wrapper"
-                                             >
-                                                <span>
-                                                   <svg
-                                                      aria-hidden="true"
-                                                      class="e-font-icon-svg e-far-copy"
-                                                      viewBox="0 0 448 512"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                   >
-                                                      <path
-                                                         d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"
-                                                      ></path>
-                                                   </svg>
-                                                </span>
-                                                <span
-                                                   class="elementor-button-text"
-                                                   >#TiovanallywithNiko</span
-                                                >
-                                             </div>
-                                          </a>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div
-                                    class="elementor-element elementor-element-a220772 elementor-widget elementor-widget-image"
-                                    data-id="a220772"
-                                    data-element_type="widget"
-                                    data-e-type="widget"
-                                    data-settings='{"_animation_mobile":"fadeIn"}'
-                                    data-widget_type="image.default"
-                                 >
-                                    <div class="elementor-widget-container">
-                                       <img
-                                          data-lazyloaded="1"
-                                          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MzUiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNTM1IDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgc3R5bGU9ImZpbGw6I2NmZDRkYjtmaWxsLW9wYWNpdHk6IDAuMTsiLz48L3N2Zz4="
-                                          loading="lazy"
-                                          decoding="async"
-                                          width="535"
-                                          height="400"
-                                          data-src="/template-assets/webinvite.id/wp-content/uploads/2025/10/bawah-123.png"
-                                          class="attachment-large size-large wp-image-58114"
-                                          alt="Bawah 123"
-                                          data-srcset="/template-assets/webinvite.id/wp-content/uploads/2025/10/bawah-123.png 535w, /template-assets/webinvite.id/wp-content/uploads/2025/10/bawah-123-300x224.png 300w"
-                                          data-sizes="(max-width: 535px) 100vw, 535px"
-                                       />
                                     </div>
                                  </div>
                               </div>
@@ -7107,6 +6663,62 @@ window.settingAutoplay = true;
       function each(sel, fn) {
         Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
       }
+      function renderLoveStory(items) {
+        var section = document.getElementById('anggi-ivan-love-story');
+        var list = section && section.querySelector('.anggi-love-story-list');
+        if (!section || !list) return;
+        list.replaceChildren();
+        if (!Array.isArray(items)) {
+          section.style.display = 'none';
+          return;
+        }
+
+        var visibleCount = 0;
+        items.slice().sort(function(a, b) { return (a.sortOrder || 0) - (b.sortOrder || 0); }).forEach(function(item) {
+          if (!item || typeof item !== 'object') return;
+          var title = typeof item.title === 'string' ? item.title.trim() : '';
+          var description = typeof item.description === 'string' ? item.description.trim() : '';
+          var assetId = typeof item.photoAssetId === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(item.photoAssetId)
+            ? item.photoAssetId
+            : '';
+          if (!title || (!assetId && !description)) return;
+
+          var card = document.createElement('article');
+          card.className = 'anggi-love-story-card';
+          var image = null;
+          if (assetId) {
+            image = document.createElement('img');
+            image.className = 'anggi-love-story-photo';
+            image.alt = title;
+            image.loading = 'lazy';
+            image.decoding = 'async';
+            image.src = '/api/assets/' + encodeURIComponent(assetId);
+            card.appendChild(image);
+          }
+
+          var heading = document.createElement('h3');
+          heading.className = 'anggi-love-story-title';
+          heading.textContent = title;
+          card.appendChild(heading);
+          if (description) {
+            var paragraph = document.createElement('p');
+            paragraph.className = 'anggi-love-story-description';
+            paragraph.textContent = description;
+            card.appendChild(paragraph);
+          }
+          list.appendChild(card);
+          visibleCount += 1;
+
+          if (image) {
+            image.addEventListener('error', function() {
+              image.remove();
+              if (!description) card.remove();
+              if (!list.querySelector('.anggi-love-story-card')) section.style.display = 'none';
+            }, { once: true });
+          }
+        });
+        section.style.display = visibleCount > 0 ? '' : 'none';
+      }
       function setImage(sel, url) {
         if (!url) return;
         var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
@@ -7189,6 +6801,9 @@ window.settingAutoplay = true;
           modal = document.createElement('div');
           modal.id = 'standalone-lightbox';
           modal.className = 'standalone-lightbox-modal';
+          modal.setAttribute('role', 'dialog');
+          modal.setAttribute('aria-modal', 'true');
+          modal.setAttribute('aria-label', 'Galeri foto');
           modal.innerHTML =
             '<div class="standalone-lightbox-counter" id="lg-counter-text">1 / 1</div>' +
             '<button class="standalone-lightbox-close" id="lg-close-btn" aria-label="Tutup">&times;</button>' +
@@ -7201,6 +6816,10 @@ window.settingAutoplay = true;
           document.body.appendChild(modal);
 
           var curIdx = 0;
+          var lastActiveElement = null;
+          var previousBodyOverflow = '';
+          var previousBodyOverflowPriority = '';
+
           function showItem(idx) {
             if (idx < 0) idx = items.length - 1;
             if (idx >= items.length) idx = 0;
@@ -7216,33 +6835,61 @@ window.settingAutoplay = true;
 
           function closeModal() {
             modal.classList.remove('active');
-            document.body.style.overflow = '';
+            if (lastActiveElement && typeof lastActiveElement.focus === 'function') lastActiveElement.focus();
+            if (previousBodyOverflow) {
+              document.body.style.setProperty('overflow', previousBodyOverflow, previousBodyOverflowPriority);
+            } else {
+              document.body.style.removeProperty('overflow');
+            }
           }
 
-          document.getElementById('lg-close-btn').onclick = closeModal;
-          document.getElementById('lg-prev-btn').onclick = function(e) { e.stopPropagation(); showItem(curIdx - 1); };
-          document.getElementById('lg-next-btn').onclick = function(e) { e.stopPropagation(); showItem(curIdx + 1); };
+          document.getElementById('lg-close-btn').onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+          };
+          document.getElementById('lg-prev-btn').onclick = function(e) { e.preventDefault(); e.stopPropagation(); showItem(curIdx - 1); };
+          document.getElementById('lg-next-btn').onclick = function(e) { e.preventDefault(); e.stopPropagation(); showItem(curIdx + 1); };
           modal.onclick = function(e) { if (e.target === modal) closeModal(); };
 
-          document.addEventListener('keydown', function(e) {
+          modal.addEventListener('keydown', function(e) {
             if (!modal.classList.contains('active')) return;
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              closeModal();
+            }
             if (e.key === 'ArrowLeft') showItem(curIdx - 1);
             if (e.key === 'ArrowRight') showItem(curIdx + 1);
           });
 
           var touchStartX = 0;
-          modal.ontouchstart = function(e) { touchStartX = e.changedTouches[0].screenX; };
+          var touchStartTarget = null;
+          modal.ontouchstart = function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartTarget = e.target;
+          };
           modal.ontouchend = function(e) {
+            if (touchStartTarget && touchStartTarget.closest && touchStartTarget.closest('.standalone-lightbox-close, .standalone-lightbox-prev, .standalone-lightbox-next')) {
+              touchStartTarget = null;
+              return;
+            }
             var diff = e.changedTouches[0].screenX - touchStartX;
             if (diff > 50) showItem(curIdx - 1);
             else if (diff < -50) showItem(curIdx + 1);
+            touchStartTarget = null;
           };
 
           window.openGalleryLightbox = function(index) {
+            if (!modal.classList.contains('active')) {
+              lastActiveElement = document.activeElement;
+              previousBodyOverflow = document.body.style.getPropertyValue('overflow');
+              previousBodyOverflowPriority = document.body.style.getPropertyPriority('overflow');
+            }
             showItem(index);
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.body.style.setProperty('overflow', 'hidden');
+            var closeButton = document.getElementById('lg-close-btn');
+            if (closeButton) closeButton.focus({ preventScroll: true });
           };
         }
       }
@@ -7375,45 +7022,6 @@ window.settingAutoplay = true;
         }
       }
 
-      // Story Timeline Hydration (Q3: Sinkron data cerita dari database)
-      var storyList = payload.story || [];
-      var toggleWidget = document.querySelector('[data-id="4522435"] .elementor-toggle');
-      if (toggleWidget && storyList.length > 0) {
-        var toggleItems = toggleWidget.querySelectorAll('.elementor-toggle-item');
-        toggleItems.forEach(function(itemEl, idx) {
-          var storyData = storyList[idx];
-          if (storyData) {
-            itemEl.style.display = '';
-            var titleA = itemEl.querySelector('.elementor-toggle-title');
-            if (titleA) titleA.textContent = storyData.title;
-
-            var contentEl = itemEl.querySelector('.elementor-tab-content');
-            if (contentEl) {
-              var pTags = contentEl.querySelectorAll('p');
-              if (pTags[0]) pTags[0].textContent = storyData.date;
-              if (pTags[1]) pTags[1].textContent = storyData.description;
-            }
-          } else {
-            // Sembunyikan item dummy berlebih jika data di DB lebih sedikit
-            itemEl.style.display = 'none';
-          }
-        });
-      }
-
-      // Hashtag
-      if (inv.hashtag) {
-        each('[data-clipboard-text]', function(el) {
-          var val = el.getAttribute('data-clipboard-text');
-          if (val && val.charAt(0) === '#') {
-            el.setAttribute('data-clipboard-text', inv.hashtag);
-            var txt = el.querySelector('.elementor-button-text');
-            if (txt) txt.textContent = inv.hashtag;
-            var sibling = el.parentElement && el.parentElement.querySelector('.copy-content');
-            if (sibling) sibling.textContent = inv.hashtag;
-          }
-        });
-      }
-
       // Gifts: 100% Figma Spec Debit Card Rendering
       var giftSection = document.querySelector('[data-id="e235bc9"]');
       var validGifts = gifts.filter(function(g) {
@@ -7542,11 +7150,8 @@ window.settingAutoplay = true;
         gallerySection.style.display = '';
       }
 
-      // 2. Cerita Cinta
-      var storySection = document.querySelector('[data-id="633fe11"]');
-      if (storySection && (!storyList || storyList.length === 0)) {
-        storySection.style.display = 'none';
-      }
+      // Love Story uses only saved, invitation-scoped content; empty defaults remain private.
+      renderLoveStory(payload.loveStory);
 
       // 3. Wedding Gift (Sembunyikan kartu kedua jika klien hanya punya 1 rekening)
       var giftSection = document.querySelector('[data-id="e235bc9"]');
@@ -7572,13 +7177,7 @@ window.settingAutoplay = true;
         topLiveGiftSection.style.display = 'none';
       }
 
-      // 5. Wedding Hashtag (hide the entire top section 70f3774 so no 90vh empty gap is left)
-      var topHashtagSection = document.querySelector('[data-id="70f3774"]');
-      if (topHashtagSection && (!inv.hashtag || inv.hashtag.trim() === '')) {
-        topHashtagSection.style.display = 'none';
-      }
-
-      // 6. Ikon Media Sosial
+      // 5. Ikon Media Sosial
       var brideIg = document.querySelector('[data-id="8624cff"]');
       var bridePhoto = document.querySelector('[data-id="5775dd2"] > .elementor-widget-container');
       if (brideIg && (!bride.instagramHandle || bride.instagramHandle.trim() === '')) {
