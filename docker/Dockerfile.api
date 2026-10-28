@@ -35,6 +35,8 @@ RUN npm ci --omit=dev --workspace=apps/api --workspace=packages/shared-types
 
 COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY apps/web/public/templates ./apps/api/pages/templates
+COPY apps/web/public/production ./apps/api/pages/production
 COPY scripts ./scripts
 
 EXPOSE 3000

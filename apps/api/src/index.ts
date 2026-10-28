@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { bodyLimit } from 'hono/body-limit';
 import { serve } from '@hono/node-server';
 import { invitationsRouter } from './routes/invitations.js';
+import { invitationPageRouter } from './routes/invitation-page.js';
 import { wishesRouter } from './routes/wishes.js';
 import { templatesRouter } from './routes/templates.js';
 import { assetsRouter } from './routes/assets.js';
@@ -49,6 +50,7 @@ app.use('*', cors({
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }));
 
 // Public Routes
+app.route('/i', invitationPageRouter);
 app.route('/api/config', configRouter);
 app.route('/api/templates', templatesRouter);
 app.route('/api/assets', assetsRouter);
