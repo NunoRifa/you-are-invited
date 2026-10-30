@@ -26,6 +26,10 @@ if (navigator.connection && navigator.connection.saveData) {
       <meta charset="UTF-8" />
       <title>You Are Invited Premium</title>
       <style id="raden-mobile-fixes">
+         [data-id="49ab019"] .anggi-venue-name,
+         [data-id="79f5f1d"] .anggi-venue-name {
+            font-size: 1.15em;
+         }
          #wpadminbar #wp-admin-bar-wccp_free_top_button .ab-icon:before {
             content: "\f160";
             color: #02ca02;
@@ -6937,6 +6941,14 @@ if (navigator.connection && navigator.connection.saveData) {
         var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
         if (el) el.textContent = String(val);
       }
+      function setVenue(sel, venueName, venueAddress) {
+        var el = document.querySelector(sel);
+        if (!el) return;
+        var name = document.createElement('span');
+        name.className = 'anggi-venue-name';
+        name.textContent = venueName || '';
+        el.replaceChildren(name, document.createElement('br'), document.createTextNode(venueAddress || ''));
+      }
       function attr(sel, a, val) {
         if (!val) return;
         var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
@@ -7332,7 +7344,7 @@ if (navigator.connection && navigator.connection.saveData) {
         text('[data-id="6009170"] .elementor-heading-title', ev0Info.dayName);
         text('[data-id="c8e6e2a"] .elementor-heading-title', ev0Info.dateFormatted);
         text('[data-id="2d00970"] .elementor-heading-title', 'Pukul : ' + events[0].startTime + ' - ' + (events[0].endTimeLabel || 'Selesai'));
-        text('[data-id="49ab019"] p', events[0].venueName + ', ' + events[0].venueAddress);
+        setVenue('[data-id="49ab019"] p', events[0].venueName, events[0].venueAddress);
         setupMapsButton('[data-id="2f59679"]', events[0].mapsUrl, events[0].venueName, events[0].venueAddress);
       }
 
@@ -7343,7 +7355,7 @@ if (navigator.connection && navigator.connection.saveData) {
         text('[data-id="4edf461"] .elementor-heading-title', ev1Info.dayName);
         text('[data-id="18b08f3"] .elementor-heading-title', ev1Info.dateFormatted);
         text('[data-id="cf9695f"] .elementor-heading-title', 'Pukul : ' + events[1].startTime + ' - ' + (events[1].endTimeLabel || 'Selesai'));
-        text('[data-id="79f5f1d"] p', events[1].venueName + ', ' + events[1].venueAddress);
+        setVenue('[data-id="79f5f1d"] p', events[1].venueName, events[1].venueAddress);
         setupMapsButton('[data-id="36a639a"]', events[1].mapsUrl, events[1].venueName, events[1].venueAddress);
       }
 
