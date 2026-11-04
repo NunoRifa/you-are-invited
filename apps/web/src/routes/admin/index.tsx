@@ -135,7 +135,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (path: string) => void; onLo
                           <span>Export CSV</span>
                         </button>
                         <a
-                          href={inv.isPublished ? `/i/${inv.slug}` : `/api/admin/invitations/${inv.id}/preview`}
+                          href={inv.isPublished ? `/i/${inv.slug}/` : `/api/admin/invitations/${inv.id}/preview/`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-medium"

@@ -182,14 +182,21 @@ export function renderInvitationHtml(
   const base = invitation.templateKey === 'yt-wedding'
     ? `<base href="${isPreview ? `/api/admin/invitations/${encodeURIComponent(invitation.id)}/preview/` : `/i/${encodeURIComponent(invitation.slug)}/`}">\n`
     : '';
+
+  const headWithBase = base
+    ? (head.includes('<head')
+      ? head.replace(/(<head\b[^>]*>)/i, `$1\n${base}`)
+      : `${base}${head}`)
+    : head;
+
   return {
     status: 200,
-    html: `${head}${base}${tags}\n${original.slice(headEnd)}`,
+    html: `${headWithBase}${tags}\n${original.slice(headEnd)}`,
     headers,
   };
 }
 
-invitationPageRouter.get('/:slug/assets/:file{.*}', (c) => {
+const handleTemplateAsset = (c: any) => {
   const slug = c.req.param('slug');
   const file = c.req.param('file');
   if (!/^[a-zA-Z0-9_-]+$/.test(slug)) return c.notFound();
@@ -205,9 +212,11 @@ invitationPageRouter.get('/:slug/assets/:file{.*}', (c) => {
       'Cache-Control': 'public, max-age=86400',
     },
   });
-});
+};
 
-invitationPageRouter.get('/:slug', (c) => {
+invitationPageRouter.get('/:slug/assets/:file{.*}', handleTemplateAsset);
+
+const handleInvitationPage = (c: any) => {
   const slug = c.req.param('slug');
   if (!/^[a-zA-Z0-9_-]+$/.test(slug)) return c.notFound();
   const invitation = db.select().from(schema.invitations).where(eq(schema.invitations.slug, slug)).get();
@@ -216,4 +225,7 @@ invitationPageRouter.get('/:slug', (c) => {
   const res = renderInvitationHtml(invitation);
   if (res.status !== 200) return c.text(res.error || 'Invitation template not available', res.status);
   return c.html(res.html!, 200, res.headers);
-});
+};
+
+invitationPageRouter.get('/:slug', handleInvitationPage);
+invitationPageRouter.get('/:slug/', handleInvitationPage);

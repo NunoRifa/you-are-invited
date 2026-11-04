@@ -1702,8 +1702,8 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
         {(() => {
           const isPublished = Boolean(payload.invitation.isPublished);
           const previewUrl = isPublished
-            ? `/i/${payload.invitation.slug}`
-            : `/api/admin/invitations/${payload.invitation.id}/preview`;
+            ? `/i/${payload.invitation.slug}/`
+            : `/api/admin/invitations/${payload.invitation.id}/preview/`;
           const iframeSrc = `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}preview=${previewVersion}`;
           return (
             <>

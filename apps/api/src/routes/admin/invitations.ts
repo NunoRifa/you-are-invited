@@ -245,15 +245,17 @@ adminInvitationsRouter.get('/:id', (c) => {
   });
 });
 
-// GET /api/admin/invitations/:id/preview
-adminInvitationsRouter.get('/:id/preview', (c) => {
+// GET /api/admin/invitations/:id/preview and /preview/
+const handleAdminPreview = (c: any) => {
   const id = c.req.param('id');
   const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, id)).get();
   if (!inv) return c.notFound();
   const res = renderInvitationHtml(inv, { isPreview: true });
   if (res.status !== 200) return c.text(res.error || 'Invitation template not available', res.status);
   return c.html(res.html!, 200, res.headers);
-});
+};
+adminInvitationsRouter.get('/:id/preview', handleAdminPreview);
+adminInvitationsRouter.get('/:id/preview/', handleAdminPreview);
 
 // GET /api/admin/invitations/:id/preview/data
 adminInvitationsRouter.get('/:id/preview/data', (c) => {
@@ -266,8 +268,8 @@ adminInvitationsRouter.get('/:id/preview/data', (c) => {
   });
 });
 
-// GET /api/admin/invitations/:id/preview/assets/:file{.*}
-adminInvitationsRouter.get('/:id/preview/assets/:file{.*}', (c) => {
+// GET /api/admin/invitations/:id/preview/assets/:file{.*} and fallback /:id/assets/:file{.*}
+const handleAdminPreviewAsset = (c: any) => {
   const id = c.req.param('id');
   const file = c.req.param('file');
   const inv = db.select().from(schema.invitations).where(eq(schema.invitations.id, id)).get();
@@ -282,7 +284,9 @@ adminInvitationsRouter.get('/:id/preview/assets/:file{.*}', (c) => {
       'X-Robots-Tag': 'noindex, nofollow',
     },
   });
-});
+};
+adminInvitationsRouter.get('/:id/preview/assets/:file{.*}', handleAdminPreviewAsset);
+adminInvitationsRouter.get('/:id/assets/:file{.*}', handleAdminPreviewAsset);
 
 // POST /api/admin/invitations/:id/assets - Multipart file upload
 adminInvitationsRouter.post('/:id/assets', async (c) => {

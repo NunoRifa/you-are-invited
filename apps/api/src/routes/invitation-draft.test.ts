@@ -231,6 +231,11 @@ describe('Task 2: Draft isolation and preview', () => {
       expect(res.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
       const html = await res.text();
       expect(html).toContain('Riska &amp; Rafli');
+      expect(html).toContain('<base href="/api/admin/invitations/riska/preview/">');
+
+      // Supports trailing slash on preview route
+      const slashRes = await app.request('/api/admin/invitations/riska/preview/', { headers: cookie('super-admin') });
+      expect(slashRes.status).toBe(200);
     });
   });
 
@@ -274,6 +279,11 @@ describe('Task 2: Draft isolation and preview', () => {
       expect(res.status).toBe(200);
       expect(res.headers.get('Content-Type')).toContain('text/css');
       expect(await res.text()).toContain('.yt');
+
+      // Also serves under fallback alias /api/admin/invitations/:id/assets/:file
+      const fallbackRes = await app.request('/api/admin/invitations/riska/assets/css/style.css', { headers: cookie('super-admin') });
+      expect(fallbackRes.status).toBe(200);
+      expect(fallbackRes.headers.get('Content-Type')).toContain('text/css');
     });
 
     it('rejects non-allowlisted files (.env)', async () => {

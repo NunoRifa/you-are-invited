@@ -54,6 +54,25 @@ export function invitationRoutePlugin(): Plugin {
           return res.end();
         }
 
+        const assetMatch = (req.url || '').match(/^\/i\/([a-zA-Z0-9_-]+)\/assets\/(.+)$/);
+        if (assetMatch) {
+          const backendUrl = process.env.VITE_API_URL || 'http://localhost:3000';
+          fetch(`${backendUrl}${req.url}`).then(async (apiRes) => {
+            if (apiRes.status === 200) {
+              const contentType = apiRes.headers.get('content-type');
+              if (contentType) res.setHeader('Content-Type', contentType);
+              const buffer = Buffer.from(await apiRes.arrayBuffer());
+              return res.end(buffer);
+            }
+            res.statusCode = apiRes.status;
+            return res.end();
+          }).catch(() => {
+            res.statusCode = 404;
+            return res.end();
+          });
+          return;
+        }
+
         const match = (req.url || '').match(/^\/i\/([a-zA-Z0-9_-]+)(\/)?(\?.*)?$/);
         if (!match) return next();
 

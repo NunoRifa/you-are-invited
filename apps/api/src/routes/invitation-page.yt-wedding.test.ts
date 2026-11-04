@@ -240,6 +240,11 @@ describe('Task 3: yt-wedding published metadata and draft preview', () => {
       expect(html).not.toContain('<img src=x onerror=alert(1)>');
       // Actual body retains draft markers until client-side bind.js fetches published payload.
       expect(html).toContain('[Belum diisi]');
+      expect(html).toContain('<base href="/i/riska-rafli/">');
+      expect(html.indexOf('<base')).toBeLessThan(html.indexOf('<link rel="stylesheet"'));
+
+      const slashRes = await app.request('/i/riska-rafli/');
+      expect(slashRes.status).toBe(200);
     } finally {
       process.chdir(cwd);
       if (pageDir === undefined) delete process.env.INVITATION_PAGE_DIR;
