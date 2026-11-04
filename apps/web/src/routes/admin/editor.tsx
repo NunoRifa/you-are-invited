@@ -2,6 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ExternalLink, Plus, RefreshCw, Save, Trash2, Eye, EyeOff, Upload, Image, X, Music, Volume2 } from 'lucide-react';
 import { bankProviders, getBankProvider, otherProviderName } from '../../features/gift/bank-providers.js';
 import type { LoveStoryItem } from '@you-are-invited/shared-types';
+import {
+  type YtSettingsState,
+  YtWeddingSettingsPanel,
+  PublicationControlBar,
+  YtPublicationModal,
+} from './yt-wedding.js';
+
+const initialYtSettings: YtSettingsState = {
+  heroCaption: '',
+  communityIntro: '',
+  eventIntro: '',
+  galleryIntro: '',
+  giftIntro: '',
+  musicLabel: '',
+  shippingAddress: '',
+  heroVideoAssetId: null,
+  heroVideoUrl: null,
+  showGallery: true,
+  showGift: true,
+};
 
 const createDefaultLoveStory = (): LoveStoryItem[] => [
   { id: 'first-meeting', title: 'Awal Bertemu', description: '', photoAssetId: null, photoUrl: null, sortOrder: 0 },
@@ -28,6 +48,8 @@ interface EditorPayload {
     id: string;
     slug: string;
     title: string;
+    templateKey: string;
+    isPublished?: boolean;
     hashtag: string | null;
     coupleDisplayName?: string | null;
     coverPhotoAssetId?: string | null;
@@ -36,6 +58,8 @@ interface EditorPayload {
     heroPhotoUrl?: string | null;
     closingPhotoAssetId?: string | null;
     closingPhotoUrl?: string | null;
+    heroVideoAssetId?: string | null;
+    heroVideoUrl?: string | null;
     galleryVideoUrl?: string | null;
     musicUrl?: string | null;
     musicAsset?: {
@@ -115,6 +139,12 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const [notice, setNotice] = useState('');
   const [previewVersion, setPreviewVersion] = useState(0);
 
+  const [userRole, setUserRole] = useState<'owner' | 'super_admin' | null>(null);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publicationErrors, setPublicationErrors] = useState<string[]>([]);
+  const [ytSettings, setYtSettings] = useState<YtSettingsState>(initialYtSettings);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -123,6 +153,23 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       if (!response.ok) throw new Error('Gagal memuat undangan. Pastikan API tersedia.');
       const data = await response.json() as EditorPayload;
       setPayload({ ...data, loveStory: Array.isArray(data.loveStory) ? data.loveStory : createDefaultLoveStory() });
+
+      const fields = data.templateFields || [];
+      const getField = (key: string, def = '') => fields.find((f) => f.fieldKey === key)?.fieldValue ?? def;
+      setYtSettings({
+        heroCaption: getField('yt_hero_caption'),
+        communityIntro: getField('yt_community_intro'),
+        eventIntro: getField('yt_event_intro'),
+        galleryIntro: getField('yt_gallery_intro'),
+        giftIntro: getField('yt_gift_intro'),
+        musicLabel: getField('yt_music_label'),
+        shippingAddress: getField('yt_shipping_address'),
+        heroVideoAssetId: data.invitation.heroVideoAssetId || getField('yt_hero_video_asset_id', '') || null,
+        heroVideoUrl: data.invitation.heroVideoUrl || null,
+        showGallery: getField('yt_show_gallery', 'true') !== 'false',
+        showGift: getField('yt_show_gift', 'true') !== 'false',
+      });
+
       loveStoryRevision.current = 0;
       setLoveStoryDirty(false);
       setActiveTab('Umum');
@@ -133,7 +180,15 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     }
   };
 
-  useEffect(() => { void load(); }, [invitationId]);
+  useEffect(() => {
+    void load();
+    fetch('/api/admin/session', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user?.role) setUserRole(data.user.role);
+      })
+      .catch(() => {});
+  }, [invitationId]);
 
   const patchInvitation = (field: keyof EditorPayload['invitation'], value: string) => {
     setPayload((current) => current ? { ...current, invitation: { ...current.invitation, [field]: value } } : current);
@@ -735,6 +790,182 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     setPreviewVersion((v) => v + 1);
   };
 
+  const saveYtSettings = async () => {
+    setSaving(true);
+    setNotice('Menyimpan pengaturan YouTube…');
+    try {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/yt-wedding`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          heroCaption: ytSettings.heroCaption,
+          communityIntro: ytSettings.communityIntro,
+          eventIntro: ytSettings.eventIntro,
+          galleryIntro: ytSettings.galleryIntro,
+          giftIntro: ytSettings.giftIntro,
+          musicLabel: ytSettings.musicLabel,
+          shippingAddress: ytSettings.shippingAddress,
+          showGallery: ytSettings.showGallery,
+          showGift: ytSettings.showGift,
+        }),
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan pengaturan YouTube.');
+      setNotice('Pengaturan YouTube berhasil disimpan.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menyimpan pengaturan YouTube.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUploadHeroVideo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'video/mp4') {
+      setNotice('Format video harus MP4.');
+      e.target.value = '';
+      return;
+    }
+    setUploadingTarget('hero-video');
+    setNotice('Mengunggah hero video MP4…');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('kind', 'video');
+      const res = await fetch(`/api/admin/invitations/${invitationId}/assets`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      if (res.status === 413) throw new Error('File video terlalu besar (maksimum 21 MiB).');
+      if (!res.ok) throw new Error('Gagal mengunggah hero video.');
+      const asset = await res.json() as { id: string; url: string };
+
+      const patchRes = await fetch(`/api/admin/invitations/${invitationId}/yt-wedding`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroVideoAssetId: asset.id }),
+      });
+      if (!patchRes.ok) throw new Error('Gagal menyimpan hero video ke pengaturan undangan.');
+
+      setYtSettings((prev) => ({
+        ...prev,
+        heroVideoAssetId: asset.id,
+        heroVideoUrl: asset.url,
+      }));
+      setNotice('Hero video berhasil diunggah.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal upload video.');
+    } finally {
+      setUploadingTarget(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveHeroVideo = async () => {
+    if (!window.confirm('Hapus video hero ini?')) return;
+    try {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/yt-wedding`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroVideoAssetId: null }),
+      });
+      if (!res.ok) throw new Error('Gagal menghapus hero video.');
+      setYtSettings((prev) => ({
+        ...prev,
+        heroVideoAssetId: null,
+        heroVideoUrl: null,
+      }));
+      setNotice('Hero video dihapus.');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menghapus hero video.');
+    }
+  };
+
+  const handleConfirmPublish = async (
+    attestations: {
+      assetsLicensed: boolean;
+      youtubeIdentityReviewed: boolean;
+      visualParityChecked: boolean;
+      linksVerified: boolean;
+    },
+    confirmation: string
+  ) => {
+    setPublishing(true);
+    setPublicationErrors([]);
+    try {
+      const body: Record<string, unknown> = {
+        isPublished: true,
+        confirmation,
+      };
+      if (payload?.invitation.templateKey === 'yt-wedding') {
+        body.attestations = attestations;
+      }
+      const res = await fetch(`/api/admin/invitations/${invitationId}/publication`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.status === 422) {
+        const data = await res.json().catch(() => ({}));
+        if (Array.isArray(data.reasons)) {
+          setPublicationErrors(data.reasons);
+          return;
+        }
+        throw new Error(data.error || 'Persyaratan publikasi belum terpenuhi.');
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Gagal menerbitkan undangan.');
+      }
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, isPublished: true },
+      } : cur);
+      setIsPublishModalOpen(false);
+      setNotice('Undangan berhasil diterbitkan ke publik!');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal menerbitkan.');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!window.confirm('Tarik undangan ini dari publik? Undangan akan berstatus Draft.')) return;
+    setPublishing(true);
+    try {
+      const res = await fetch(`/api/admin/invitations/${invitationId}/publication`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: false, confirmation: payload?.invitation.slug }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Gagal menarik undangan dari publik.');
+      }
+      setPayload((cur) => cur ? {
+        ...cur,
+        invitation: { ...cur.invitation, isPublished: false },
+      } : cur);
+      setNotice('Undangan berhasil ditarik dari publik (berstatus Draft).');
+      setPreviewVersion((v) => v + 1);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Gagal unpublish.');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   if (loading) return <div className="p-10 text-sm text-stone-600">Memuat editor undangan…</div>;
   if (!payload) return <div className="p-10 text-sm text-red-700">{notice || 'Data undangan tidak ditemukan.'}</div>;
 
@@ -746,7 +977,12 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const sortedCouples = [...payload.couples].sort((a, b) => (a.role === 'bride' ? -1 : 1));
   const bride = payload.couples.find((c) => c.role === 'bride');
   const groom = payload.couples.find((c) => c.role === 'groom');
-  const editorTabs = payload.invitation.slug === 'anggi-ivan' ? [...tabs, 'Kisah Cinta'] : tabs;
+  const isYtWedding = payload.invitation.templateKey === 'yt-wedding';
+  const editorTabs = payload.invitation.slug === 'anggi-ivan'
+    ? [...tabs, 'Kisah Cinta']
+    : isYtWedding
+    ? [...tabs, 'Pengaturan YouTube']
+    : tabs;
 
   return <main className="min-h-screen bg-stone-100 text-stone-900">
     <header className="flex items-center justify-between gap-4 border-b border-stone-200 bg-white px-5 py-4">
@@ -760,6 +996,17 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     </header>
     <div className="grid min-h-[calc(100vh-65px)] lg:grid-cols-[minmax(380px,480px)_1fr]">
       <section className="border-r border-stone-200 bg-white">
+        <PublicationControlBar
+          isPublished={Boolean(payload.invitation.isPublished)}
+          userRole={userRole}
+          isYtWedding={isYtWedding}
+          onOpenPublishModal={() => {
+            setPublicationErrors([]);
+            setIsPublishModalOpen(true);
+          }}
+          onUnpublish={handleUnpublish}
+          publishing={publishing}
+        />
         <div className="border-b border-stone-200 px-6 py-5"><p className="text-xs uppercase tracking-widest text-stone-500">Editor Undangan</p><h1 className="mt-1 text-xl font-semibold">{payload.invitation.title}</h1></div>
         <nav aria-label="Bagian undangan" className="flex gap-1 overflow-x-auto border-b border-stone-200 px-4 py-3">{editorTabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-md px-3 py-2 text-xs font-medium ${activeTab === tab ? 'bg-amber-100 text-amber-950 font-semibold' : 'text-stone-600 hover:bg-stone-100'}`}>{tab}</button>)}</nav>
         <div className="space-y-4 p-6">
@@ -1437,13 +1684,57 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
               <p className="text-sm text-stone-500 text-center py-8">Belum ada ucapan dari tamu undangan.</p>
             )}
           </>}
+
+          {activeTab === 'Pengaturan YouTube' && isYtWedding && (
+            <YtWeddingSettingsPanel
+              settings={ytSettings}
+              onChange={(changes) => setYtSettings((prev) => ({ ...prev, ...changes }))}
+              onSave={saveYtSettings}
+              saving={saving}
+              uploading={uploadingTarget === 'hero-video'}
+              onUploadHeroVideo={handleUploadHeroVideo}
+              onRemoveHeroVideo={handleRemoveHeroVideo}
+            />
+          )}
         </div>
       </section>
       <section className="hidden min-h-0 flex-col bg-stone-200 p-4 lg:flex">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold">Live Preview · /i/{payload.invitation.slug}</h2><a className="inline-flex items-center gap-1 text-xs text-stone-700 underline" href={`/i/${payload.invitation.slug}`} target="_blank" rel="noreferrer">Buka tab baru <ExternalLink size={13}/></a></div>
-        <iframe key={previewVersion} title={`Preview ${payload.invitation.title}`} src={`/i/${payload.invitation.slug}?preview=${previewVersion}`} className="min-h-[680px] flex-1 rounded-xl border border-stone-300 bg-white shadow-sm" />
+        {(() => {
+          const isPublished = Boolean(payload.invitation.isPublished);
+          const previewUrl = isPublished
+            ? `/i/${payload.invitation.slug}`
+            : `/api/admin/invitations/${payload.invitation.id}/preview`;
+          const iframeSrc = `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}preview=${previewVersion}`;
+          return (
+            <>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-sm font-semibold">
+                  {isPublished ? 'Live Preview · /i/' : 'Draft Preview · /i/'}{payload.invitation.slug}
+                </h2>
+                <a className="inline-flex items-center gap-1 text-xs text-stone-700 underline" href={previewUrl} target="_blank" rel="noreferrer">
+                  Buka tab baru <ExternalLink size={13}/>
+                </a>
+              </div>
+              <iframe
+                key={previewVersion}
+                title={`Preview ${payload.invitation.title}`}
+                src={iframeSrc}
+                className="min-h-[680px] flex-1 rounded-xl border border-stone-300 bg-white shadow-sm"
+              />
+            </>
+          );
+        })()}
       </section>
     </div>
+    <YtPublicationModal
+      isOpen={isPublishModalOpen}
+      slug={payload.invitation.slug}
+      isYtWedding={isYtWedding}
+      onClose={() => setIsPublishModalOpen(false)}
+      onConfirmPublish={handleConfirmPublish}
+      publishing={publishing}
+      errorReasons={publicationErrors}
+    />
   </main>;
 };
 

@@ -26,6 +26,8 @@ beforeAll(async () => {
   const { invitationsRouter } = await import('../invitations.js');
   const now = Date.now();
   db.insert(schema.templates).values({ id: 'raden-motion', displayName: 'Raden Motion' }).run();
+  db.insert(schema.adminUsers).values({ id: 'test-admin', email: 'test@example.test', passwordHash: 'unused', role: 'super_admin', createdAt: now }).run();
+  db.insert(schema.sessions).values({ id: 'test-session', userId: 'test-admin', expiresAt: now + 600_000 }).run();
   db.insert(schema.invitations).values([
     { id: 'inv-anggi', slug: 'anggi-ivan', title: 'Anggi & Ivan', templateKey: 'raden-motion', createdAt: now, updatedAt: now },
     { id: 'inv-other', slug: 'other-couple', title: 'Other Couple', templateKey: 'raden-motion', createdAt: now, updatedAt: now },
@@ -36,6 +38,10 @@ beforeAll(async () => {
     { id: 'audio-anggi', invitationId: 'inv-anggi', kind: 'audio', storagePath: '/tmp/music.mp3', mimeType: 'audio/mpeg', originalFilename: 'music.mp3', createdAt: now },
   ]).run();
   app = new Hono();
+  app.use('/api/admin/invitations/*', async (c, next) => {
+    c.req.raw.headers.set('Cookie', 'session_id=test-session');
+    await next();
+  });
   app.route('/api/admin/invitations', adminInvitationsRouter);
   app.route('/api/invitations', invitationsRouter);
 });

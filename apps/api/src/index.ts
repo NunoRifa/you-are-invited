@@ -8,7 +8,8 @@ import { wishesRouter } from './routes/wishes.js';
 import { templatesRouter } from './routes/templates.js';
 import { assetsRouter } from './routes/assets.js';
 import { configRouter } from './routes/config.js';
-import { adminAuthRouter, requireAdminSession } from './routes/admin/auth.js';
+import { adminAuthRouter } from './routes/admin/auth.js';
+import { getAdminActor } from './routes/admin/authorization.js';
 import { adminInvitationsRouter } from './routes/admin/invitations.js';
 import { adminWishesRouter } from './routes/admin/wishes.js';
 import { seedTemplates } from './db/seed/templates.js';
@@ -60,7 +61,7 @@ app.route('/api/invitations', wishesRouter);
 // Register protection before admin routes so it runs for every management request.
 app.use('/api/admin/*', async (c, next) => {
   if (c.req.path === '/api/admin/login' || c.req.path === '/api/admin/logout' || c.req.path === '/api/admin/session') return next();
-  if (!requireAdminSession(c.req.header('Cookie'))) return c.json({ error: 'Unauthenticated' }, 401);
+  if (!getAdminActor(c.req.header('Cookie'))) return c.json({ error: 'Unauthenticated' }, 401);
   return next();
 });
 

@@ -231,6 +231,8 @@ sqlite.exec(`
     invitation_id TEXT NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
     guest_name TEXT NOT NULL,
     attendance_status TEXT NOT NULL DEFAULT 'attending',
+    attendance_channel TEXT,
+    guest_count INTEGER NOT NULL DEFAULT 1,
     message TEXT NOT NULL,
     is_hidden INTEGER NOT NULL DEFAULT 0,
     created_at INTEGER NOT NULL
@@ -267,6 +269,14 @@ try {
   }
   if (!invCols.some((c) => c.name === 'cover_photo_asset_id')) {
     sqlite.exec('ALTER TABLE invitations ADD COLUMN cover_photo_asset_id TEXT REFERENCES invitation_assets(id);');
+  }
+
+  const wishCols = sqlite.prepare("PRAGMA table_info(wishes)").all() as { name: string }[];
+  if (!wishCols.some((c) => c.name === 'attendance_channel')) {
+    sqlite.exec('ALTER TABLE wishes ADD COLUMN attendance_channel TEXT;');
+  }
+  if (!wishCols.some((c) => c.name === 'guest_count')) {
+    sqlite.exec('ALTER TABLE wishes ADD COLUMN guest_count INTEGER NOT NULL DEFAULT 1;');
   }
 } catch (e) {
   console.error('Migration warning for invitations:', e);

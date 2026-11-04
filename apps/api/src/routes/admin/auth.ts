@@ -85,15 +85,3 @@ adminAuthRouter.post('/logout', (c) => {
   c.header('Set-Cookie', sessionCookie('', 0));
   return c.json({ success: true });
 });
-
-export function requireAdminSession(cookieHeader: string | undefined): boolean {
-  const sessionId = readSessionId(cookieHeader);
-  if (!sessionId) return false;
-  const session = db.select().from(schema.sessions).where(eq(schema.sessions.id, sessionId)).get();
-  if (!session) return false;
-  if (session.expiresAt <= Date.now()) {
-    db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId)).run();
-    return false;
-  }
-  return Boolean(db.select().from(schema.adminUsers).where(eq(schema.adminUsers.id, session.userId)).get());
-}

@@ -6,6 +6,7 @@ interface AdminInvitationItem {
   slug: string;
   title: string;
   templateKey: string;
+  isPublished?: boolean;
   createdAt: number;
 }
 
@@ -82,6 +83,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (path: string) => void; onLo
                     <th className="p-4">Judul Undangan</th>
                     <th className="p-4">Slug / URL</th>
                     <th className="p-4">Template Terpilih</th>
+                    <th className="p-4">Status</th>
                     <th className="p-4 text-right">Aksi</th>
                   </tr>
                 </thead>
@@ -94,6 +96,17 @@ export const AdminDashboard: React.FC<{ onNavigate: (path: string) => void; onLo
                         <span className="px-2 py-0.5 rounded bg-stone-100 text-stone-700 font-mono text-[11px]">
                           {inv.templateKey}
                         </span>
+                      </td>
+                      <td className="p-4">
+                        {inv.isPublished ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Terbit
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                            Draft
+                          </span>
+                        )}
                       </td>
                       <td className="p-4 text-right space-x-2">
                         <button
@@ -122,12 +135,12 @@ export const AdminDashboard: React.FC<{ onNavigate: (path: string) => void; onLo
                           <span>Export CSV</span>
                         </button>
                         <a
-                          href={`/i/${inv.slug}`}
+                          href={inv.isPublished ? `/i/${inv.slug}` : `/api/admin/invitations/${inv.id}/preview`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-medium"
                         >
-                          <span>Buka</span>
+                          <span>{inv.isPublished ? 'Buka' : 'Preview'}</span>
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                       </td>
