@@ -35,11 +35,17 @@ beforeAll(async () => {
   const { adminInvitationsRouter } = await import('./invitations.js');
   const now = Date.now();
   db.insert(schema.templates).values({ id: 'raden-motion', displayName: 'Raden Motion' }).run();
+  db.insert(schema.adminUsers).values({ id: 'test-admin', email: 'test@example.test', passwordHash: 'unused', role: 'super_admin', createdAt: now }).run();
+  db.insert(schema.sessions).values({ id: 'test-session', userId: 'test-admin', expiresAt: now + 600_000 }).run();
   db.insert(schema.invitations).values({
     id: 'inv-test', slug: 'test', title: 'Test', templateKey: 'raden-motion',
     createdAt: now, updatedAt: now,
   }).run();
   app = new Hono();
+  app.use('/api/admin/invitations/*', async (c, next) => {
+    c.req.raw.headers.set('Cookie', 'session_id=test-session');
+    await next();
+  });
   app.use('/api/admin/invitations/:id/assets', bodyLimit({
     maxSize: 21 * 1024 * 1024,
     onError: (c) => c.json({ error: 'Upload request exceeds the 21 MiB limit' }, 413),

@@ -10,6 +10,16 @@ export const wishesRouter = new Hono();
 // Simple in-memory rate limiting map: ip -> lastSubmissionTimestamp
 const rateLimitMap = new Map<string, number>();
 
+function isValidStreamUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string' || !url.trim()) return false;
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
 // GET /api/invitations/:slug/wishes?cursor=&limit=10
 wishesRouter.get('/:slug/wishes', (c) => {
   const slug = c.req.param('slug');
@@ -18,12 +28,12 @@ wishesRouter.get('/:slug/wishes', (c) => {
   const cursorId = c.req.query('cursorId') || undefined;
 
   const inv = db
-    .select({ id: schema.invitations.id })
+    .select({ id: schema.invitations.id, isPublished: schema.invitations.isPublished })
     .from(schema.invitations)
     .where(eq(schema.invitations.slug, slug))
     .get();
 
-  if (!inv) {
+  if (!inv || !inv.isPublished) {
     return c.json({ error: 'Invitation not found' }, 404);
   }
 
@@ -50,6 +60,8 @@ wishesRouter.get('/:slug/wishes', (c) => {
     invitationId: w.invitationId,
     guestName: w.guestName,
     attendanceStatus: w.attendanceStatus as 'attending' | 'not_attending' | 'maybe',
+    attendanceChannel: (w.attendanceChannel as 'offline' | 'online' | null) ?? null,
+    guestCount: w.guestCount ?? 1,
     message: w.message,
     isHidden: w.isHidden,
     createdAt: w.createdAt,
@@ -100,6 +112,20 @@ wishesRouter.post('/:slug/wishes', async (c) => {
   }
 
   // 4. Validation
+  const inv = db
+    .select({
+      id: schema.invitations.id,
+      templateKey: schema.invitations.templateKey,
+      isPublished: schema.invitations.isPublished,
+    })
+    .from(schema.invitations)
+    .where(eq(schema.invitations.slug, slug))
+    .get();
+
+  if (!inv || !inv.isPublished) {
+    return c.json({ error: 'Invitation not found' }, 404);
+  }
+
   const guestName = (body.guestName || '').trim();
   const message = (body.message || '').trim();
   const attendanceStatus = body.attendanceStatus || 'attending';
@@ -117,14 +143,47 @@ wishesRouter.post('/:slug/wishes', async (c) => {
     return c.json({ error: 'Status kehadiran tidak valid' }, 400);
   }
 
-  const inv = db
-    .select({ id: schema.invitations.id })
-    .from(schema.invitations)
-    .where(eq(schema.invitations.slug, slug))
-    .get();
+  let attendanceChannel: 'offline' | 'online' | null = null;
+  let guestCount = 1;
 
-  if (!inv) {
-    return c.json({ error: 'Invitation not found' }, 404);
+  if (inv.templateKey === 'yt-wedding') {
+    if (attendanceStatus === 'attending') {
+      if (body.attendanceChannel !== 'offline' && body.attendanceChannel !== 'online') {
+        return c.json({ error: "Channel kehadiran harus dipilih ('offline' atau 'online')" }, 400);
+      }
+      attendanceChannel = body.attendanceChannel;
+
+      if (attendanceChannel === 'online') {
+        const livestream = db
+          .select({ streamUrl: schema.livestreamInfo.streamUrl })
+          .from(schema.livestreamInfo)
+          .where(eq(schema.livestreamInfo.invitationId, inv.id))
+          .get();
+
+        if (!isValidStreamUrl(livestream?.streamUrl)) {
+          return c.json({ error: 'Live streaming belum tersedia untuk undangan ini' }, 400);
+        }
+        guestCount = 1;
+      } else {
+        const pax = body.guestCount;
+        if (typeof pax !== 'number' || !Number.isInteger(pax) || pax < 1 || pax > 10) {
+          return c.json({ error: 'Jumlah tamu harus bilangan bulat antara 1 dan 10' }, 400);
+        }
+        guestCount = pax;
+      }
+    } else {
+      guestCount = 1;
+      attendanceChannel = null;
+    }
+  } else {
+    if (body.attendanceChannel === 'offline' || body.attendanceChannel === 'online') {
+      attendanceChannel = body.attendanceChannel;
+    }
+    if (typeof body.guestCount === 'number' && Number.isInteger(body.guestCount) && body.guestCount >= 1 && body.guestCount <= 10) {
+      guestCount = body.guestCount;
+    } else {
+      guestCount = 1;
+    }
   }
 
   const newWishId = `w-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -132,7 +191,9 @@ wishesRouter.post('/:slug/wishes', async (c) => {
     id: newWishId,
     invitationId: inv.id,
     guestName,
-    attendanceStatus,
+    attendanceStatus: attendanceStatus as 'attending' | 'not_attending' | 'maybe',
+    attendanceChannel,
+    guestCount,
     message,
     isHidden: false,
     createdAt: now,

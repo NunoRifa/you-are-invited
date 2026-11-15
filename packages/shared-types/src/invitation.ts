@@ -1,6 +1,19 @@
 export type AttendanceStatus = 'attending' | 'not_attending' | 'maybe';
 export type CoupleRole = 'bride' | 'groom';
-export type AssetKind = 'image' | 'audio' | 'font';
+export type AssetKind = 'image' | 'audio' | 'font' | 'video';
+
+export interface YTWeddingSettingsInput {
+  heroCaption?: string | null;
+  communityIntro?: string | null;
+  eventIntro?: string | null;
+  galleryIntro?: string | null;
+  giftIntro?: string | null;
+  musicLabel?: string | null;
+  shippingAddress?: string | null;
+  heroVideoAssetId?: string | null;
+  showGallery?: boolean;
+  showGift?: boolean;
+}
 
 export interface Invitation {
   id: string;
@@ -23,6 +36,8 @@ export interface Invitation {
   closingPhotoAssetId?: string | null;
   closingPhotoUrl?: string | null;
   galleryVideoUrl?: string | null;
+  heroVideoAssetId?: string | null;
+  heroVideoUrl?: string | null;
   musicUrl?: string | null;
   musicAsset?: {
     id: string;
@@ -95,6 +110,8 @@ export interface Wish {
   invitationId: string;
   guestName: string;
   attendanceStatus: AttendanceStatus;
+  attendanceChannel?: 'offline' | 'online' | null;
+  guestCount?: number;
   message: string;
   isHidden: boolean;
   createdAt: number;
@@ -143,6 +160,8 @@ export interface WishSummary {
 export interface CreateWishInput {
   guestName: string;
   attendanceStatus: AttendanceStatus;
+  attendanceChannel?: 'offline' | 'online';
+  guestCount?: number;
   message: string;
   website_hp?: string; // honeypot field
   turnstileToken?: string; // Cloudflare Turnstile response token

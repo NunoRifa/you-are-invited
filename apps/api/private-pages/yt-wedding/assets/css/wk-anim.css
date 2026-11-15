@@ -1,0 +1,114 @@
+/* ============================================================
+   WK-ANIM — Universal scroll-triggered entrance + continuous loops
+   For use across all wedding themes (cottagecore, ghibli, polaroid,
+   disney, mixtape, kai, ig, spotify, etc.)
+
+   Pair with /js/wk-anim.js
+   ============================================================ */
+
+/* ---------- Continuous loop keyframes (opt-in via classes) ---------- */
+@keyframes wk-wobble {
+    0%, 100% { transform: rotate(var(--wk-rot, 0deg)) scale(1); }
+    25%      { transform: rotate(calc(var(--wk-rot, 0deg) + 3deg)) scale(1.04); }
+    50%      { transform: rotate(calc(var(--wk-rot, 0deg) - 2deg)) scale(1.06); }
+    75%      { transform: rotate(calc(var(--wk-rot, 0deg) + 2deg)) scale(1.03); }
+}
+@keyframes wk-bob {
+    0%, 100% { transform: translateY(0) rotate(var(--wk-rot, 0deg)); }
+    50%      { transform: translateY(-6px) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-pulse {
+    0%, 100% { transform: scale(1) rotate(var(--wk-rot, 0deg)); }
+    50%      { transform: scale(1.06) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-spin-slow {
+    from { transform: rotate(var(--wk-rot, 0deg)); }
+    to   { transform: rotate(calc(var(--wk-rot, 0deg) + 360deg)); }
+}
+@keyframes wk-twinkle {
+    0%, 100% { opacity: .7; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.18); }
+}
+@keyframes wk-float {
+    0%, 100% { transform: translateY(0) translateX(0) rotate(var(--wk-rot, 0deg)); }
+    33%      { transform: translateY(-6px) translateX(3px) rotate(var(--wk-rot, 0deg)); }
+    66%      { transform: translateY(-3px) translateX(-3px) rotate(var(--wk-rot, 0deg)); }
+}
+
+/* Opt-in continuous loops */
+.wk-wobble   { display: inline-block; transform-origin: center; animation: wk-wobble 3.4s ease-in-out infinite; }
+.wk-bob      { animation: wk-bob 5s ease-in-out infinite; }
+.wk-pulse    { animation: wk-pulse 3s ease-in-out infinite; }
+.wk-spin     { animation: wk-spin-slow 12s linear infinite; }
+.wk-twinkle  { display: inline-block; animation: wk-twinkle 2.4s ease-in-out infinite; }
+.wk-float    { animation: wk-float 6s ease-in-out infinite; }
+
+/* Stagger continuous loops for organic feel */
+.wk-wobble:nth-of-type(2n) { animation-duration: 4.2s; animation-delay: -1.4s; }
+.wk-wobble:nth-of-type(3n) { animation-duration: 2.8s; animation-delay: -0.7s; }
+.wk-bob:nth-of-type(2n)    { animation-duration: 6s; animation-delay: -1s; }
+.wk-twinkle:nth-of-type(2n){ animation-duration: 3.1s; animation-delay: -0.8s; }
+
+/* ---------- Scroll-triggered entrance keyframes ---------- */
+@keyframes wk-pop-in {
+    0%   { opacity: 0; transform: scale(.5) rotate(calc(var(--wk-rot, 0deg) - 10deg)); }
+    65%  { opacity: 1; transform: scale(1.08) rotate(calc(var(--wk-rot, 0deg) + 3deg)); }
+    100% { opacity: 1; transform: scale(1) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-bounce-in {
+    0%   { opacity: 0; transform: scale(.4) translateY(30px) rotate(var(--wk-rot, 0deg)); }
+    60%  { opacity: 1; transform: scale(1.08) translateY(-6px) rotate(var(--wk-rot, 0deg)); }
+    100% { opacity: 1; transform: scale(1) translateY(0) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-slide-up-in {
+    0%   { opacity: 0; transform: translateY(40px) rotate(var(--wk-rot, 0deg)); }
+    100% { opacity: 1; transform: translateY(0) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-slide-left-in {
+    0%   { opacity: 0; transform: translateX(-50px) rotate(var(--wk-rot, 0deg)); }
+    100% { opacity: 1; transform: translateX(0) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-slide-right-in {
+    0%   { opacity: 0; transform: translateX(50px) rotate(var(--wk-rot, 0deg)); }
+    100% { opacity: 1; transform: translateX(0) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-zoom-in {
+    0%   { opacity: 0; transform: scale(1.3) rotate(var(--wk-rot, 0deg)); }
+    100% { opacity: 1; transform: scale(1) rotate(var(--wk-rot, 0deg)); }
+}
+@keyframes wk-swing-in {
+    0%   { opacity: 0; transform-origin: top center; transform: rotate(calc(var(--wk-rot, 0deg) - 20deg)) translateY(-20px); }
+    60%  { opacity: 1; transform: rotate(calc(var(--wk-rot, 0deg) + 6deg)) translateY(0); }
+    100% { opacity: 1; transform: rotate(var(--wk-rot, 0deg)) translateY(0); }
+}
+@keyframes wk-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Default: hidden until .wk-in toggles */
+[data-wk-anim] { opacity: 0; }
+
+[data-wk-anim].wk-in {
+    animation-duration: .65s;
+    animation-timing-function: cubic-bezier(.34, 1.56, .64, 1);
+    animation-fill-mode: both;
+    animation-delay: var(--wk-delay, 0s);
+}
+[data-wk-anim="pop"].wk-in        { animation-name: wk-pop-in; }
+[data-wk-anim="bounce"].wk-in     { animation-name: wk-bounce-in; }
+[data-wk-anim="slide-up"].wk-in   { animation-name: wk-slide-up-in;    animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+[data-wk-anim="slide-left"].wk-in { animation-name: wk-slide-left-in;  animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+[data-wk-anim="slide-right"].wk-in{ animation-name: wk-slide-right-in; animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+[data-wk-anim="zoom"].wk-in       { animation-name: wk-zoom-in;        animation-duration: .55s; animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+[data-wk-anim="swing"].wk-in      { animation-name: wk-swing-in;       animation-duration: .85s; }
+[data-wk-anim="fade"].wk-in       { animation-name: wk-fade-in;        animation-duration: .65s; animation-timing-function: ease-out; }
+
+/* ---------- Reduced motion: respect user preference ---------- */
+@media (prefers-reduced-motion: reduce) {
+    [data-wk-anim],
+    .wk-wobble, .wk-bob, .wk-pulse, .wk-spin, .wk-twinkle, .wk-float {
+        animation: none !important;
+    }
+    [data-wk-anim] { opacity: 1 !important; }
+}

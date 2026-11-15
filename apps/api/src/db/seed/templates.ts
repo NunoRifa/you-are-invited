@@ -36,6 +36,16 @@ export async function seedTemplates() {
       galleryVideoType: 'hosted',
       isActive: true,
     },
+    {
+      id: 'yt-wedding',
+      displayName: 'YT Wedding',
+      previewImagePath: '/templates/yt-wedding/preview.jpg',
+      supportsPantun: false,
+      supportsHeroVideo: false,
+      quoteBlockPosition: 'none',
+      galleryVideoType: 'none',
+      isActive: true,
+    },
   ];
 
   for (const t of templateList) {
@@ -206,7 +216,7 @@ export async function seedTemplates() {
       quoteText: 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang',
       quoteSource: 'Q.S. Ar-Rum Ayat 21',
       coverGuestLabelDefault: 'Tamu Undangan',
-      hashtag: '#AnggiIvanForever',
+      hashtag: '#IvanAnggiForever',
       coupleDisplayName: 'Anggi & Ivan',
       isPublished: true,
       createdAt: now,
@@ -267,43 +277,44 @@ export async function seedTemplates() {
       },
     ]).run();
 
-    console.log(`- Seeded invitation: ${anggiIvanSlug}`);
-  }
-
-  // Keep the current client details in sync when this seed runs again.
-  const anggiIvan = db.select().from(schema.invitations).where(eq(schema.invitations.slug, anggiIvanSlug)).get();
-  if (anggiIvan) {
-    db.update(schema.invitations)
-      .set({ hashtag: '#IvanAnggiForever', updatedAt: Date.now() })
-      .where(eq(schema.invitations.id, anggiIvan.id))
-      .run();
-
-    const existingBca = db.select().from(schema.giftAccounts)
-      .where(eq(schema.giftAccounts.invitationId, anggiIvan.id))
-      .all()
-      .find((gift) => gift.providerName === 'BCA');
-
-    if (existingBca) {
-      db.update(schema.giftAccounts)
-        .set({ holderName: 'Anggi Azoka Dea Prabowo', accountNumber: '4062284840', sortOrder: 1 })
-        .where(eq(schema.giftAccounts.id, existingBca.id))
-        .run();
-    } else {
-      db.insert(schema.giftAccounts).values({
+    // Gift Accounts
+    db.insert(schema.giftAccounts).values([
+      {
         id: 'gf-anggi-bca',
-        invitationId: anggiIvan.id,
+        invitationId: invId,
         holderName: 'Anggi Azoka Dea Prabowo',
         accountNumber: '4062284840',
         providerName: 'BCA',
         sortOrder: 1,
-      }).run();
-    }
+      },
+    ]).run();
 
-    db.select().from(schema.giftAccounts)
-      .where(eq(schema.giftAccounts.invitationId, anggiIvan.id))
-      .all()
-      .filter((gift) => gift.providerName !== 'BCA')
-      .forEach((gift) => db.delete(schema.giftAccounts).where(eq(schema.giftAccounts.id, gift.id)).run());
+    console.log(`- Seeded invitation: ${anggiIvanSlug}`);
+  }
+
+  // 1c. Riska & Rafli Client Invitation (yt-wedding template)
+  const riskaSlug = 'riska-rafli';
+  const existingRiska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, riskaSlug)).get();
+  if (!existingRiska) {
+    const superAdmin = db.select().from(schema.adminUsers).where(eq(schema.adminUsers.role, 'super_admin')).get();
+    if (!superAdmin) {
+      console.warn('[seedTemplates] Skipped seeding riska-rafli draft: No super_admin user found in database. Create an admin user with role="super_admin" first.');
+    } else {
+      const invId = 'inv-riska-rafli';
+      db.insert(schema.invitations).values({
+        id: invId,
+        slug: riskaSlug,
+        title: 'Pernikahan Riska & Rafli',
+        coupleDisplayName: 'Riska & Rafli',
+        templateKey: 'yt-wedding',
+        ownerUserId: superAdmin.id,
+        isPublished: false,
+        coverGuestLabelDefault: 'Tamu Undangan',
+        createdAt: now,
+        updatedAt: now,
+      }).run();
+      console.log(`- Seeded unpublished draft invitation: ${riskaSlug}`);
+    }
   }
 
   // 2. Betawi Motion Demo

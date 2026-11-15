@@ -59,7 +59,7 @@ export const invitationTemplateFields = sqliteTable('invitation_template_fields'
 export const invitationAssets = sqliteTable('invitation_assets', {
   id: text('id').primaryKey(),
   invitationId: text('invitation_id').notNull().references(() => invitations.id, { onDelete: 'cascade' }),
-  kind: text('kind', { enum: ['image', 'audio', 'font'] }).notNull(),
+  kind: text('kind', { enum: ['image', 'audio', 'font', 'video'] }).notNull(),
   storagePath: text('storage_path').notNull(),
   mimeType: text('mime_type').notNull(),
   originalFilename: text('original_filename').notNull(),
@@ -120,6 +120,8 @@ export const wishes = sqliteTable('wishes', {
   invitationId: text('invitation_id').notNull().references(() => invitations.id, { onDelete: 'cascade' }),
   guestName: text('guest_name').notNull(),
   attendanceStatus: text('attendance_status', { enum: ['attending', 'not_attending', 'maybe'] }).notNull().default('attending'),
+  attendanceChannel: text('attendance_channel', { enum: ['offline', 'online'] }),
+  guestCount: integer('guest_count').notNull().default(1),
   message: text('message').notNull(),
   isHidden: integer('is_hidden', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at').notNull(),

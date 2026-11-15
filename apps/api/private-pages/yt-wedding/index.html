@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="id"
+    data-bride=""
+    data-groom="">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Undangan Pernikahan (YouTube Theme)</title>
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <style id="yt-tokens">:root{
+        --yt-bg:#0F0F0F;
+        --yt-ink:#F1F1F1;
+        --yt-accent:#FF0000;
+        --yt-accent-2:#3EA6FF;
+        /* derived vars sharing a hero color follow the main token automatically */
+        --yt-gradient-1:var(--yt-accent);
+        --yt-gradient-3:var(--yt-accent);
+        --yt-gradient-4:var(--yt-accent);
+        --yt-gradient-5:var(--yt-accent);
+        /* derived vars with their own distinct shade (aliased for AI override) */
+        --yt-card:#272727;
+        --yt-border:#3F3F3F;
+        --yt-gray:#AAAAAA;
+        --yt-gradient-2:#CC0000;
+    }</style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/wk-anim.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+</head>
+
+<body class="bg-yt-bg text-yt-text font-sans antialiased pb-14">
+        
+    <!-- Cover/Welcome Screen — partial-include pattern (photo vs no-photo total beda style) -->
+    <div id="welcome-cover"
+    class="fixed inset-0 z-[300] bg-yt-bg flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+    <div class="relative w-full max-w-[500px] h-full flex flex-col justify-center items-center">
+        <!-- Thumbnail Background -->
+        <div class="absolute inset-0 z-0">
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="Thumbnail" class="w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-black/40"></div>
+            <!-- YouTube Top Shadow -->
+            <div class="absolute top-0 w-full h-32 bg-gradient-to-b from-black/80 to-transparent"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-6 transition-all transform hover:scale-105 duration-500 w-full">
+            <!-- Large Play Button Overlay -->
+            <div class="mb-6 flex justify-center">
+                <button id="btn-cover-play" type="button" class="w-16 h-16 bg-yt-red/90 text-white rounded-full flex items-center justify-center pl-1 backdrop-blur-sm shadow-[0_0_20px_rgba(255,0,0,0.4)]" aria-label="Buka Undangan">
+                    <i class="fa-solid fa-play text-[24px]"></i>
+                </button>
+            </div>
+
+            <h1 class="font-bold text-[32px] tracking-wide mb-1 text-white shadow-black drop-shadow-lg">[Belum diisi]</h1>
+            <p class="text-white/80 text-[14px] mb-8 font-medium shadow-black drop-shadow-md">Undangan Pernikahan</p>
+
+            <div class="bg-black/60 backdrop-blur-md rounded-lg p-5 mb-10 w-full max-w-[320px] mx-auto border border-white/10">
+                <p class="text-yt-gray text-[12px] mb-1 font-medium">Kepada Yth.</p>
+                <div class="text-white/80 text-[13px] mb-1">Bapak/Ibu/Saudara/i</div><div id="guest-name" class="font-bold text-[18px] text-white">—</div>
+            </div>
+
+            <button id="btn-open-invitation"
+                class="bg-yt-red text-white font-bold py-3 px-8 rounded-full text-[14px] hover:bg-yt-red/80 transition-all shadow-xl flex items-center justify-center gap-2 mx-auto uppercase tracking-wider">
+                <i class="fa-solid fa-step-forward"></i> Buka Undangan
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- YouTube Top Bar -->
+    <header
+        class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-yt-bg z-50 px-4 py-2.5 flex justify-between items-center">
+        <div class="flex items-center gap-1">
+            <i class="fa-brands fa-youtube text-[28px] text-yt-red"></i>
+            <span class="font-bold text-[20px] tracking-tighter"
+                style="font-family: 'Arial Narrow', Arial, sans-serif;">YouTube</span>
+        </div>
+        <div class="flex items-center gap-5 text-[20px] text-yt-text">
+            <button class="hover:bg-yt-card rounded-full w-9 h-9 transition flex items-center justify-center">
+                <i class="fa-solid fa-satellite-dish text-[18px]"></i>
+            </button>
+            <button class="hover:bg-yt-card rounded-full w-9 h-9 transition relative flex items-center justify-center"
+                onclick="openUcapan()">
+                <i class="fa-regular fa-bell"></i>
+                <div
+                    class="absolute top-[6px] right-[8px] w-2.5 h-2.5 bg-yt-red rounded-full border-2 border-yt-bg flex items-center justify-center text-[6px] font-bold"></div>
+            </button>
+            <button class="hover:bg-yt-card rounded-full w-9 h-9 transition flex items-center justify-center">
+                <i class="fa-solid fa-magnifying-glass text-[18px]"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-[500px] mx-auto pt-[56px] relative">
+
+        <!-- YouTube Filter Chips -->
+        <div id="hero-container"
+            class="py-3 border-b border-yt-border/30 sticky top-[56px] bg-yt-bg/95 backdrop-blur-md z-40 relative">
+            <div class="flex gap-3 px-4 overflow-x-auto hide-scrollbar text-[14px] font-medium whitespace-nowrap">
+                <button class="bg-white text-black px-3.5 py-1.5 rounded-lg shrink-0">All</button>
+                <button
+                    class="bg-yt-card text-yt-text border border-yt-border px-3.5 py-1.5 rounded-lg shrink-0 hover:bg-yt-border transition"
+                    onclick="document.getElementById('hero-post').scrollIntoView({behavior:'smooth', block:'center'})">Our
+                    Story</button>
+                <button
+                    class="bg-yt-card text-yt-text border border-yt-border px-3.5 py-1.5 rounded-lg shrink-0 hover:bg-yt-border transition"
+                    onclick="document.getElementById('mempelai-post').scrollIntoView({behavior:'smooth', block:'center'})">Mempelai</button>
+                <button
+                    class="bg-yt-card text-yt-text border border-yt-border px-3.5 py-1.5 rounded-lg shrink-0 hover:bg-yt-border transition"
+                    onclick="document.getElementById('event-post').scrollIntoView({behavior:'smooth', block:'center'})">Acara
+                    & Lokasi</button>
+                <button
+                    class="bg-yt-card text-yt-text border border-yt-border px-3.5 py-1.5 rounded-lg shrink-0 hover:bg-yt-border transition"
+                    onclick="document.getElementById('gallery-post').scrollIntoView({behavior:'smooth', block:'center'})">Galeri</button>
+                                <button
+                    class="bg-yt-card text-yt-text border border-yt-border px-3.5 py-1.5 rounded-lg shrink-0 hover:bg-yt-border transition"
+                    onclick="document.getElementById('angpao-post').scrollIntoView({behavior:'smooth', block:'center'})">Kirim
+                    Hadiah</button>
+            </div>
+            <!-- Gradient fades for scrolling indication -->
+            <div
+                class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-yt-bg to-transparent pointer-events-none">
+            </div>
+        </div>
+
+        <!-- SECTION 1: Main Video Player (Hero) -->
+        <div id="hero-post" class="yt-post mb-2">
+            <!-- Video Player Area -->
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center group overflow-hidden">
+                                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="Prewedding" class="w-full h-full object-cover opacity-80">
+                                
+            </div>
+
+            <div class="px-3 pt-3">
+                <!-- Video Title -->
+                <h2 class="font-bold text-[18px] leading-snug mb-1">[Belum diisi] · Save the Date 💍</h2>
+
+                <!-- Views & Date -->
+                <p class="text-yt-gray text-[12px] mb-3">Disaksikan keluarga besar &bull; [Belum diisi]</p>
+
+                <!-- Channel Info & Subscribe Row -->
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2.5">
+                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-9 h-9 rounded-full object-cover">                        <div>
+                            <div class="font-bold text-[15px] flex items-center gap-1">
+                                [Belum diisi] <i class="fa-solid fa-circle-check text-yt-gray text-[12px]"></i>
+                            </div>
+                            <div class="text-yt-gray text-[12px]">Calon Pengantin · Save the Date</div>
+                        </div>
+                    </div>
+                    <!-- Subscribe Button (Subscribed State) -->
+                    <button
+                        class="bg-yt-card border border-yt-border text-yt-text font-bold px-4 py-2 rounded-full text-[13px] flex items-center gap-2 hover:bg-yt-border transition">
+                        <i class="fa-regular fa-bell"></i> Subscribe <i
+                            class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </button>
+                </div>
+
+                <!-- Action Ribbons -->
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1 mb-3">
+                    <!-- Like/Dislike -->
+                    <div class="flex bg-yt-card rounded-full shrink-0">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 border-r border-yt-border hover:bg-white/10 transition rounded-l-full">
+                            <i class="fa-regular fa-thumbs-up text-[16px]"></i> <span
+                                class="text-[13px] font-bold"></span>
+                        </button>
+                        <button class="px-4 py-2 hover:bg-white/10 transition rounded-r-full">
+                            <i class="fa-regular fa-thumbs-down text-[16px]"></i>
+                        </button>
+                    </div>
+                    <!-- Share -->
+                    <button
+                        class="flex items-center gap-2 bg-yt-card px-4 py-2 rounded-full hover:bg-white/10 transition shrink-0">
+                        <i class="fa-solid fa-share text-[16px]"></i> <span class="text-[13px] font-bold">Bagikan</span>
+                    </button>
+                    <!-- Remix -->
+                    <button
+                        class="flex items-center gap-2 bg-yt-card px-4 py-2 rounded-full hover:bg-white/10 transition shrink-0">
+                        <i class="fa-solid fa-plus text-[16px]"></i> <span class="text-[13px] font-bold">Remix</span>
+                    </button>
+                    <!-- Download -->
+                    <button
+                        class="flex items-center gap-2 bg-yt-card px-4 py-2 rounded-full hover:bg-white/10 transition shrink-0">
+                        <i class="fa-solid fa-arrow-down text-[16px]"></i> <span
+                            class="text-[13px] font-bold">Download</span>
+                    </button>
+                </div>
+
+                <!-- Description Box -->
+                <div class="bg-yt-card rounded-xl p-3 text-[13px] leading-relaxed relative overflow-hidden"
+                    onclick="openUcapan()">
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        0 Komentar
+                    </div>
+                    <p class="font-light">
+                        "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari
+                        jenismu sendiri..."
+                        <span class="text-yt-gray block mt-0.5">— QS. Ar-Rum: 21</span>
+                    </p>
+                    <div class="absolute bottom-2 right-2 bg-yt-card pl-4">
+                        <span class="font-bold cursor-pointer">...more</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST 2: Mempelai (Community Post) -->
+        <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+
+        <div id="mempelai-post" class="yt-post px-3 mb-4">
+            <!-- Community Post Header -->
+            <div class="flex items-center justify-between mb-2 pb-1">
+                <div class="flex items-center gap-3">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-[36px] h-[36px] rounded-full object-cover">                    <div class="flex flex-col">
+                        <span class="font-bold text-[14px]">[Belum diisi]</span>
+                        <span class="text-yt-gray text-[12px]">[Belum diisi]</span>
+                    </div>
+                </div>
+                <button class="text-yt-text hover:bg-white/10 w-8 h-8 rounded-full transition"><i
+                        class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+
+            <!-- Community Description -->
+            <div class="text-[14px] leading-relaxed mb-3">
+                <span class="font-light">Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Perkenankanlah kami merangkaikan kasih sayang yang Kau ciptakan di antara kami berdua.</span>
+                <span class="text-yt-gray font-bold cursor-pointer block mt-1">Baca selengkapnya</span>
+            </div>
+
+            <!-- Community Images (Grid) -->
+            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden mb-3">
+                <!-- Groom -->
+                <div class="relative bg-yt-card">
+                                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="[Belum diisi]"
+                        class="w-full aspect-[4/5] object-cover border border-yt-border/50 rounded-tl-xl rounded-bl-xl">
+                                        <div
+                        class="absolute bottom-0 left-0 right-0 p-3 pt-12 bg-gradient-to-t from-black/90 to-transparent">
+                        <h3 class="font-bold text-[15px] text-white">[Belum diisi]</h3>
+                        <p class="text-white/80 text-[10px] leading-tight">Putra dari Bpk. [Belum diisi]</p>
+                    </div>
+                </div>
+                <!-- Bride -->
+                <div class="relative bg-yt-card">
+                                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="[Belum diisi]"
+                        class="w-full aspect-[4/5] object-cover border border-yt-border/50 rounded-tr-xl rounded-br-xl">
+                                        <div
+                        class="absolute bottom-0 left-0 right-0 p-3 pt-12 bg-gradient-to-t from-black/90 to-transparent">
+                        <h3 class="font-bold text-[15px] text-white">[Belum diisi]</h3>
+                        <p class="text-white/80 text-[10px] leading-tight">Putri dari Bpk. [Belum diisi]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Action Bar -->
+            <div class="flex items-center justify-between text-yt-gray">
+                <div class="flex items-center gap-1">
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-up text-[18px]"></i>
+                    </button>
+                    <span class="text-[13px] font-medium mr-2"></span>
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-down text-[18px]"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition"
+                        onclick="openUcapan()">
+                        <i class="fa-regular fa-comment text-[16px]"></i>
+                        <span class="text-[13px] font-medium"></span>
+                    </button>
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition">
+                        <i class="fa-solid fa-share text-[16px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COUNTDOWN POST -->
+                <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+        <div id="countdown-post" class="yt-post px-3 mb-4">
+            <div class="bg-yt-card border border-yt-border rounded-xl p-4">
+                <p class="text-yt-gray text-[11px] uppercase tracking-[3px] mb-3 text-center font-bold">Tayang Dalam</p>
+                <div data-countdown-target="" class="grid grid-cols-4 gap-2">
+                    <div class="text-center">
+                        <div class="bg-yt-bg border border-yt-border rounded-lg py-3">
+                            <span data-countdown="days" class="font-extrabold text-yt-text text-[22px] leading-none">00</span>
+                        </div>
+                        <p class="text-yt-gray text-[10px] uppercase tracking-wider mt-1.5">Hari</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yt-bg border border-yt-border rounded-lg py-3">
+                            <span data-countdown="hours" class="font-extrabold text-yt-text text-[22px] leading-none">00</span>
+                        </div>
+                        <p class="text-yt-gray text-[10px] uppercase tracking-wider mt-1.5">Jam</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yt-bg border border-yt-border rounded-lg py-3">
+                            <span data-countdown="minutes" class="font-extrabold text-yt-text text-[22px] leading-none">00</span>
+                        </div>
+                        <p class="text-yt-gray text-[10px] uppercase tracking-wider mt-1.5">Menit</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yt-red rounded-lg py-3">
+                            <span data-countdown="seconds" class="font-extrabold text-white text-[22px] leading-none">00</span>
+                        </div>
+                        <p class="text-yt-gray text-[10px] uppercase tracking-wider mt-1.5">Detik</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- POST 3: Event Details (Community Post) -->
+        <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+
+        <div id="event-post" class="yt-post px-3 mb-4">
+            <!-- Community Post Header -->
+            <div class="flex items-center justify-between mb-2 pb-1">
+                <div class="flex items-center gap-3">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-[36px] h-[36px] rounded-full object-cover">                    <div class="flex flex-col">
+                        <span class="font-bold text-[14px]">[Belum diisi]</span>
+                        <span class="text-yt-gray text-[12px]">[Belum diisi]</span>
+                    </div>
+                </div>
+                <button class="text-yt-text hover:bg-white/10 w-8 h-8 rounded-full transition"><i
+                        class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+
+            <!-- Community Description -->
+            <div class="text-[14px] leading-relaxed mb-3">
+                <span class="font-light">Berikut adalah detail waktu dan tempat untuk hari spesial kami 💍. Jangan lupa
+                    tandai kalender kalian ya!</span>
+            </div>
+
+            <!-- Event Cards (Inside Post) -->
+            <div class="space-y-3 mb-3">
+                <!-- Akad Card --><div class="bg-yt-card border border-yt-border/50 rounded-xl p-4 relative overflow-hidden" data-event="akad">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-yt-red"></div>
+                    <div class="pl-2">
+                        <div class="flex items-center gap-2 mb-2 text-yt-text">
+                            <i class="fa-solid fa-mosque text-[16px]"></i>
+                            <h3 class="font-bold text-[16px]">Akad Nikah</h3>
+                        </div>
+                        <div class="text-[13px] text-yt-gray mb-3 space-y-1.5">
+                            <p><i class="fa-regular fa-calendar-check w-5 text-center"></i> [Belum diisi]</p>
+                            <p><i class="fa-regular fa-clock w-5 text-center"></i> [Belum diisi]</p>
+                            <p><i class="fa-solid fa-location-dot w-5 text-center"></i> [Belum diisi]</p>
+                        </div>
+                        <a href="https:///#" target="_blank"
+                            class="w-full bg-white/10 text-yt-text font-bold py-2 rounded-full text-[13px] hover:bg-white/20 transition flex items-center justify-center gap-2">
+                            Buka Google Maps <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resepsi Card --><div class="bg-yt-card border border-yt-border/50 rounded-xl p-4 relative overflow-hidden" data-event="resepsi">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-yt-blue"></div>
+                    <div class="pl-2">
+                        <div class="flex items-center gap-2 mb-2 text-yt-text">
+                            <i class="fa-solid fa-champagne-glasses text-[16px]"></i>
+                            <h3 class="font-bold text-[16px]">Resepsi</h3>
+                        </div>
+                        <div class="text-[13px] text-yt-gray mb-3 space-y-1.5">
+                            <p><i class="fa-regular fa-calendar-check w-5 text-center"></i> [Belum diisi]</p>
+                            <p><i class="fa-regular fa-clock w-5 text-center"></i> [Belum diisi]</p>
+                            <p><i class="fa-solid fa-location-dot w-5 text-center"></i> [Belum diisi]</p>
+                        </div>
+                        <a href="https:///#" target="_blank"
+                            class="w-full bg-white/10 text-yt-text font-bold py-2 rounded-full text-[13px] hover:bg-white/20 transition flex items-center justify-center gap-2">
+                            Buka Google Maps <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                            </div>
+
+            <!-- Community Action Bar -->
+            <div class="flex items-center justify-between text-yt-gray">
+                <div class="flex items-center gap-1">
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-up text-[18px]"></i>
+                    </button>
+                    <span class="text-[13px] font-medium mr-2"></span>
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-down text-[18px]"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition"
+                        onclick="openUcapan()">
+                        <i class="fa-regular fa-comment text-[16px]"></i>
+                        <span class="text-[13px] font-medium">0</span>
+                    </button>
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition">
+                        <i class="fa-solid fa-share text-[16px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST 4: Gallery (Community Post) -->
+        <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+
+        <div id="gallery-post" class="yt-post px-3 mb-4">
+            <!-- Community Post Header -->
+            <div class="flex items-center justify-between mb-2 pb-1">
+                <div class="flex items-center gap-3">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-[36px] h-[36px] rounded-full object-cover">                    <div class="flex flex-col">
+                        <span class="font-bold text-[14px]">[Belum diisi]</span>
+                        <span class="text-yt-gray text-[12px]">[Belum diisi]</span>
+                    </div>
+                </div>
+                <button class="text-yt-text hover:bg-white/10 w-8 h-8 rounded-full transition"><i
+                        class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+
+            <!-- Community Description -->
+            <div class="text-[14px] leading-relaxed mb-3">
+                <span class="font-light">Kenangan manis perjalanan kami menuju hari bahagia ini 📸✨</span>
+            </div>
+
+            <!-- Gallery Grid — thumbnail markup is replaced from invitation gallery data -->
+            <div class="grid grid-cols-2 gap-[2px] rounded-xl overflow-hidden mb-3 cursor-pointer" id="gallery-grid"
+                onclick="openGallery()">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-full aspect-square object-cover" alt="Gallery">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-full aspect-square object-cover" alt="Gallery">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-full aspect-square object-cover" alt="Gallery">
+                <!-- 4th slot dengan  overlay (remaining gallery 5,6,7,8) -->
+                <div class="relative">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-full aspect-square object-cover" alt="Gallery">
+                    <div
+                        class="absolute inset-0 bg-black/60 flex items-center justify-center transition hover:bg-black/40">
+                        <span class="text-white font-bold text-[24px]"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Action Bar -->
+            <div class="flex items-center justify-between text-yt-gray">
+                <div class="flex items-center gap-1">
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-up text-[18px]"></i>
+                    </button>
+                    <span class="text-[13px] font-medium mr-2"></span>
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-down text-[18px]"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition"
+                        onclick="openUcapan()">
+                        <i class="fa-regular fa-comment text-[16px]"></i>
+                        <span class="text-[13px] font-medium"></span>
+                    </button>
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition">
+                        <i class="fa-solid fa-share text-[16px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- POST 6: Angpao / Gift (YouTube Membership Promo) -->
+        <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+
+        <div id="angpao-post" class="yt-post px-4 mb-6">
+            <!-- Channel Membership Header -->
+            <div
+                class="bg-gradient-to-r from-blue-900 to-purple-900 rounded-t-xl p-5 text-center relative overflow-hidden">
+                <i class="fa-brands fa-youtube absolute -right-4 -bottom-4 text-[100px] text-white/5 rotate-12"></i>
+                <h2 class="text-white font-bold text-[20px] mb-1">Join this channel</h2>
+                <p class="text-white/80 text-[13px] font-light">Berikan dukungan & tanda kasih untuk [Belum diisi]</p>
+                <button onclick="openRekening()"
+                    class="mt-4 bg-white text-black font-bold py-2 px-6 rounded-full text-[14px] hover:bg-white/90 transition w-full">
+                    Kirim Hadiah Langsung
+                </button>
+            </div>
+
+            <!-- Tier Cards — rendered dari daftar kado host (katalog_kado) -->
+            <div class="bg-yt-card border border-yt-border border-t-0 rounded-b-xl p-4">
+                <h3 class="font-bold text-[14px] mb-3 text-yt-gray uppercase">Sponsorship Tiers</h3>
+
+                                    <!-- Empty state — host belum bikin daftar kado -->
+                    <div class="border border-dashed border-yt-border rounded-lg p-5 text-center">
+                        <i class="fa-solid fa-gift text-yt-gray text-[28px] mb-2"></i>
+                        <p class="text-yt-gray text-[13px] mb-1">Belum ada wishlist kado nih</p>
+                        <p class="text-yt-gray/70 text-[11.5px]">Klik <strong class="text-white">Kirim Hadiah Langsung</strong> buat transfer angpao aja</p>
+                    </div>
+                            </div>
+        </div>
+
+        <!-- POST 6: Penutup -->
+        <div class="h-[6px] bg-yt-border/50 w-full mb-3"></div>
+
+        <div id="penutup-post" class="yt-post mb-24">
+            <!-- Channel Header (YouTube Style) -->
+            <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-9 h-9 rounded-full object-cover shrink-0" alt="Channel">                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-medium text-[14px]">[Belum diisi]</span>
+                            <i class="fa-solid fa-circle-check text-yt-gray text-[12px]"></i>
+                        </div>
+                        <span class="text-yt-gray text-[12px]">[Belum diisi]</span>
+                    </div>
+                </div>
+                <button class="text-yt-gray hover:text-yt-text px-2"><i
+                        class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+
+            <!-- Post Content -->
+            <div class="px-4 mb-3 text-[14px] text-yt-text leading-relaxed">
+                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan memutar video perjalanan kami dan memberikan dukungan            </div>
+
+            <!-- Custom Closing Card -->
+            <div class="px-4 mb-3">
+                <div class="bg-yt-card border border-yt-border rounded-xl p-6 text-center">
+                    <p class="font-bold text-[16px] mb-2 uppercase tracking-wide">Kami Yang Berbahagia</p>
+                    <div class="w-12 h-[2px] bg-yt-gray/50 mx-auto mb-4"></div>
+                    <div class="mb-4">
+                        <p class="font-bold text-[18px] text-yt-text leading-snug">[Belum diisi]</p>
+                        <p class="text-yt-gray text-[13px] leading-relaxed mt-1">Putra dari Bpk. [Belum diisi]</p>
+                    </div>
+                    <p class="text-yt-gray text-[16px] leading-relaxed">&</p>
+                    <div class="mt-4">
+                        <p class="font-bold text-[18px] text-yt-text leading-snug">[Belum diisi]</p>
+                        <p class="text-yt-gray text-[13px] leading-relaxed mt-1">Putri dari Bpk. [Belum diisi]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Action Bar -->
+            <div class="flex items-center justify-between text-yt-gray px-4 pb-2">
+                <div class="flex items-center gap-1">
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-up text-[18px]"></i>
+                    </button>
+                    <span class="text-[13px] font-medium mr-2">Suka</span>
+                    <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                        <i class="fa-regular fa-thumbs-down text-[18px]"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition">
+                        <i class="fa-solid fa-share text-[16px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- YouTube Bottom Navigation -->
+    <nav id="ytw-bottom-nav"
+        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] h-[52px] bg-yt-bg flex items-center justify-between px-2 z-50 text-[10px] font-medium text-yt-text">
+        <!-- Home -->
+        <button class="flex flex-col items-center justify-center w-[20%] h-full nav-item" data-target="hero-container">
+            <i class="fa-solid fa-house text-[22px] mb-1"></i>
+            <span>Home</span>
+        </button>
+        <!-- Shorts (Mempelai) -->
+        <button
+            class="flex flex-col items-center justify-center w-[20%] h-full text-yt-gray hover:text-yt-text transition nav-item"
+            data-target="mempelai-post">
+            <i class="fa-solid fa-bolt text-[22px] mb-1"></i>
+            <span>Shorts</span>
+        </button>
+        <!-- Create / RSVP -->
+        <button class="flex items-center justify-center w-[20%] h-full text-yt-text nav-item" id="fab-rsvp-center">
+            <i class="fa-solid fa-square-plus text-[34px]"></i>
+        </button>
+        <!-- Subscriptions (Kado) -->
+        <button
+            class="flex flex-col items-center justify-center w-[20%] h-full text-yt-gray hover:text-yt-text transition nav-item"
+            data-target="angpao-post">
+            <i class="fa-solid fa-gift text-[22px] mb-1"></i>
+            <span>Subscriptions</span>
+        </button>
+        <!-- Inbox (Ucapan) -->
+        <button
+            class="flex flex-col items-center justify-center w-[20%] h-full text-yt-gray hover:text-yt-text transition nav-item btn-nav-ucapan">
+            <i class="fa-solid fa-inbox text-[22px] mb-1"></i>
+            <span>Inbox</span>
+        </button>
+    </nav>
+
+    <!-- RSVP Modal - YouTube Style -->
+    <div id="rsvp-modal" class="fixed inset-0 z-[200] hidden pointer-events-none flex justify-center">
+        <div id="rsvp-backdrop"
+            class="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 pointer-events-auto"></div>
+        <div id="rsvp-sheet"
+            class="w-full max-w-[500px] absolute bottom-0 bg-yt-bg rounded-t-xl shadow-2xl transition-transform duration-300 transform translate-y-full z-10 pointer-events-auto flex flex-col pb-6 max-h-[85vh]">
+
+            <!-- YT Header -->
+            <div class="flex items-center justify-between px-4 py-3 shrink-0">
+                <h3 class="text-yt-text font-bold text-[18px]">Kirim RSVP</h3>
+                <button id="btn-close-rsvp"
+                    class="text-yt-text text-[20px] w-8 h-8 rounded-full hover:bg-yt-card flex justify-center items-center transition"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Content Area — conditional: form state vs success state -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                
+                                                <!-- ===== FORM STATE — user belum RSVP ===== -->
+                <form id="form-rsvp" class="w-full px-4"
+                      data-guest-slug=""
+                      data-guest-status="Belum Konfirmasi"
+                      data-tipe-tamu="Personal"
+                      data-konfirmasi-pax="0"
+                      data-quota-remaining="999">
+                                        <!-- Profile Input -->
+                    <div class="flex gap-3 pt-2 pb-4 border-b border-yt-border">
+                        <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center" style="background:var(--yt-accent);">
+                                                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-full h-full object-cover">
+                                                    </div>
+                        <div class="flex-1">
+                            <input type="text" name="fullName" placeholder="Nama..." value=""
+                                class="w-full bg-transparent text-[14px] text-yt-text placeholder-yt-gray outline-none mb-3"
+                                required>
+                            <textarea name="notes" placeholder="Tambahkan ucapan atau doa..."
+                                class="w-full bg-transparent text-[14px] text-yt-text placeholder-yt-gray outline-none resize-none min-h-[60px]"
+                                required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- YT Options List -->
+                    <div class="py-2">
+                        <p class="text-yt-gray text-[12px] mb-3 px-1">Kehadiran Anda</p>
+                        <!-- Status Buttons -->
+                        <div class="flex flex-col gap-2 mb-4">
+                            <label data-rsvp-opt="offline"
+                                class="cursor-pointer flex items-center gap-3 px-2 py-2 hover:bg-yt-card rounded-lg transition">
+                                <input type="radio" name="status" value="Hadir di Lokasi"
+                                    class="peer accent-yt-blue w-4 h-4" required checked>
+                                <div class="text-yt-text text-[15px]"><i
+                                        class="fa-solid fa-location-dot w-6 text-center text-yt-gray mr-1"></i> Hadir di
+                                    Lokasi</div>
+                            </label>
+                            <label data-rsvp-opt="online"
+                                class="cursor-pointer flex items-center gap-3 px-2 py-2 hover:bg-yt-card rounded-lg transition">
+                                <input type="radio" name="status" value="Hadir Online"
+                                    class="peer accent-yt-blue w-4 h-4">
+                                <div class="text-yt-text text-[15px]"><i
+                                        class="fa-solid fa-video w-6 text-center text-yt-gray mr-1"></i> Hadir Online
+                                </div>
+                            </label>
+                            <label
+                                class="cursor-pointer flex items-center gap-3 px-2 py-2 hover:bg-yt-card rounded-lg transition">
+                                <input type="radio" name="status" value="Tidak Hadir"
+                                    class="peer accent-yt-blue w-4 h-4">
+                                <div class="text-yt-text text-[15px]"><i
+                                        class="fa-solid fa-xmark w-6 text-center text-yt-gray mr-1"></i> Tidak dapat
+                                    hadir</div>
+                            </label>
+                        </div>
+
+                        <!-- Guest Count — interactive stepper (− / value / +), hidden shared pax max dari jumlah_tamu -->
+                        <div class="flex items-center justify-between px-2 py-3 hover:bg-yt-card rounded-lg transition" id="rsvp-pax-row">
+                            <div class="flex items-center gap-2"><i
+                                    class="fa-solid fa-user-tag text-yt-gray text-[18px] w-6 text-center"></i><span
+                                    class="text-yt-text text-[15px]">Jumlah Tamu</span></div>
+                            <div class="flex items-center gap-3">
+                                <button type="button" id="rsvp-pax-dec" class="w-7 h-7 rounded-full bg-yt-card hover:bg-yt-border text-yt-text flex items-center justify-center transition" aria-label="Kurangi"><i class="fa-solid fa-minus text-[11px]"></i></button>
+                                <span class="text-yt-text text-[14px] font-medium min-w-[24px] text-center" id="rsvp-pax-display">1</span>
+                                <button type="button" id="rsvp-pax-inc" class="w-7 h-7 rounded-full bg-yt-card hover:bg-yt-border text-yt-text flex items-center justify-center transition" aria-label="Tambah"><i class="fa-solid fa-plus text-[11px]"></i></button>
+                                <input type="hidden" name="guestCount" id="rsvp-pax-input" value="1" data-max="10">
+                            </div>
+                        </div>
+                        <div id="ytw-turnstile" class="my-2 flex justify-center"></div>
+                    </div>
+                </form>
+                            </div>
+
+            <!-- Bottom Control — submit (form state) vs Tutup (success state) -->
+            <div class="w-full px-4 pt-2 shrink-0 flex justify-end">
+                                <button type="submit" form="form-rsvp" id="btn-post-rsvp"
+                    class="bg-yt-blue text-black font-medium py-2 px-5 rounded-full text-[14px] hover:bg-white transition">
+                    Kirim RSVP
+                </button>
+                            </div>
+        </div>
+    </div>
+
+    <!-- Ucapan Modal (YouTube Comments) -->
+    <div id="ucapan-modal" class="fixed inset-0 z-[200] hidden pointer-events-none flex justify-center">
+        <div id="ucapan-backdrop"
+            class="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 pointer-events-auto"></div>
+        <div id="ucapan-sheet"
+            class="w-full max-w-[500px] absolute bottom-0 bg-yt-bg rounded-t-xl shadow-2xl transition-transform duration-300 transform translate-y-full z-10 pointer-events-auto flex flex-col pb-6 max-h-[85vh]">
+
+            <div class="flex items-center justify-between px-4 py-3 border-b border-yt-border/50 shrink-0">
+                <h3 class="text-yt-text font-bold text-[16px]">Comments <span
+                        class="font-normal text-yt-gray text-[14px]">0</span></h3>
+                <button id="btn-close-ucapan"
+                    class="text-yt-text text-[20px] w-8 h-8 rounded-full hover:bg-yt-card flex justify-center items-center transition"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto hide-scrollbar" id="ucapan-list">
+                <!-- Add Comment Trigger — buka RSVP modal (di situ ada textarea 'Tambahkan ucapan atau doa') -->
+                <div class="flex gap-3 px-4 py-3 border-b border-yt-border pr-5 cursor-pointer hover:bg-yt-card/30 transition"
+                    onclick="document.getElementById('btn-close-ucapan').click(); document.getElementById('fab-rsvp-center').click();">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yt-blue/30 to-yt-red/30 flex items-center justify-center shrink-0 text-[11px] font-bold text-yt-text">
+                        <i class="fa-solid fa-user text-[12px]"></i>                    </div>
+                    <div class="flex-1 bg-yt-card text-yt-gray text-[13px] px-3 py-1.5 rounded-lg flex items-center justify-between">
+                        <span>Tulis ucapan lewat RSVP...</span>
+                        <i class="fa-regular fa-face-smile"></i>
+                    </div>
+                </div>
+
+                                    <!-- Empty state -->
+                    <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
+                        <i class="fa-solid fa-comments text-yt-gray text-[40px] mb-3"></i>
+                        <p class="text-yt-text font-bold text-[14px] mb-1">Belum ada doa & ucapan</p>
+                        <p class="text-yt-gray text-[12.5px] leading-snug">Tinggalkan doa pertamamu lewat tombol RSVP di atas — pasti bermakna buat kami 💕</p>
+                    </div>
+                            </div>
+        </div>
+    </div>
+
+    <!-- Kontribusi Modal (Super Thanks Style) -->
+    <div id="kontribusi-modal" class="fixed inset-0 z-[200] hidden pointer-events-none flex justify-center">
+        <div id="kontribusi-backdrop"
+            class="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 pointer-events-auto"
+            onclick="closeKontribusi()"></div>
+        <div id="kontribusi-sheet"
+            class="w-full max-w-[500px] absolute bottom-0 bg-yt-card rounded-t-xl shadow-2xl transition-transform duration-300 transform translate-y-full z-10 pointer-events-auto flex flex-col overflow-hidden max-h-[85vh]">
+
+            <div class="bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-0.5"></div>
+
+            <div class="flex items-center justify-between px-5 pt-4 pb-2 shrink-0">
+                <h3 class="text-yt-text font-bold text-[18px] flex items-center gap-2">
+                    <i class="fa-solid fa-heart-circle-check text-yt-red text-[20px]"></i> Super Thanks
+                </h3>
+                <button onclick="closeKontribusi()"
+                    class="text-yt-gray hover:text-white transition w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center"><i
+                        class="fa-solid fa-xmark text-[18px]"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-5 pt-2 pb-5 hide-scrollbar max-h-[80vh]">
+                <div class="flex gap-3 bg-yt-bg p-3 rounded-xl mb-4 items-center">
+                                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" class="w-12 h-12 rounded-lg object-cover">
+                                        <div>
+                        <h4 class="font-bold text-[14px]">[Belum diisi]</h4>
+                        <p class="text-yt-gray text-[12px] mt-0.5">[Belum diisi]</p>
+                    </div>
+                </div>
+
+                <p class="text-yt-gray text-[13px]">Kontribusi belum tersedia.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rekening Modal (Store / Direct Support Style) -->
+    <div id="rekening-modal" class="fixed inset-0 z-[200] hidden pointer-events-none flex justify-center">
+        <div id="rekening-backdrop"
+            class="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 pointer-events-auto"
+            onclick="closeRekening()"></div>
+        <div id="rekening-sheet"
+            class="w-full max-w-[500px] absolute bottom-0 bg-yt-bg rounded-t-xl shadow-2xl transition-transform duration-300 transform translate-y-full z-10 pointer-events-auto flex flex-col pb-6 max-h-[85vh]">
+
+            <div class="flex items-center justify-between px-4 py-3 border-b border-yt-border/50 shrink-0">
+                <h3 class="text-yt-text font-bold text-[18px]">Support Channel</h3>
+                <button onclick="closeRekening()"
+                    class="text-yt-text text-[20px] w-8 h-8 rounded-full hover:bg-yt-card flex justify-center items-center transition"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto hide-scrollbar px-4 pt-4 pb-2">
+                <p class="text-yt-gray text-[13px] mb-4">Dukungan terbaik kamu bisa lewat transfer ke rekening atau kirim kado ke alamat di bawah.</p>
+
+                <!-- BANK ACCOUNTS — rendered dari rekening_bank host -->
+                
+                <!-- SHIPPING ADDRESS — rendered dari users.alamat_kirim_kado JSON -->
+                
+                <!-- Empty state — host belum setup rekening + alamat -->
+                                <div class="border border-dashed border-yt-border rounded-xl p-6 text-center">
+                    <i class="fa-solid fa-inbox text-yt-gray text-[32px] mb-2"></i>
+                    <p class="text-yt-gray text-[13px]">Belum ada info rekening/alamat.</p>
+                    <p class="text-yt-gray/70 text-[11.5px] mt-1">Minta host lengkapin dulu via dashboard.</p>
+                </div>
+                            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox (YouTube Community Image Fullscreen) -->
+    <div id="gallery-modal"
+        class="fixed inset-y-0 w-full max-w-[500px] left-1/2 -translate-x-1/2 z-[300] hidden flex-col bg-black pointer-events-none transition-opacity duration-300 opacity-0">
+        <!-- Header -->
+        <div
+            class="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent absolute top-0 w-full z-10">
+            <div class="text-white text-[14px]">
+                <span id="gallery-counter" class="font-bold">0</span> / <span id="gallery-total">0</span>
+            </div>
+            <button onclick="closeGallery()"
+                class="text-white w-8 h-8 rounded-full hover:bg-white/10 flex justify-center items-center transition pointer-events-auto">
+                <i class="fa-solid fa-xmark text-[20px]"></i>
+            </button>
+        </div>
+
+        <!-- Slider Track / Image Viewer -->
+        <div class="flex-1 w-full flex items-center justify-center overflow-hidden pointer-events-auto relative">
+            <button onclick="prevGalleryImage()"
+                class="absolute left-2 text-white w-10 h-10 bg-black/50 rounded-full flex justify-center items-center z-20 hover:bg-black/80 transition"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+
+            <img id="gallery-main-img" src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="
+                class="w-full h-full object-contain transition-opacity duration-200" alt="Fullscreen Gallery">
+
+            <button onclick="nextGalleryImage()"
+                class="absolute right-2 text-white w-10 h-10 bg-black/50 rounded-full flex justify-center items-center z-20 hover:bg-black/80 transition"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Community Action Bar (Bottom) -->
+        <div
+            class="px-4 py-4 bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 w-full flex justify-between items-center z-10 pointer-events-auto">
+            <div class="flex items-center gap-1 text-white">
+                <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                    <i class="fa-regular fa-thumbs-up text-[18px]"></i>
+                </button>
+                <span class="text-[13px] font-medium mr-2"></span>
+                <button class="hover:bg-white/10 w-9 h-9 rounded-full transition flex items-center justify-center">
+                    <i class="fa-regular fa-thumbs-down text-[18px]"></i>
+                </button>
+            </div>
+            <div class="flex items-center gap-2 text-white">
+                <button class="flex items-center gap-1.5 hover:bg-white/10 px-2 py-1.5 rounded-full transition"
+                    onclick="closeGallery(); openUcapan();">
+                    <i class="fa-regular fa-comment text-[16px]"></i>
+                    <span class="text-[13px] font-medium"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bg-music" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
+
+    <!-- Floating Music Bar - YouTube Mini Player Style -->
+    <button id="btn-musicToggle"
+        class="fixed bottom-[52px] left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-[#212121] text-yt-text flex items-center justify-between z-40 transition-transform duration-500 transform translate-y-[100%] shadow-[0_-5px_10px_rgba(0,0,0,0.5)] pointer-events-none">
+
+        
+
+        <div class="flex items-center gap-3 px-3 py-2 w-full truncate border-b-2 border-transparent">
+            <div class="w-10 h-10 bg-yt-bg flex items-center justify-center shrink-0 object-cover" id="music-disc">
+                <i class="fa-brands fa-youtube text-yt-red text-[20px]" id="music-icon"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight flex-1 ">
+                <span class="text-[13px] font-medium text-white truncate max-w-[200px]" id="music-label">Musik Latar</span>
+                <span class="text-[11px] text-yt-gray truncate max-w-[200px]" id="music-artist">Untuk [Belum diisi] · Tap buat dengerin</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 px-4 shrink-0 text-white">
+            <i class="fa-solid fa-play text-[16px]"></i>
+            <i class="fa-solid fa-xmark text-[18px] text-yt-gray hover:text-white transition"></i>
+        </div>
+    </button>
+
+    <!-- Script for interaction -->
+    <script src="assets/js/bind.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/wk-anim.js" defer></script></body>
+
+
+</html>

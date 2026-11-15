@@ -7,19 +7,7 @@ import { LOVE_STORY_FIELD_KEY, parseLoveStoryFieldValue } from '../lib/love-stor
 
 export const invitationsRouter = new Hono();
 
-invitationsRouter.get('/:slug', (c) => {
-  const slug = c.req.param('slug');
-
-  const inv = db
-    .select()
-    .from(schema.invitations)
-    .where(eq(schema.invitations.slug, slug))
-    .get();
-
-  if (!inv || !inv.isPublished) {
-    return c.json({ error: 'Invitation not found' }, 404);
-  }
-
+export function buildPublicInvitationPayload(inv: typeof schema.invitations.$inferSelect): PublicInvitationPayload {
   // Fetch relations
   const couplesList = db
     .select()
@@ -79,7 +67,6 @@ invitationsRouter.get('/:slug', (c) => {
       ? db.select().from(schema.invitationAssets)
         .where(and(
           eq(schema.invitationAssets.id, item.photoAssetId),
-          eq(schema.invitationAssets.invitationId, inv.id),
           eq(schema.invitationAssets.kind, 'image'),
         ))
         .get()
@@ -91,25 +78,25 @@ invitationsRouter.get('/:slug', (c) => {
     };
   });
 
-  // Public wish list and RSVP counters include every stored wish, including hidden rows.
-  const allWishes = db
+  // Public wish list and RSVP counters only include non-hidden wishes.
+  const visibleWishes = db
     .select()
     .from(schema.wishes)
-    .where(eq(schema.wishes.invitationId, inv.id))
+    .where(and(eq(schema.wishes.invitationId, inv.id), eq(schema.wishes.isHidden, false)))
     .all();
 
   const wishSummary: WishSummary = {
-    total: allWishes.length,
-    attending: allWishes.filter((w) => w.attendanceStatus === 'attending').length,
-    notAttending: allWishes.filter((w) => w.attendanceStatus === 'not_attending').length,
-    maybe: allWishes.filter((w) => w.attendanceStatus === 'maybe').length,
+    total: visibleWishes.length,
+    attending: visibleWishes.filter((w) => w.attendanceStatus === 'attending').length,
+    notAttending: visibleWishes.filter((w) => w.attendanceStatus === 'not_attending').length,
+    maybe: visibleWishes.filter((w) => w.attendanceStatus === 'maybe').length,
   };
 
   // Recent wishes for initial page; full list uses GET /:slug/wishes with cursors.
   const recentWishes = db
     .select()
     .from(schema.wishes)
-    .where(eq(schema.wishes.invitationId, inv.id))
+    .where(and(eq(schema.wishes.invitationId, inv.id), eq(schema.wishes.isHidden, false)))
     .orderBy(desc(schema.wishes.createdAt), desc(schema.wishes.id))
     .limit(10)
     .all();
@@ -121,11 +108,10 @@ invitationsRouter.get('/:slug', (c) => {
     .where(and(eq(schema.invitationAssets.invitationId, inv.id), eq(schema.invitationAssets.kind, 'audio')))
     .get();
 
-  const payload: PublicInvitationPayload = {
+  return {
     invitation: {
       id: inv.id,
       slug: inv.slug,
-      ownerUserId: inv.ownerUserId,
       title: inv.title,
       templateKey: inv.templateKey,
       openingGreetingText: inv.openingGreetingText,
@@ -142,6 +128,8 @@ invitationsRouter.get('/:slug', (c) => {
       heroPhotoUrl: templateFieldsRecord['hero_photo_asset_id'] ? `/api/assets/${templateFieldsRecord['hero_photo_asset_id']}` : null,
       closingPhotoAssetId: templateFieldsRecord['closing_photo_asset_id'] || null,
       closingPhotoUrl: templateFieldsRecord['closing_photo_asset_id'] ? `/api/assets/${templateFieldsRecord['closing_photo_asset_id']}` : null,
+      heroVideoAssetId: templateFieldsRecord['yt_hero_video_asset_id'] || null,
+      heroVideoUrl: templateFieldsRecord['yt_hero_video_asset_id'] ? `/api/assets/${templateFieldsRecord['yt_hero_video_asset_id']}` : null,
       isPublished: inv.isPublished,
       createdAt: inv.createdAt,
       updatedAt: inv.updatedAt,
@@ -211,12 +199,28 @@ invitationsRouter.get('/:slug', (c) => {
       invitationId: w.invitationId,
       guestName: w.guestName,
       attendanceStatus: w.attendanceStatus as 'attending' | 'not_attending' | 'maybe',
+      attendanceChannel: (w.attendanceChannel as 'offline' | 'online' | null) ?? null,
+      guestCount: w.guestCount ?? 1,
       message: w.message,
       isHidden: w.isHidden,
       createdAt: w.createdAt,
     })),
     wishSummary,
   };
+}
 
-  return c.json(payload);
+invitationsRouter.get('/:slug', (c) => {
+  const slug = c.req.param('slug');
+
+  const inv = db
+    .select()
+    .from(schema.invitations)
+    .where(eq(schema.invitations.slug, slug))
+    .get();
+
+  if (!inv || !inv.isPublished) {
+    return c.json({ error: 'Invitation not found' }, 404);
+  }
+
+  return c.json(buildPublicInvitationPayload(inv));
 });
