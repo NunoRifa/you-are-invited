@@ -288,6 +288,12 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
         if (errJson?.code === 'invalid_audio_signature') {
           throw new Error('Isi file tidak terdeteksi sebagai audio yang valid. Pastikan file bukan hasil rename dari ekstensi lain.');
         }
+        if (errJson?.code === 'unsupported_image_mime') {
+          throw new Error('Ekstensi file gambar tidak didukung. Gunakan PNG, JPEG, atau WebP.');
+        }
+        if (errJson?.code === 'invalid_image_signature') {
+          throw new Error('Isi file tidak terdeteksi sebagai gambar PNG, JPEG, atau WebP yang valid. Coba buka file tersebut — jika tampil normal, simpan ulang (export) sebagai PNG/JPEG lalu unggah kembali.');
+        }
       } catch (e) {
         if (e instanceof Error && e.message.includes('file')) throw e;
       }

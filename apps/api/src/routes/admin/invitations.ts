@@ -20,12 +20,14 @@ const AUDIO_MIME_TYPES: Record<string, string[]> = {
   '.ogg': ['audio/ogg', 'application/ogg'],
 };
 
-const IMAGE_MIME_TYPES: Record<string, string[]> = {
-  '.png': ['image/png'],
-  '.jpg': ['image/jpeg', 'image/pjpeg'],
-  '.jpeg': ['image/jpeg', 'image/pjpeg'],
-  '.webp': ['image/webp'],
-};
+type DetectedImageType = { ext: '.png' | '.jpg' | '.webp'; mime: 'image/png' | 'image/jpeg' | 'image/webp' };
+
+function detectImageType(bytes: Buffer): DetectedImageType | null {
+  if (isValidPng(bytes)) return { ext: '.png', mime: 'image/png' };
+  if (isValidJpeg(bytes)) return { ext: '.jpg', mime: 'image/jpeg' };
+  if (isValidWebp(bytes)) return { ext: '.webp', mime: 'image/webp' };
+  return null;
+}
 
 const VIDEO_MIME_TYPES: Record<string, string[]> = {
   '.mp4': ['video/mp4'],
@@ -86,13 +88,6 @@ const AUDIO_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
   '.m4a': (bytes) => bytes.length >= 8 && bytes.subarray(4, 8).toString() === 'ftyp',
   '.wav': (bytes) => bytes.length >= 12 && bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WAVE',
   '.ogg': (bytes) => bytes.length >= 4 && bytes.subarray(0, 4).toString() === 'OggS',
-};
-
-const IMAGE_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
-  '.png': isValidPng,
-  '.jpg': isValidJpeg,
-  '.jpeg': isValidJpeg,
-  '.webp': isValidWebp,
 };
 
 const VIDEO_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
@@ -304,8 +299,9 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
   }
 
   const originalFilename = file.name || (kind === 'audio' ? 'music.mp3' : (kind === 'video' ? 'video.mp4' : 'image.jpg'));
-  const ext = (path.extname(originalFilename) || (kind === 'audio' ? '.mp3' : (kind === 'video' ? '.mp4' : '.jpg'))).toLowerCase();
+  let ext = (path.extname(originalFilename) || (kind === 'audio' ? '.mp3' : (kind === 'video' ? '.mp4' : '.jpg'))).toLowerCase();
   const mimeType = (file.type || '').toLowerCase();
+  let imageMime: string | null = null;
 
   if (kind === 'audio') {
     if (file.size > MAX_AUDIO_BYTES) {
@@ -333,9 +329,9 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     if (file.size > MAX_MEDIA_BYTES) {
       return c.json({ error: 'Image file exceeds the 20 MiB limit', code: 'image_size_exceeded' }, 413);
     }
-    const allowedMimes = IMAGE_MIME_TYPES[ext];
-    const isValidMime = allowedMimes?.includes(mimeType) || (mimeType === 'application/octet-stream' && allowedMimes !== undefined);
-    if (!isValidMime) {
+    // Image format comes from file content, not the client filename or MIME header.
+    // Still reject unrelated extensions; allow .png/.jpg/.jpeg/.webp regardless of detected image type.
+    if (!['.png', '.jpg', '.jpeg', '.webp'].includes(ext)) {
       return c.json({ error: 'Unsupported image format. Use PNG, JPEG, or WebP.', code: 'unsupported_image_mime' }, 415);
     }
   }
@@ -367,10 +363,13 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     if (fileBytes.byteLength > MAX_MEDIA_BYTES) {
       return c.json({ error: 'Image file exceeds the 20 MiB limit', code: 'image_size_exceeded' }, 413);
     }
-    const verifySignature = IMAGE_SIGNATURES[ext];
-    if (!verifySignature || !verifySignature(fileBytes)) {
+    const detected = detectImageType(fileBytes);
+    if (!detected) {
       return c.json({ error: 'File content is not a supported image format', code: 'invalid_image_signature' }, 415);
     }
+    // Normalize filename and MIME to the verified bytes (e.g. JPEG renamed to .png).
+    ext = detected.ext;
+    imageMime = detected.mime;
   }
 
   const assetId = `ast-${randomUUID()}`;
@@ -383,7 +382,9 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
       : (kind === 'font'
         ? 'font/woff2'
         : (ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg')));
-  const normalizedMime = (!mimeType || mimeType === 'application/octet-stream') ? defaultMime : mimeType;
+  const normalizedMime = kind === 'image' && imageMime
+    ? imageMime
+    : ((!mimeType || mimeType === 'application/octet-stream') ? defaultMime : mimeType);
   const uploadDir = path.resolve(process.cwd(), `storage/uploads/${invitationId}`);
   const targetPath = path.join(uploadDir, safeFilename);
 
@@ -427,7 +428,7 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     id: assetId,
     url: `/api/assets/${assetId}`,
     kind,
-    mimeType,
+    mimeType: normalizedMime,
     originalFilename,
   }, 201);
 });

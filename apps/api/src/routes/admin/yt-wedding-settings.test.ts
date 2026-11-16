@@ -135,6 +135,25 @@ afterAll(() => {
 });
 
 describe('Task 5: Media trust boundary and typed yt-wedding template settings', () => {
+  it('detects JPEG bytes in a .png upload and stores normalized JPEG MIME and extension', async () => {
+    const response = await uploadFile('yt', 'inv-yt', 'hero_bg.png', 'image/png', makeValidJpeg(), 'image');
+    expect(response.status).toBe(201);
+    const { id, mimeType } = await response.json() as { id: string; mimeType: string };
+    const asset = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, id)).get();
+    expect(mimeType).toBe('image/jpeg');
+    expect(asset?.mimeType).toBe('image/jpeg');
+    expect(path.extname(asset?.storagePath || '')).toBe('.jpg');
+  });
+
+  it('accepts valid supported image bytes when browser MIME is generic', async () => {
+    const response = await uploadFile('yt', 'inv-yt', 'camera-export.png', 'application/octet-stream', makeValidPng(), 'image');
+    expect(response.status).toBe(201);
+    const { id, mimeType } = await response.json() as { id: string; mimeType: string };
+    const asset = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, id)).get();
+    expect(mimeType).toBe('image/png');
+    expect(asset?.mimeType).toBe('image/png');
+  });
+
   it('accepts valid media uploads (PNG, JPEG, WebP, MP4) with 201', async () => {
     const pngRes = await uploadFile('yt', 'inv-yt', 'photo.png', 'image/png', makeValidPng(), 'image');
     expect(pngRes.status).toBe(201);
