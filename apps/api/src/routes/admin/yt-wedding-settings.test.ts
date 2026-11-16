@@ -135,6 +135,36 @@ afterAll(() => {
 });
 
 describe('Task 5: Media trust boundary and typed yt-wedding template settings', () => {
+  it('accepts a JPEG file named .png and stores it as image/jpeg', async () => {
+    const res = await uploadFile('yt', 'inv-yt', 'hero_bg.png', 'image/png', makeValidJpeg(), 'image');
+    expect(res.status).toBe(201);
+    const data = await res.json() as { id: string; mimeType: string; originalFilename: string };
+    expect(data.mimeType).toBe('image/jpeg');
+    const row = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, data.id)).get();
+    expect(row?.mimeType).toBe('image/jpeg');
+    expect(row?.storagePath.endsWith('.jpg')).toBe(true);
+  });
+
+  it('accepts a PNG file named .jpg and stores it as image/png', async () => {
+    const res = await uploadFile('yt', 'inv-yt', 'hero_bg.jpg', 'image/jpeg', makeValidPng(), 'image');
+    expect(res.status).toBe(201);
+    const data = await res.json() as { id: string; mimeType: string };
+    expect(data.mimeType).toBe('image/png');
+  });
+
+  it('accepts an image whose browser MIME is octet-stream but bytes are valid', async () => {
+    const res = await uploadFile('yt', 'inv-yt', 'unknown.png', 'application/octet-stream', makeValidPng(), 'image');
+    expect(res.status).toBe(201);
+    const data = await res.json() as { mimeType: string };
+    expect(data.mimeType).toBe('image/png');
+  });
+
+  it('rejects an image with an unsupported extension even when bytes are valid', async () => {
+    const res = await uploadFile('yt', 'inv-yt', 'photo.bmp', 'image/bmp', makeValidPng(), 'image');
+    expect(res.status).toBe(415);
+    expect((await res.json() as { code: string }).code).toBe('unsupported_image_mime');
+  });
+
   it('accepts valid media uploads (PNG, JPEG, WebP, MP4) with 201', async () => {
     const pngRes = await uploadFile('yt', 'inv-yt', 'photo.png', 'image/png', makeValidPng(), 'image');
     expect(pngRes.status).toBe(201);
