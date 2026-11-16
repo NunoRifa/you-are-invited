@@ -92,6 +92,38 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
       eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
     )).get();
     expect(gallerySetting?.fieldValue).toBe('false');
+
+    // A public request remains private until the explicit publication workflow runs.
+    const { invitationPageRouter } = await import('../../routes/invitation-page.js');
+    const { Hono } = await import('hono');
+    const app = new Hono();
+    app.route('/i', invitationPageRouter);
+    const publicResponse = await app.request('/i/riska-rafli');
+    expect(publicResponse.status).toBe(404);
+  });
+
+  it('seeds gallery hidden only when the setting is absent and no gallery rows exist', async () => {
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    // Remove prior test's seed default to construct empty gallery + absent setting state.
+    db.delete(schema.invitationTemplateFields).where(and(
+      eq(schema.invitationTemplateFields.invitationId, riska.id),
+      eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
+    )).run();
+    const gallery = db.select().from(schema.galleryImages).where(eq(schema.galleryImages.invitationId, riska.id)).all();
+    const setting = db.select().from(schema.invitationTemplateFields).where(and(
+      eq(schema.invitationTemplateFields.invitationId, riska.id),
+      eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
+    )).get();
+    expect(gallery).toHaveLength(0);
+    expect(setting).toBeUndefined();
+
+    await seedTemplates();
+
+    const seededSetting = db.select().from(schema.invitationTemplateFields).where(and(
+      eq(schema.invitationTemplateFields.invitationId, riska.id),
+      eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
+    )).get();
+    expect(seededSetting?.fieldValue).toBe('false');
   });
 
   it('does not duplicate default bride and groom slots on repeated seed', async () => {
