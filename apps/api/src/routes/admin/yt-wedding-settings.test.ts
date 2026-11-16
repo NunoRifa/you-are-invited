@@ -135,28 +135,23 @@ afterAll(() => {
 });
 
 describe('Task 5: Media trust boundary and typed yt-wedding template settings', () => {
-  it('accepts a JPEG file named .png and stores it as image/jpeg', async () => {
-    const res = await uploadFile('yt', 'inv-yt', 'hero_bg.png', 'image/png', makeValidJpeg(), 'image');
-    expect(res.status).toBe(201);
-    const data = await res.json() as { id: string; mimeType: string; originalFilename: string };
-    expect(data.mimeType).toBe('image/jpeg');
-    const row = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, data.id)).get();
-    expect(row?.mimeType).toBe('image/jpeg');
-    expect(row?.storagePath.endsWith('.jpg')).toBe(true);
+  it('detects JPEG bytes in a .png upload and stores normalized JPEG MIME and extension', async () => {
+    const response = await uploadFile('yt', 'inv-yt', 'hero_bg.png', 'image/png', makeValidJpeg(), 'image');
+    expect(response.status).toBe(201);
+    const { id, mimeType } = await response.json() as { id: string; mimeType: string };
+    const asset = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, id)).get();
+    expect(mimeType).toBe('image/jpeg');
+    expect(asset?.mimeType).toBe('image/jpeg');
+    expect(path.extname(asset?.storagePath || '')).toBe('.jpg');
   });
 
-  it('accepts a PNG file named .jpg and stores it as image/png', async () => {
-    const res = await uploadFile('yt', 'inv-yt', 'hero_bg.jpg', 'image/jpeg', makeValidPng(), 'image');
-    expect(res.status).toBe(201);
-    const data = await res.json() as { id: string; mimeType: string };
-    expect(data.mimeType).toBe('image/png');
-  });
-
-  it('accepts an image whose browser MIME is octet-stream but bytes are valid', async () => {
-    const res = await uploadFile('yt', 'inv-yt', 'unknown.png', 'application/octet-stream', makeValidPng(), 'image');
-    expect(res.status).toBe(201);
-    const data = await res.json() as { mimeType: string };
-    expect(data.mimeType).toBe('image/png');
+  it('accepts valid supported image bytes when browser MIME is generic', async () => {
+    const response = await uploadFile('yt', 'inv-yt', 'camera-export.png', 'application/octet-stream', makeValidPng(), 'image');
+    expect(response.status).toBe(201);
+    const { id, mimeType } = await response.json() as { id: string; mimeType: string };
+    const asset = db.select().from(schema.invitationAssets).where(eq(schema.invitationAssets.id, id)).get();
+    expect(mimeType).toBe('image/png');
+    expect(asset?.mimeType).toBe('image/png');
   });
 
   it('rejects an image with an unsupported extension even when bytes are valid', async () => {

@@ -98,7 +98,6 @@ const IMAGE_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
 };
 
 const IMAGE_EXTENSIONS = new Set(Object.keys(IMAGE_SIGNATURES));
-
 const VIDEO_SIGNATURES: Record<string, (bytes: Buffer) => boolean> = {
   '.mp4': isValidMp4,
 };
@@ -338,8 +337,7 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     if (file.size > MAX_MEDIA_BYTES) {
       return c.json({ error: 'Image file exceeds the 20 MiB limit', code: 'image_size_exceeded' }, 413);
     }
-    // Format is decided by magic bytes below, not by the (unreliable) browser MIME
-    // string or filename. Only the extension allowlist gates the request here.
+    // Image format comes from file bytes, not from a possibly mismatched browser MIME.
     if (!IMAGE_EXTENSIONS.has(ext)) {
       return c.json({ error: 'Unsupported image format. Use PNG, JPEG, or WebP.', code: 'unsupported_image_mime' }, 415);
     }
@@ -376,7 +374,7 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
     if (!detected) {
       return c.json({ error: 'File content is not a supported image format', code: 'invalid_image_signature' }, 415);
     }
-    // Trust the actual bytes: a JPEG saved as .png is stored as .jpg/image-jpeg.
+    // Normalize filename and MIME from verified bytes (e.g. JPEG renamed to .png).
     ext = detected.ext;
     imageMime = detected.mime;
   }
@@ -391,7 +389,7 @@ adminInvitationsRouter.post('/:id/assets', async (c) => {
       : (kind === 'font'
         ? 'font/woff2'
         : (ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg')));
-  const normalizedMime = (kind === 'image' && imageMime)
+  const normalizedMime = kind === 'image' && imageMime
     ? imageMime
     : ((!mimeType || mimeType === 'application/octet-stream') ? defaultMime : mimeType);
   const uploadDir = path.resolve(process.cwd(), `storage/uploads/${invitationId}`);

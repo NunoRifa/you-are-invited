@@ -1,6 +1,6 @@
 import { db } from '../client.js';
 import * as schema from '../schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 export async function seedTemplates() {
   console.log('Seeding templates...');
@@ -294,7 +294,7 @@ export async function seedTemplates() {
 
   // 1c. Riska & Rafli Client Invitation (yt-wedding template)
   const riskaSlug = 'riska-rafli';
-  const existingRiska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, riskaSlug)).get();
+  let existingRiska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, riskaSlug)).get();
   if (!existingRiska) {
     const superAdmin = db.select().from(schema.adminUsers).where(eq(schema.adminUsers.role, 'super_admin')).get();
     if (!superAdmin) {
@@ -314,6 +314,45 @@ export async function seedTemplates() {
         updatedAt: now,
       }).run();
       console.log(`- Seeded unpublished draft invitation: ${riskaSlug}`);
+      existingRiska = db.select().from(schema.invitations).where(eq(schema.invitations.id, invId)).get();
+    }
+  }
+
+  if (existingRiska) {
+    for (const role of ['bride', 'groom'] as const) {
+      const existingCouple = db.select().from(schema.couples).where(and(
+        eq(schema.couples.invitationId, existingRiska.id),
+        eq(schema.couples.role, role),
+      )).get();
+      if (!existingCouple) {
+        db.insert(schema.couples).values({
+          id: `c-riska-${role}`,
+          invitationId: existingRiska.id,
+          role,
+          fullName: '',
+          displayName: '',
+          fatherName: null,
+          motherName: null,
+          birthOrderLabel: null,
+          instagramHandle: null,
+          photoAssetId: null,
+        }).run();
+      }
+    }
+
+    const existingGallerySetting = db.select().from(schema.invitationTemplateFields).where(and(
+      eq(schema.invitationTemplateFields.invitationId, existingRiska.id),
+      eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
+    )).get();
+    const galleryImages = db.select().from(schema.galleryImages)
+      .where(eq(schema.galleryImages.invitationId, existingRiska.id)).all();
+    if (!existingGallerySetting && galleryImages.length === 0) {
+      db.insert(schema.invitationTemplateFields).values({
+        id: 'tf-riska-yt-show-gallery',
+        invitationId: existingRiska.id,
+        fieldKey: 'yt_show_gallery',
+        fieldValue: 'false',
+      }).run();
     }
   }
 
