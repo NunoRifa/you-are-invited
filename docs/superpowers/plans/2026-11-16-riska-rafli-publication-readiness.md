@@ -43,7 +43,10 @@
 - [x] Re-run focused tests, `npm --workspace=apps/api test`, `npm run build`, and `node scripts/test-anggi-venue.cjs`. Verify Riska public route remains 404 in test DB while unpublished.
 - [x] Review `git diff --check`, stage only Task 1 source/tests and approved spec/plan docs; preserve unrelated files. Commit `fix(invitation): seed editable Riska couple slots`.
 - [x] Push `worktree-riska-rafli-yt-wedding-implementation` to origin.
-- [ ] Merge worktree branch into local `master` with `--no-ff`; run focused/full verification on master. Do not deploy or push `master`.
+- [x] Merge worktree branch into local `master` with `--no-ff`; merge commit `f71c891` contains seed implementation.
+- [x] Later, explicit empty-gallery regression and approved design/plan docs merged in `f285134`.
+- [x] On local `master`, verify API suite (146 passed, 5 skipped), `npm run build`, `node scripts/test-anggi-venue.cjs`, and `node scripts/test-yt-wedding.cjs`.
+- [x] Push `master` only after user explicitly requested it. No deployment performed.
 
 ## Release/404 diagnostic (read-only, separate from implementation)
 
