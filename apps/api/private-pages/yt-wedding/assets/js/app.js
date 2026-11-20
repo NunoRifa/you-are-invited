@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const open = name => {
     const modal = get(`${name}-modal`);
     if (!modal) return;
+    // Source bottom-nav hardfix is z-index 9999; interactive sheets must sit above it.
+    modal.style.zIndex = '10000';
     modal.classList.remove('hidden');
     requestAnimationFrame(() => modal.classList.add('modal-open'));
     document.body.style.overflow = 'hidden';
@@ -64,7 +66,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function syncMusic() {
     icon?.classList.toggle('fa-play', audio?.paused !== false);
     icon?.classList.toggle('fa-pause', audio?.paused === false);
+    musicButton?.setAttribute('aria-label', audio?.paused === false ? 'Jeda musik' : 'Putar musik');
+    musicButton?.setAttribute('aria-pressed', String(audio?.paused === false));
   }
+  const musicProgress = get('music-progress');
+  if (musicProgress) musicProgress.style.width = '0%';
+  for (const event of ['play', 'pause', 'ended', 'error']) audio?.addEventListener(event, syncMusic);
+  audio?.addEventListener('timeupdate', () => {
+    const progress = get('music-progress');
+    if (progress && Number.isFinite(audio.duration) && audio.duration > 0) {
+      progress.style.width = `${Math.min(100, Math.max(0, audio.currentTime / audio.duration * 100))}%`;
+    }
+  });
   async function revealInvitation() {
     if (document.documentElement.dataset.invitationReady !== 'true') return;
     const cover = get('welcome-cover');
@@ -211,9 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
         else ucapanList.append(card);
         const countSpan = document.querySelector('#ucapan-sheet h3 span');
         if (countSpan) countSpan.textContent = String(Number(countSpan.textContent || 0) + 1);
-        document.querySelectorAll('#hero-post .bg-yt-card .flex.items-center.gap-2, #hero-post .bg-yt-card div.font-bold').forEach(el => {
-          el.textContent = `${countSpan?.textContent || 1} Komentar`;
-        });
+        const heroCount = document.querySelector('#hero-post > .px-3 > .bg-yt-card > .font-bold');
+        if (heroCount) heroCount.textContent = `${countSpan?.textContent || 1} Komentar`;
       }
 
       const confirmation = document.createElement('div');
@@ -253,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const images = window.galleryImages || [];
     if (!images.length || !modal) return;
     currentIndex = Number.isInteger(index) && index >= 0 && index < images.length ? index : 0;
+    modal.style.zIndex = '10000';
     showImage(); modal.classList.remove('hidden'); modal.classList.add('flex');
     requestAnimationFrame(() => { modal.classList.remove('opacity-0', 'pointer-events-none'); modal.classList.add('opacity-100', 'pointer-events-auto'); });
     document.body.style.overflow = 'hidden';

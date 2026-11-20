@@ -92,6 +92,11 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
       eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
     )).get();
     expect(gallerySetting?.fieldValue).toBe('false');
+    const visibilitySource = db.select().from(schema.invitationTemplateFields).where(and(
+      eq(schema.invitationTemplateFields.invitationId, riska!.id),
+      eq(schema.invitationTemplateFields.fieldKey, 'yt_gallery_visibility_source'),
+    )).get();
+    expect(visibilitySource?.fieldValue).toBe('auto');
 
     // A public request remains private until the explicit publication workflow runs.
     const { invitationPageRouter } = await import('../../routes/invitation-page.js');

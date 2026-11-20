@@ -12,9 +12,15 @@ function bindYTWedding(root, payload, guestName, preview) {
   const name = c => typeof (c.displayName || c.fullName) === 'string' ? (c.displayName || c.fullName).trim() : '';
   const text = (selector, content) => {
     const el = root.querySelector?.(selector);
-    if (el) el.textContent = content;
+    if (!el) return;
+    // Update the source text node, not its icon/citation children.
+    if (el.firstChild?.nodeType === 3 || (el.firstChild && el.querySelector?.('i'))) el.firstChild.textContent = content;
+    else el.textContent = content;
   };
-  const all = (selector, content) => root.querySelectorAll?.(selector).forEach(el => { el.textContent = content; });
+  const all = (selector, content) => root.querySelectorAll?.(selector).forEach(el => {
+    if (el.firstChild?.nodeType === 3 && el.querySelector?.('i')) el.firstChild.textContent = content;
+    else el.textContent = content;
+  });
   const validAsset = url => typeof url === 'string' && /^\/api\/assets\/[a-zA-Z0-9_-]+$/.test(url);
   const validMap = url => typeof url === 'string' && /^https:\/\/(?:www\.)?(?:google\.(?:com|co\.id)\/maps(?:\/|\?)|maps\.google\.(?:com|co\.id)\/|goo\.gl\/maps\/|maps\.app\.goo\.gl\/)/i.test(url);
   const picture = (selector, url) => {
@@ -30,7 +36,8 @@ function bindYTWedding(root, payload, guestName, preview) {
   text('#hero-post > .px-3 > p', value(setting('hero_caption')));
   text('#hero-post .font-bold.text-\\[15px\\]', coupleName);
   all('#mempelai-post > div:first-child .font-bold, #event-post > div:first-child .font-bold, #gallery-post > div:first-child .font-bold, #penutup-post > div:first-child .font-medium', coupleName);
-  all('#mempelai-post > div:first-child .text-yt-gray, #event-post > div:first-child .text-yt-gray, #gallery-post > div:first-child .text-yt-gray, #penutup-post > div:first-child .text-yt-gray', missing);
+  // Preserve the source subtitle line box without inventing posting timestamps.
+  all('#mempelai-post > div:first-child .text-yt-gray, #event-post > div:first-child .text-yt-gray, #gallery-post > div:first-child .text-yt-gray, #penutup-post > div:first-child .text-yt-gray', missing || ' ');
   text('#angpao-post .font-light', value(setting('gift_intro') || `Berikan dukungan & tanda kasih untuk ${coupleName}`));
   text('#music-artist', `Untuk ${coupleName} · Tap buat dengerin`);
   const lineage = (c, prefix) => {
@@ -73,10 +80,19 @@ function bindYTWedding(root, payload, guestName, preview) {
   }
   const dates = [];
   const events = Array.isArray(payload.events) ? payload.events : [];
-  for (const type of ['akad', 'resepsi']) {
+  const eventTypes = ['akad', 'resepsi'];
+  const mappedEvents = eventTypes.map(type => events.find(e => (e.label || '').toLowerCase().includes(type)));
+  const remainingEvents = events.filter(event => !mappedEvents.includes(event));
+  for (let index = 0; index < eventTypes.length; index++) {
+    if (!mappedEvents[index]) mappedEvents[index] = remainingEvents.shift();
+  }
+  for (const [index, type] of eventTypes.entries()) {
     const card = root.querySelector?.(`[data-event="${type}"]`);
-    const event = events.find(e => (e.label || '').toLowerCase().includes(type)) || (events.length === 2 ? events[['akad', 'resepsi'].indexOf(type)] : null);
+    const event = mappedEvents[index];
     if (!event) { if (card?.style) card.style.display = preview ? '' : 'none'; continue; }
+    if (card?.style) card.style.display = '';
+    const title = card?.querySelector?.('h3');
+    if (title) title.textContent = value(event.label);
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(event.date || '');
     const time = /^(\d{2}):(\d{2})/.exec(event.startTime || '');
     if (match && time) {
@@ -85,8 +101,12 @@ function bindYTWedding(root, payload, guestName, preview) {
       if (check.getUTCFullYear() === +match[1] && check.getUTCMonth() === +match[2] - 1 && check.getUTCDate() === +match[3] && +time[1] < 24 && +time[2] < 60) dates.push(timestamp);
     }
     const lines = card?.querySelectorAll?.('.space-y-1\\.5 p') || [];
-    if (lines[0]) { const icon = lines[0].querySelector?.('i'); lines[0].textContent = ` ${value(event.date)}`; if (icon) lines[0].prepend(icon); }
-    if (lines[1]) { const icon = lines[1].querySelector?.('i'); lines[1].textContent = ` ${value(event.startTime)}${event.endTimeLabel ? ` - ${event.endTimeLabel}` : ''} WIB`; if (icon) lines[1].prepend(icon); }
+    const dateValue = match ? new Date(`${event.date}T00:00:00+07:00`) : null;
+    const dateLabel = dateValue && !Number.isNaN(dateValue.getTime()) ? new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(dateValue) : value(event.date);
+    const endLabel = (event.endTimeLabel || '').replace(/\b(\d{2}):(\d{2})\b/g, '$1.$2');
+    const timeLabel = `${value(event.startTime).replace(':', '.')}${endLabel ? ` - ${endLabel}` : ''}${/\b(?:WIB|WITA|WIT)\b/i.test(endLabel) ? '' : ' WIB'}`;
+    if (lines[0]) { const icon = lines[0].querySelector?.('i'); lines[0].textContent = ` ${dateLabel}`; if (icon) lines[0].prepend(icon); }
+    if (lines[1]) { const icon = lines[1].querySelector?.('i'); lines[1].textContent = ` ${timeLabel}`; if (icon) lines[1].prepend(icon); }
     if (lines[2]) { const icon = lines[2].querySelector?.('i'); lines[2].textContent = ` ${value(event.venueName)}${event.venueAddress ? `, ${event.venueAddress}` : ''}`; if (icon) lines[2].prepend(icon); }
     const link = card?.querySelector?.('a');
     if (link) {
@@ -121,7 +141,9 @@ function bindYTWedding(root, payload, guestName, preview) {
   const showGallerySetting = setting('show_gallery');
   const showGallery = showGallerySetting !== 'false' && showGallerySetting !== false;
   const gallerySection = root.querySelector?.('#gallery-post');
-  if (gallerySection?.style) gallerySection.style.display = (showGallery && images.length) || preview ? '' : 'none';
+  // Keep the admin's visibility choice authoritative: an enabled empty gallery
+  // retains its original empty state instead of vanishing during dynamic binding.
+  if (gallerySection?.style) gallerySection.style.display = showGallery || preview ? '' : 'none';
   const grid = root.querySelector?.('#gallery-grid');
   if (grid && typeof document !== 'undefined') {
     grid.replaceChildren();
@@ -143,7 +165,8 @@ function bindYTWedding(root, payload, guestName, preview) {
   const accounts = Array.isArray(payload.giftAccounts) ? payload.giftAccounts : [];
   const accountPane = root.querySelector?.('#rekening-sheet .overflow-y-auto');
   if (accountPane && typeof document !== 'undefined') {
-    accountPane.querySelector?.('.border-dashed')?.remove();
+    const emptyAccounts = accountPane.querySelector?.('.border-dashed');
+    if (emptyAccounts?.style) emptyAccounts.style.display = accounts.length || setting('shipping_address') ? 'none' : '';
     accountPane.querySelectorAll?.('.ytw-rekening-card').forEach(el => el.remove());
     accounts.forEach(account => {
       const card = document.createElement('div'); card.className = 'ytw-rekening-card bg-yt-card border border-yt-border rounded-xl p-4 mb-3';
@@ -182,10 +205,10 @@ function bindYTWedding(root, payload, guestName, preview) {
   const showGiftSetting = setting('show_gift');
   const showGift = showGiftSetting !== 'false' && showGiftSetting !== false;
   const gift = root.querySelector?.('#angpao-post');
-  if (gift?.style) gift.style.display = (showGift && (accounts.length || setting('shipping_address'))) || preview ? '' : 'none';
+  if (gift?.style) gift.style.display = showGift || preview ? '' : 'none';
   const wishes = Array.isArray(payload.wishes) ? payload.wishes : [];
   text('#ucapan-sheet h3 span', String(wishes.length));
-  all('#hero-post .bg-yt-card .flex.items-center.gap-2, #hero-post .bg-yt-card div.font-bold', `${wishes.length} Komentar`);
+  text('#hero-post > .px-3 > .bg-yt-card > .font-bold', `${wishes.length} Komentar`);
   const ucapanList = root.querySelector?.('#ucapan-list');
   if (ucapanList && typeof document !== 'undefined') {
     ucapanList.querySelectorAll?.('.ytw-comment-item')?.forEach(el => el.remove?.());
