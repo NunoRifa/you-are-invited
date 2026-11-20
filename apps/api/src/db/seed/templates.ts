@@ -1,4 +1,4 @@
-import { db } from '../client.js';
+import { db, sqlite } from '../client.js';
 import * as schema from '../schema.js';
 import { and, eq } from 'drizzle-orm';
 
@@ -340,20 +340,37 @@ export async function seedTemplates() {
       }
     }
 
-    const existingGallerySetting = db.select().from(schema.invitationTemplateFields).where(and(
-      eq(schema.invitationTemplateFields.invitationId, existingRiska.id),
-      eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
-    )).get();
-    const galleryImages = db.select().from(schema.galleryImages)
-      .where(eq(schema.galleryImages.invitationId, existingRiska.id)).all();
-    if (!existingGallerySetting && galleryImages.length === 0) {
-      db.insert(schema.invitationTemplateFields).values({
-        id: 'tf-riska-yt-show-gallery',
-        invitationId: existingRiska.id,
-        fieldKey: 'yt_show_gallery',
-        fieldValue: 'false',
-      }).run();
-    }
+    const riskaId = existingRiska.id;
+    sqlite.transaction(() => {
+      const fields = db.select().from(schema.invitationTemplateFields)
+        .where(eq(schema.invitationTemplateFields.invitationId, riskaId)).all();
+      const existingGallerySetting = fields.find((field) => field.fieldKey === 'yt_show_gallery');
+      const galleryImages = db.select().from(schema.galleryImages)
+        .where(eq(schema.galleryImages.invitationId, riskaId)).all();
+      const source = fields.find((field) => field.fieldKey === 'yt_gallery_visibility_source');
+      const auto = source?.fieldValue === 'auto';
+      const seedHidden = !existingGallerySetting && galleryImages.length === 0;
+      const enableGallery = galleryImages.length > 0 && existingGallerySetting?.fieldValue === 'false' && auto;
+      if (seedHidden) {
+        db.insert(schema.invitationTemplateFields).values({
+          id: 'tf-riska-yt-show-gallery',
+          invitationId: riskaId,
+          fieldKey: 'yt_show_gallery',
+          fieldValue: 'false',
+        }).run();
+      } else if (enableGallery) {
+        db.update(schema.invitationTemplateFields).set({ fieldValue: 'true' })
+          .where(eq(schema.invitationTemplateFields.id, existingGallerySetting.id)).run();
+      }
+      if (seedHidden && !source) {
+        db.insert(schema.invitationTemplateFields).values({
+          id: 'tf-riska-yt-gallery-visibility-source',
+          invitationId: riskaId,
+          fieldKey: 'yt_gallery_visibility_source',
+          fieldValue: 'auto',
+        }).run();
+      }
+    })();
   }
 
   // 2. Betawi Motion Demo

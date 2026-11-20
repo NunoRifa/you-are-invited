@@ -65,10 +65,31 @@ assetsRouter.get('/:id', (c) => {
     contentType = 'video/mp4';
   }
 
-  return new Response(fileBuffer, {
-    headers: {
-      'Content-Type': contentType,
-      'Cache-Control': isDraft ? 'private, no-store' : 'public, max-age=31536000, immutable',
-    },
-  });
+  const headers: Record<string, string> = {
+    'Content-Type': contentType,
+    'Cache-Control': isDraft ? 'private, no-store' : 'public, max-age=31536000, immutable',
+    'Accept-Ranges': 'bytes',
+    'Content-Length': String(fileBuffer.length),
+  };
+  const range = c.req.header('Range');
+  if (range) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+    const size = fileBuffer.length;
+    let start = 0;
+    let end = size - 1;
+    if (match && (match[1] || match[2])) {
+      if (!match[1]) start = Math.max(0, size - Number(match[2]));
+      else {
+        start = Number(match[1]);
+        if (match[2]) end = Math.min(end, Number(match[2]));
+      }
+    }
+    if (!match || (!match[1] && !match[2]) || !Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || start > end || start >= size) {
+      return new Response(null, { status: 416, headers: { ...headers, 'Content-Range': `bytes */${size}`, 'Content-Length': '0' } });
+    }
+    headers['Content-Range'] = `bytes ${start}-${end}/${size}`;
+    headers['Content-Length'] = String(end - start + 1);
+    return new Response(fileBuffer.subarray(start, end + 1), { status: 206, headers });
+  }
+  return new Response(fileBuffer, { headers });
 });

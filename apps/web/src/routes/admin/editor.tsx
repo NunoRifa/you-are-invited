@@ -144,9 +144,11 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const [publishing, setPublishing] = useState(false);
   const [publicationErrors, setPublicationErrors] = useState<string[]>([]);
   const [ytSettings, setYtSettings] = useState<YtSettingsState>(initialYtSettings);
+  const [galleryVisibilityConfirmed, setGalleryVisibilityConfirmed] = useState(false);
 
   const load = async () => {
     setLoading(true);
+    setGalleryVisibilityConfirmed(false);
     try {
       const response = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include' });
       if (response.status === 401) { onLogout(); throw new Error('Sesi admin tidak valid. Silakan login kembali.'); }
@@ -170,6 +172,7 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
         showGift: getField('yt_show_gift', 'true') !== 'false',
       });
 
+      setGalleryVisibilityConfirmed(true);
       loveStoryRevision.current = 0;
       setLoveStoryDirty(false);
       setActiveTab('Umum');
@@ -637,10 +640,19 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       });
       if (!res.ok) throw new Error('Gagal menambahkan foto ke galeri.');
       const newItem = await res.json();
+      setGalleryVisibilityConfirmed(false);
       setPayload((cur) => cur ? {
         ...cur,
         gallery: [...(cur.gallery || []), newItem],
       } : cur);
+      // Gallery creation may enable a formerly auto-hidden section. Read back its
+      // saved visibility so a later settings save cannot reapply stale false.
+      const savedResponse = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include', cache: 'no-store' });
+      if (!savedResponse.ok) throw new Error('Foto tersimpan, tetapi status galeri gagal dimuat ulang. Muat ulang editor sebelum menyimpan pengaturan.');
+      const saved = await savedResponse.json() as EditorPayload;
+      const visibility = saved.templateFields?.find((field) => field.fieldKey === 'yt_show_gallery');
+      setYtSettings((current) => ({ ...current, showGallery: visibility?.fieldValue !== 'false' }));
+      setGalleryVisibilityConfirmed(true);
       setNotice('Foto berhasil ditambahkan ke galeri.');
       setPreviewVersion((v) => v + 1);
     } catch (err) {
@@ -648,6 +660,31 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
     } finally {
       setUploadingTarget(null);
       e.target.value = '';
+    }
+  };
+
+  const saveGalleryVisibility = async (showGallery: boolean) => {
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/admin/invitations/${invitationId}/yt-wedding`, {
+        method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showGallery }),
+      });
+      if (!response.ok) throw await apiError(response, 'Gagal menyimpan visibilitas galeri.');
+      setGalleryVisibilityConfirmed(false);
+      const readback = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include', cache: 'no-store' });
+      if (!readback.ok) throw new Error('Visibilitas galeri belum terkonfirmasi. Muat ulang editor.');
+      const saved = await readback.json() as EditorPayload;
+      const stored = saved.templateFields?.find((field) => field.fieldKey === 'yt_show_gallery')?.fieldValue;
+      if (stored !== String(showGallery)) throw new Error('Visibilitas galeri belum terkonfirmasi tersimpan.');
+      setYtSettings((current) => ({ ...current, showGallery }));
+      setGalleryVisibilityConfirmed(true);
+      setPreviewVersion((version) => version + 1);
+      setNotice(showGallery ? 'Galeri ditampilkan pada undangan.' : 'Galeri disembunyikan pada undangan.');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal menyimpan visibilitas galeri.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -797,6 +834,10 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   };
 
   const saveYtSettings = async () => {
+    if (!galleryVisibilityConfirmed) {
+      setNotice('Status galeri belum terkonfirmasi. Muat ulang editor sebelum menyimpan pengaturan.');
+      return;
+    }
     setSaving(true);
     setNotice('Menyimpan pengaturan YouTube…');
     try {
@@ -1430,6 +1471,14 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
                   />
                 </label>
               </div>
+
+              {isYtWedding && <div className="space-y-2 rounded-lg border border-stone-200 bg-stone-50 p-3">
+                <label className="flex items-center justify-between gap-3 text-sm font-medium text-stone-800">
+                  Tampilkan galeri pada undangan
+                  <input type="checkbox" checked={ytSettings.showGallery} disabled={saving || Boolean(uploadingTarget) || !galleryVisibilityConfirmed} onChange={(event) => void saveGalleryVisibility(event.target.checked)} className="h-4 w-4 accent-amber-800" />
+                </label>
+                {!galleryVisibilityConfirmed ? <p role="alert" className="text-xs text-red-800">Status galeri belum terkonfirmasi. Klik Muat Ulang sebelum menyimpan pengaturan.</p> : !ytSettings.showGallery && <p role="status" className="text-xs text-amber-900">Foto tetap tersimpan, tetapi galeri sedang disembunyikan. Aktifkan pilihan di atas agar foto tampil; perubahan langsung disimpan.</p>}
+              </div>}
 
               {/* Video Galeri Opsional */}
               <div className="rounded-lg bg-stone-50 border border-stone-200 p-3 space-y-2">

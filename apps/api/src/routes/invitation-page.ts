@@ -209,7 +209,7 @@ const handleTemplateAsset = (c: any) => {
   return new Response(fileBuffer, {
     headers: {
       'Content-Type': asset.mimeType,
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': 'public, max-age=0, must-revalidate',
     },
   });
 };

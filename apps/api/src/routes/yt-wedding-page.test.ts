@@ -185,7 +185,18 @@ describe('Task 7: yt-wedding private page, bindings, and asset delivery', () => 
       expect(Number.isNaN(parsedTimestamp)).toBe(false);
     });
 
-    it('gallery handling: 0 images hides gallery or stays empty, 5 images creates 4 preview grid + 5 lightbox array', () => {
+    it('hides empty gallery only when disabled; enabled empty gallery keeps its source empty state', () => {
+      const code = readFileSync(path.join(rootPrivatePagesDir, 'assets/js/bind.js'), 'utf8');
+      const section = { style: { display: '' } };
+      const root = { querySelector: (selector: string) => selector === '#gallery-post' ? section : null, querySelectorAll: () => [] };
+      const bind = new Function(`${code}; return bindYTWedding`)();
+      bind(root, { invitation: {}, events: [], gallery: [], templateFields: { yt_show_gallery: 'false' } }, '', false);
+      expect(section.style.display).toBe('none');
+      bind(root, { invitation: {}, events: [], gallery: [], templateFields: { yt_show_gallery: 'true' } }, '', false);
+      expect(section.style.display).toBe('');
+    });
+
+    it('gallery handling: 0 images obeys visibility; 5 images creates 4 preview grid + 5 lightbox array', () => {
       const bindJsPath = path.join(rootPrivatePagesDir, 'assets', 'js', 'bind.js');
       const code = readFileSync(bindJsPath, 'utf8');
 
@@ -203,12 +214,13 @@ describe('Task 7: yt-wedding private page, bindings, and asset delivery', () => 
       const fn = new Function('root', 'payload', 'guestName', 'preview', `${code}; return typeof bindYTWedding === 'function' ? bindYTWedding : null;`);
       const bindYTWedding = fn(mockDoc, {}, '', false);
 
-      // 0 images hides section
+      // Empty gallery is controlled by explicit visibility; the seeded default is false.
       bindYTWedding(mockDoc, {
         invitation: { title: 'Test' },
         couple: {},
         events: [],
         gallery: [],
+        templateFields: { yt_show_gallery: 'false' },
         giftAccounts: [],
       }, '', false);
 
@@ -351,6 +363,11 @@ describe('Task 7: yt-wedding private page, bindings, and asset delivery', () => 
       expect(gallerySection.style.display).toBe('none');
       expect(giftSection.style.display).toBe('none');
       expect(giftIntro.textContent).toBe('Custom Gift Copy');
+
+      // Enabled gallery must stay visible with no images so its empty-state can render.
+      gallerySection.style.display = 'none';
+      bind(root, { invitation: {}, gallery: [], events: [], giftAccounts: [], templateFields: { yt_show_gallery: 'true' } }, '', false);
+      expect(gallerySection.style.display).toBe('');
 
       // Case 2: Preview mode preserves sections even if false
       gallerySection.style.display = '';
@@ -495,6 +512,8 @@ describe('Task 7: yt-wedding private page, bindings, and asset delivery', () => 
       const res = await app.request('/i/riska-rafli-pub/assets/css/style.css');
       expect(res.status).toBe(200);
       expect(res.headers.get('Content-Type')).toContain('text/css');
+      expect(res.headers.get('Cache-Control')).toContain('must-revalidate');
+      expect(res.headers.get('Cache-Control')).toContain('max-age=0');
     });
 
     it('returns 404 for assets under /i/:slug/assets/:file when draft (unpublished)', async () => {

@@ -146,6 +146,7 @@ const YT_FIELD_MAP: Record<string, string> = {
   shippingAddress: 'yt_shipping_address',
   heroVideoAssetId: 'yt_hero_video_asset_id',
   showGallery: 'yt_show_gallery',
+  galleryVisibilitySource: 'yt_gallery_visibility_source',
   showGift: 'yt_show_gift',
 };
 
@@ -519,13 +520,27 @@ adminInvitationsRouter.post('/:id/gallery', async (c) => {
   if (!asset) return c.json({ error: 'Image asset not found for invitation' }, 400);
 
   const id = `gal-${randomUUID()}`;
-  db.insert(schema.galleryImages).values({
-    id,
-    invitationId,
-    assetId: body.assetId,
-    caption: body.caption || '',
-    sortOrder: body.sortOrder ?? 0,
-  }).run();
+  sqlite.transaction(() => {
+    db.insert(schema.galleryImages).values({
+      id,
+      invitationId,
+      assetId: asset.id,
+      caption: body.caption || '',
+      sortOrder: body.sortOrder ?? 0,
+    }).run();
+
+    const invitation = db.select().from(schema.invitations)
+      .where(eq(schema.invitations.id, invitationId)).get();
+    if (invitation?.templateKey !== 'yt-wedding') return;
+    const fields = db.select().from(schema.invitationTemplateFields)
+      .where(eq(schema.invitationTemplateFields.invitationId, invitationId)).all();
+    const visibility = fields.find((field) => field.fieldKey === 'yt_show_gallery');
+    const source = fields.find((field) => field.fieldKey === 'yt_gallery_visibility_source');
+    // Unmarked legacy rows may contain an explicit admin hide; only trust the marker.
+    if (visibility?.fieldValue !== 'false' || source?.fieldValue !== 'auto') return;
+    db.update(schema.invitationTemplateFields).set({ fieldValue: 'true' })
+      .where(eq(schema.invitationTemplateFields.id, visibility.id)).run();
+  })();
 
   return c.json({
     id,
@@ -832,7 +847,9 @@ adminInvitationsRouter.patch('/:id/yt-wedding', async (c) => {
 
   const now = Date.now();
   sqlite.transaction(() => {
-    for (const [key, rawVal] of Object.entries(body)) {
+    const fields = { ...body };
+    if (typeof body.showGallery === 'boolean') fields.galleryVisibilitySource = 'manual';
+    for (const [key, rawVal] of Object.entries(fields)) {
       const fieldKey = YT_FIELD_MAP[key];
       if (!fieldKey) continue;
       if (rawVal === null) {
