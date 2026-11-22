@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toast.setAttribute('role', 'status');
       document.body.append(toast);
     }
+    toast.style.zIndex = '10001';
     toast.textContent = message;
     toast.classList.replace('opacity-0', 'opacity-100');
     clearTimeout(toastTimer);

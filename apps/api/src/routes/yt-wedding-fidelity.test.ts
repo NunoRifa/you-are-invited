@@ -9,6 +9,54 @@ const bindCode = readFileSync(path.join(bundle, 'assets/js/bind.js'), 'utf8');
 
 // Removing these source controls is a user-visible regression, not a redesign permission.
 describe('yt-wedding source fidelity', () => {
+  it('keeps interactive modal content out of scroll entrance delays while retaining page animation', () => {
+    const script = readFileSync(path.join(bundle, 'assets/js/wk-anim.js'), 'utf8');
+    const elements = ['rsvp-modal', 'ucapan-modal', 'hero-post'].map(id => {
+      const openingTag = html.match(new RegExp(`<div id="${id}"[^>]*>`))?.[0] || '';
+      const attributes = new Map<string, string>();
+      return {
+        className: '', style: { setProperty: () => {} },
+        hasAttribute: (name: string) => attributes.has(name),
+        setAttribute: (name: string, value: string) => attributes.set(name, value),
+        closest: () => openingTag.includes('data-wk-anim-skip') ? {} : null,
+        classList: { add: () => {} }, attributes,
+      };
+    });
+    const document = {
+      readyState: 'complete',
+      querySelector: () => null,
+      querySelectorAll: (selector: string) => selector.startsWith('img:') ? elements : [],
+    };
+    new Function('window', 'document', 'getComputedStyle', script)({}, document, () => ({ position: 'static' }));
+    expect(elements[0].attributes.has('data-wk-anim')).toBe(false);
+    expect(elements[1].attributes.has('data-wk-anim')).toBe(false);
+    expect(elements[2].attributes.get('data-wk-anim')).toBe('fade');
+  });
+
+  it('places every toast above interactive sheets including reused notifications', () => {
+    const nodes = new Map<string, any>();
+    const element = () => ({ style: {} as Record<string, string>, className: '', textContent: '', setAttribute: () => {}, addEventListener: () => {}, classList: { add: () => {}, remove: () => {}, replace: () => {} } });
+    for (const name of ['rsvp', 'ucapan', 'kontribusi', 'rekening']) nodes.set(`${name}-modal`, element());
+    const window: any = {};
+    const document = {
+      addEventListener: (event: string, callback: () => void) => { if (event === 'DOMContentLoaded') callback(); },
+      getElementById: (id: string) => nodes.get(id), querySelector: () => null, querySelectorAll: () => [],
+      createElement: element, body: { style: {}, append: (node: any) => nodes.set(node.id, node) },
+    };
+    const script = readFileSync(path.join(bundle, 'assets/js/app.js'), 'utf8');
+    new Function('window', 'document', 'fetch', 'requestAnimationFrame', 'setTimeout', 'clearTimeout', script)(
+      window, document, async () => ({ ok: true, json: async () => ({ enabled: false }) }), (cb: () => void) => cb(), () => 1, () => {},
+    );
+    window.openRekening();
+    window.showToast('Berhasil disalin');
+    const toast = nodes.get('toast-notification');
+    expect(Number(toast.style.zIndex)).toBeGreaterThan(Number(nodes.get('rekening-modal').style.zIndex));
+    window.showToast('Gagal menyalin');
+    expect(nodes.get('toast-notification')).toBe(toast);
+    expect(toast.textContent).toBe('Gagal menyalin');
+    expect(Number(toast.style.zIndex)).toBeGreaterThan(10000);
+  });
+
   it('retains original still-image hero progress and timestamp chrome', () => {
     const hero = html.slice(html.indexOf('id="hero-post"'), html.indexOf('id="mempelai-post"'));
     expect(hero).toContain('absolute bottom-0 left-0 w-full h-1 bg-white/30');
