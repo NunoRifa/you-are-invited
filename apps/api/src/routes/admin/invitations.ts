@@ -124,6 +124,8 @@ function isPlaceholderUrl(rawUrl: string | null | undefined): boolean {
 }
 
 const YT_ALLOWED_KEYS = new Set([
+  'heroPhotoPositionX',
+  'heroPhotoPositionY',
   'heroCaption',
   'communityIntro',
   'eventIntro',
@@ -137,6 +139,8 @@ const YT_ALLOWED_KEYS = new Set([
 ]);
 
 const YT_FIELD_MAP: Record<string, string> = {
+  heroPhotoPositionX: 'yt_hero_photo_position_x',
+  heroPhotoPositionY: 'yt_hero_photo_position_y',
   heroCaption: 'yt_hero_caption',
   communityIntro: 'yt_community_intro',
   eventIntro: 'yt_event_intro',
@@ -794,6 +798,13 @@ adminInvitationsRouter.patch('/:id/yt-wedding', async (c) => {
   for (const key of Object.keys(body)) {
     if (!YT_ALLOWED_KEYS.has(key)) {
       return c.json({ error: `Unsupported key: ${key}` }, 400);
+    }
+  }
+
+  for (const key of ['heroPhotoPositionX', 'heroPhotoPositionY']) {
+    const value = body[key];
+    if (value !== undefined && value !== null && (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 100)) {
+      return c.json({ error: `${key} must be a finite number between 0 and 100 or null` }, 400);
     }
   }
 

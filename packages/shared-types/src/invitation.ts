@@ -3,6 +3,8 @@ export type CoupleRole = 'bride' | 'groom';
 export type AssetKind = 'image' | 'audio' | 'font' | 'video';
 
 export interface YTWeddingSettingsInput {
+  heroPhotoPositionX?: number | null;
+  heroPhotoPositionY?: number | null;
   heroCaption?: string | null;
   communityIntro?: string | null;
   eventIntro?: string | null;

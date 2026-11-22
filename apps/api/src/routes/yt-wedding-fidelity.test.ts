@@ -54,6 +54,40 @@ describe('yt-wedding source fidelity', () => {
     expect(lines[1].textContent.trim()).toBe('08.00 - 10.00 WIB');
   });
 
+  it('applies valid focal axes only to hero still image with independent safe defaults', () => {
+    const bind = new Function(`${bindCode}; return bindYTWedding`)();
+    for (const [x, y, expected] of [
+      ['0', '27.5', '0% 27.5%'], [undefined, undefined, '50% 50%'],
+      ['', null, '50% 50%'], ['101', '0', '50% 0%'],
+      ['-1', '100', '50% 100%'], ['Infinity', 'NaN', '50% 50%'],
+      ['0; color:red', '20', '50% 20%'], [false, [], '50% 50%'],
+    ]) {
+      const hero = { style: { objectPosition: '' } };
+      const avatar = { style: { objectPosition: '40% 60%' } };
+      const root = { querySelector: (s: string) => s === '#hero-post .aspect-video > img' ? hero : null, querySelectorAll: () => [] };
+      bind(root, { templateFields: { yt_hero_photo_position_x: x, yt_hero_photo_position_y: y } }, '', false);
+      expect(hero.style.objectPosition).toBe(expected);
+      expect(avatar.style.objectPosition).toBe('40% 60%');
+    }
+  });
+
+  it('renders existing parent salutations literally in profile and closing', () => {
+    const nodes = new Map<string, { textContent: string }>();
+    for (const [pos, suffix] of [[1, 'mb-4'], [2, 'mt-4']]) {
+      nodes.set(`#mempelai-post .grid.grid-cols-2 > div:nth-child(${pos}) p`, { textContent: '' });
+      nodes.set(`#penutup-post .bg-yt-card .${suffix} .text-yt-gray`, { textContent: '' });
+    }
+    const bind = new Function(`${bindCode}; return bindYTWedding`)();
+    bind({ querySelector: (s: string) => nodes.get(s), querySelectorAll: () => [] }, { couples: [
+      { role: 'groom', fatherName: 'Bapak Ayah Contoh', motherName: 'Ibu Bunda Contoh' },
+      { role: 'bride', fatherName: 'Bapak Ayah Sampel', motherName: 'Ibu Bunda Sampel' },
+    ] }, '', false);
+    expect([...nodes.values()].map(n => n.textContent)).toEqual([
+      'Putra dari Bapak Ayah Contoh & Ibu Bunda Contoh', 'Putra dari Bapak Ayah Contoh & Ibu Bunda Contoh',
+      'Putri dari Bapak Ayah Sampel & Ibu Bunda Sampel', 'Putri dari Bapak Ayah Sampel & Ibu Bunda Sampel',
+    ]);
+  });
+
   it('preserves verification icons when inserting couple name', () => {
     const icon = { className: 'fa-solid fa-circle-check' };
     const node = { textContent: 'Sample name' };

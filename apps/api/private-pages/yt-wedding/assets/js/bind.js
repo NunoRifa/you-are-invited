@@ -62,6 +62,13 @@ function bindYTWedding(root, payload, guestName, preview) {
   if (citation) citation.textContent = `— ${value(invitation.quoteSource)}`;
   text('#music-label', value(setting('music_label') || 'Musik Latar'));
   picture('#welcome-cover img, #hero-post img, #mempelai-post > div:first-child img, #event-post > div:first-child img, #gallery-post > div:first-child img, #penutup-post > div:first-child img, #form-rsvp img', invitation.heroPhotoUrl || invitation.coverPhotoUrl);
+  const focal = key => {
+    const raw = fields[`yt_hero_photo_position_${key}`];
+    const n = typeof raw === 'number' || (typeof raw === 'string' && raw.trim()) ? Number(raw) : NaN;
+    return Number.isFinite(n) && n >= 0 && n <= 100 ? n : 50;
+  };
+  const heroImage = root.querySelector?.('#hero-post .aspect-video > img');
+  if (heroImage?.style) heroImage.style.objectPosition = `${focal('x')}% ${focal('y')}%`;
   const video = root.querySelector?.('#hero-post .aspect-video');
   if (video && validAsset(invitation.heroVideoUrl) && typeof video.querySelector === 'function') {
     const img = video.querySelector('img');

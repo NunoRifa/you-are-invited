@@ -250,6 +250,26 @@ describe('Task 5: Media trust boundary and typed yt-wedding template settings', 
     expect(rootRes.headers.get('Content-Type')).toBe('video/mp4');
   });
 
+  it('persists focal percentages without modifying other settings and resets only one axis', async () => {
+    const endpoint = '/api/admin/invitations/inv-yt/yt-wedding';
+    const patch = (body: unknown) => app.request(endpoint, { method: 'PATCH', headers: jsonHeaders('yt'), body: JSON.stringify(body) });
+    const fields = () => db.select().from(schema.invitationTemplateFields).where(eq(schema.invitationTemplateFields.invitationId, 'inv-yt')).all();
+    const before = fields().filter(f => !f.fieldKey.startsWith('yt_hero_photo_position_'));
+    expect((await patch({ heroPhotoPositionX: 0, heroPhotoPositionY: 27.5 })).status).toBe(200);
+    expect(fields().find(f => f.fieldKey === 'yt_hero_photo_position_x')?.fieldValue).toBe('0');
+    expect(fields().find(f => f.fieldKey === 'yt_hero_photo_position_y')?.fieldValue).toBe('27.5');
+    expect(fields().filter(f => !f.fieldKey.startsWith('yt_hero_photo_position_'))).toEqual(before);
+    for (const value of [-1, 101, '20', true, [], {}]) {
+      const saved = fields();
+      expect((await patch({ heroPhotoPositionX: 70, heroPhotoPositionY: value })).status).toBe(400);
+      expect(fields()).toEqual(saved);
+    }
+    expect((await patch({ heroPhotoPositionX: null })).status).toBe(200);
+    expect(fields().find(f => f.fieldKey === 'yt_hero_photo_position_x')).toBeUndefined();
+    expect(fields().find(f => f.fieldKey === 'yt_hero_photo_position_y')?.fieldValue).toBe('27.5');
+    expect((await app.request(endpoint, { method: 'PATCH', headers: jsonHeaders('other'), body: JSON.stringify({ heroPhotoPositionY: 10 }) })).status).toBe(404);
+  });
+
   it('PATCH /api/admin/invitations/:id/yt-wedding saves typed settings and reflects in read-back', async () => {
     const videoUpload = await uploadFile('yt', 'inv-yt', 'wedding-hero.mp4', 'video/mp4', makeValidMp4(), 'video');
     const { id: heroVideoAssetId } = await videoUpload.json() as { id: string };

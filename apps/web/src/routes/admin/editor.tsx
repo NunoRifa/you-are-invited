@@ -145,6 +145,39 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
   const [publicationErrors, setPublicationErrors] = useState<string[]>([]);
   const [ytSettings, setYtSettings] = useState<YtSettingsState>(initialYtSettings);
   const [galleryVisibilityConfirmed, setGalleryVisibilityConfirmed] = useState(false);
+  const [heroPosition, setHeroPosition] = useState({ x: 50, y: 50 });
+  const [savingHeroPosition, setSavingHeroPosition] = useState(false);
+
+  const readHeroPosition = (fields: EditorPayload['templateFields']) => {
+    const axis = (key: string) => {
+      const raw = fields?.find(f => f.fieldKey === `yt_hero_photo_position_${key}`)?.fieldValue;
+      const value = raw?.trim() ? Number(raw) : NaN;
+      return Number.isFinite(value) && value >= 0 && value <= 100 ? value : 50;
+    };
+    return { x: axis('x'), y: axis('y') };
+  };
+
+  const saveHeroPosition = async () => {
+    setSavingHeroPosition(true);
+    try {
+      const response = await fetch(`/api/admin/invitations/${invitationId}/yt-wedding`, {
+        method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroPhotoPositionX: heroPosition.x, heroPhotoPositionY: heroPosition.y }),
+      });
+      if (!response.ok) throw await apiError(response, 'Gagal menyimpan posisi foto.');
+      const readback = await fetch(`/api/admin/invitations/${invitationId}`, { credentials: 'include', cache: 'no-store' });
+      if (!readback.ok) throw await apiError(readback, 'Posisi foto belum terkonfirmasi.');
+      const saved = await readback.json() as EditorPayload;
+      const position = readHeroPosition(saved.templateFields);
+      if (position.x !== heroPosition.x || position.y !== heroPosition.y) throw new Error('Posisi foto belum terkonfirmasi tersimpan.');
+      setNotice('Posisi foto hero tersimpan.');
+      setPreviewVersion(v => v + 1);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal menyimpan posisi foto.');
+    } finally {
+      setSavingHeroPosition(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -157,6 +190,7 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       setPayload({ ...data, loveStory: Array.isArray(data.loveStory) ? data.loveStory : createDefaultLoveStory() });
 
       const fields = data.templateFields || [];
+      setHeroPosition(readHeroPosition(fields));
       const getField = (key: string, def = '') => fields.find((f) => f.fieldKey === key)?.fieldValue ?? def;
       setYtSettings({
         heroCaption: getField('yt_hero_caption'),
@@ -1037,7 +1071,7 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
       <div className="flex items-center gap-2">
         {notice && <span role="status" className="mr-2 text-xs text-stone-600">{notice}</span>}
         <button onClick={() => { void onLogout(); }} className="rounded-lg border border-stone-300 px-3 py-2 text-sm">Keluar</button>
-        <button onClick={() => { void load(); setPreviewVersion((v) => v + 1); }} className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"><RefreshCw size={15}/>Muat Ulang</button>
+        <button disabled={savingHeroPosition} onClick={() => { void load(); setPreviewVersion((v) => v + 1); }} className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"><RefreshCw size={15}/>Muat Ulang</button>
         <button onClick={() => void save()} disabled={saving || Boolean(uploadingTarget)} className="inline-flex items-center gap-2 rounded-lg bg-amber-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"><Save size={15}/>{saving ? 'Menyimpan…' : 'Simpan'}</button>
       </div>
     </header>
@@ -1252,6 +1286,39 @@ export const InvitationEditor: React.FC<{ invitationId: string; onNavigate: (pat
                 </div>
               </div>
             </article>
+
+            {payload.invitation.templateKey === 'yt-wedding' && (
+              <article className="space-y-3 rounded-xl border border-stone-200 p-4">
+                <h3 className="font-semibold text-stone-800 text-sm">Posisi Foto Hero</h3>
+                {ytSettings.heroVideoUrl ? <p className="text-xs text-stone-500">Video hero aktif. Pengaturan posisi hanya berlaku untuk foto.</p> : (
+                  <>
+                    {(payload.invitation.heroPhotoUrl || payload.invitation.coverPhotoUrl) && <img
+                      src={payload.invitation.heroPhotoUrl || payload.invitation.coverPhotoUrl || ''}
+                      alt="Preview posisi foto hero"
+                      className="aspect-video w-full object-cover"
+                      style={{ objectPosition: `${heroPosition.x}% ${heroPosition.y}%` }}
+                    />}
+                    <fieldset disabled={savingHeroPosition || Boolean(uploadingTarget)} className="space-y-3">
+                      <label className="block text-xs font-medium text-stone-700">
+                        Posisi Horizontal Foto Hero: {heroPosition.x}%
+                        <input aria-label="Posisi Horizontal Foto Hero" type="range" min="0" max="100" step="1" value={heroPosition.x}
+                          onChange={e => setHeroPosition(p => ({ ...p, x: Number(e.target.value) }))} className="mt-2 block w-full" />
+                      </label>
+                      <label className="block text-xs font-medium text-stone-700">
+                        Posisi Vertikal Foto Hero: {heroPosition.y}%
+                        <input aria-label="Posisi Vertikal Foto Hero" type="range" min="0" max="100" step="1" value={heroPosition.y}
+                          onChange={e => setHeroPosition(p => ({ ...p, y: Number(e.target.value) }))} className="mt-2 block w-full" />
+                      </label>
+                      <p className="text-xs text-stone-500">Geser isi foto tanpa mengubah ukuran bingkai. Vertikal 0% menampilkan bagian atas foto.</p>
+                      <div className="flex flex-wrap gap-3">
+                        <button type="button" onClick={() => void saveHeroPosition()} className="rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white">{savingHeroPosition ? 'Menyimpan…' : 'Simpan Posisi Foto'}</button>
+                        <button type="button" onClick={() => setHeroPosition({ x: 50, y: 50 })} className="text-xs text-stone-600 underline">Reset Posisi</button>
+                      </div>
+                    </fieldset>
+                  </>
+                )}
+              </article>
+            )}
 
             {/* 3. Foto Mempelai Wanita */}
             {bride && (
