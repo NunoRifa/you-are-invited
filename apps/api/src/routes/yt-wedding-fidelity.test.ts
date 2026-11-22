@@ -35,9 +35,18 @@ describe('yt-wedding source fidelity', () => {
 
   it('places every toast above interactive sheets including reused notifications', () => {
     const nodes = new Map<string, any>();
-    const element = () => ({ style: {} as Record<string, string>, className: '', textContent: '', setAttribute: () => {}, addEventListener: () => {}, classList: { add: () => {}, remove: () => {}, replace: () => {} } });
+    const element = () => {
+      const node: any = { style: {} as Record<string, string>, className: '', textContent: '', setAttribute: () => {}, addEventListener: () => {} };
+      node.classList = {
+        add: (name: string) => { if (!node.className.split(/\s+/).includes(name)) node.className = `${node.className} ${name}`.trim(); },
+        remove: (name: string) => { node.className = node.className.split(/\s+/).filter((token: string) => token !== name).join(' '); },
+        replace: (oldName: string, newName: string) => { if (node.className.split(/\s+/).includes(oldName)) { node.classList.remove(oldName); node.classList.add(newName); return true; } return false; },
+      };
+      return node;
+    };
     for (const name of ['rsvp', 'ucapan', 'kontribusi', 'rekening']) nodes.set(`${name}-modal`, element());
     const window: any = {};
+    let toastTimerCallback: (() => void) | undefined;
     const document = {
       addEventListener: (event: string, callback: () => void) => { if (event === 'DOMContentLoaded') callback(); },
       getElementById: (id: string) => nodes.get(id), querySelector: () => null, querySelectorAll: () => [],
@@ -45,16 +54,20 @@ describe('yt-wedding source fidelity', () => {
     };
     const script = readFileSync(path.join(bundle, 'assets/js/app.js'), 'utf8');
     new Function('window', 'document', 'fetch', 'requestAnimationFrame', 'setTimeout', 'clearTimeout', script)(
-      window, document, async () => ({ ok: true, json: async () => ({ enabled: false }) }), (cb: () => void) => cb(), () => 1, () => {},
+      window, document, async () => ({ ok: true, json: async () => ({ enabled: false }) }), (cb: () => void) => cb(), (cb: () => void) => { toastTimerCallback = cb; return 1; }, () => {},
     );
     window.openRekening();
     window.showToast('Berhasil disalin');
     const toast = nodes.get('toast-notification');
     expect(Number(toast.style.zIndex)).toBeGreaterThan(Number(nodes.get('rekening-modal').style.zIndex));
+    expect(toast.style.opacity).toBe('1');
     window.showToast('Gagal menyalin');
     expect(nodes.get('toast-notification')).toBe(toast);
     expect(toast.textContent).toBe('Gagal menyalin');
+    expect(toast.style.opacity).toBe('1');
     expect(Number(toast.style.zIndex)).toBeGreaterThan(10000);
+    toastTimerCallback?.();
+    expect(toast.style.opacity).toBe('0');
   });
 
   it('retains original still-image hero progress and timestamp chrome', () => {

@@ -52,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.append(toast);
     }
     toast.style.zIndex = '10001';
+    toast.style.opacity = '1';
     toast.textContent = message;
-    toast.classList.replace('opacity-0', 'opacity-100');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.replace('opacity-100', 'opacity-0'), 3000);
+    toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 3000);
   };
   window.copyRek = async number => {
     try { await navigator.clipboard.writeText(number); window.showToast('✓ Berhasil Disalin'); }
