@@ -218,6 +218,17 @@ invitationPageRouter.get('/:slug/assets/:file{.*}', handleTemplateAsset);
 
 const handleInvitationPage = (c: any) => {
   const slug = c.req.param('slug');
+  if (slug === 'riska-rafli') {
+    const target = db.select().from(schema.invitations).where(and(
+      eq(schema.invitations.id, 'inv-riska-rafli'),
+      eq(schema.invitations.slug, 'riska-rafly'),
+      eq(schema.invitations.isPublished, true),
+    )).get();
+    if (target) {
+      const url = new URL(c.req.url);
+      return c.redirect(url.pathname.replace('/i/riska-rafli', '/i/riska-rafly') + url.search, 301);
+    }
+  }
   if (!/^[a-zA-Z0-9_-]+$/.test(slug)) return c.notFound();
   const invitation = db.select().from(schema.invitations).where(eq(schema.invitations.slug, slug)).get();
   if (!invitation || !invitation.isPublished) return c.notFound();

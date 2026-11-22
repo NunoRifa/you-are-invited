@@ -30,6 +30,30 @@ afterAll(() => {
 });
 
 describe('Task 3: yt-wedding seed and draft isolation', () => {
+  it('migrates only the stable client slug and keeps the old URL redirect private until published', async () => {
+    await seedTemplates();
+    const now = Date.now();
+    db.insert(schema.adminUsers).values({ id: 'migration-admin', email: 'migration@example.test', passwordHash: 'unused', role: 'owner', createdAt: now }).run();
+    db.insert(schema.invitations).values({ id: 'inv-riska-rafli', slug: 'riska-rafli', templateKey: 'yt-wedding', title: 'Client title', ownerUserId: 'migration-admin', isPublished: false, createdAt: now, updatedAt: now }).run();
+    const before = sqlite.prepare("SELECT * FROM invitations WHERE id = 'inv-riska-rafli'").get() as Record<string, unknown>;
+    await seedTemplates();
+    expect(sqlite.prepare("SELECT * FROM invitations WHERE id = 'inv-riska-rafli'").get()).toEqual({ ...before, slug: 'riska-rafly' });
+    await seedTemplates();
+    expect(sqlite.prepare("SELECT count(*) AS n FROM invitations WHERE slug IN ('riska-rafli','riska-rafly')").get()).toEqual({ n: 1 });
+    const { invitationPageRouter } = await import('../../routes/invitation-page.js');
+    const { Hono } = await import('hono');
+    const app = new Hono().route('/i', invitationPageRouter);
+    expect((await app.request('/i/riska-rafli?to=Nuno+Rifa')).status).toBe(404);
+    sqlite.prepare("UPDATE invitations SET is_published = 1 WHERE id = 'inv-riska-rafli'").run();
+    for (const suffix of ['', '/']) {
+      const response = await app.request(`/i/riska-rafli${suffix}?to=Nuno+Rifa`);
+      expect(response.status).toBe(301);
+      expect(response.headers.get('location')).toBe(`/i/riska-rafly${suffix}?to=Nuno+Rifa`);
+    }
+    db.delete(schema.invitations).where(eq(schema.invitations.id, 'inv-riska-rafli')).run();
+    db.delete(schema.adminUsers).where(eq(schema.adminUsers.id, 'migration-admin')).run();
+  });
+
   it('upserts yt-wedding template catalog entry', async () => {
     await seedTemplates();
     const tmpl = db.select().from(schema.templates).where(eq(schema.templates.id, 'yt-wedding')).get();
@@ -45,7 +69,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
     const warnSpy = vi.spyOn(console, 'warn');
     await seedTemplates();
 
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get();
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get();
     expect(riska).toBeUndefined();
 
     // Must not invent credentials or dummy users
@@ -70,9 +94,9 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
 
     await seedTemplates();
 
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get();
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get();
     expect(riska).toBeDefined();
-    expect(riska?.slug).toBe('riska-rafli');
+    expect(riska?.slug).toBe('riska-rafly');
     expect(riska?.templateKey).toBe('yt-wedding');
     expect(riska?.isPublished).toBe(false);
     expect(riska?.ownerUserId).toBe(superAdminId);
@@ -108,7 +132,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
   });
 
   it('seeds gallery hidden only when the setting is absent and no gallery rows exist', async () => {
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     // Remove prior test's seed default to construct empty gallery + absent setting state.
     db.delete(schema.invitationTemplateFields).where(and(
       eq(schema.invitationTemplateFields.invitationId, riska.id),
@@ -132,7 +156,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
   });
 
   it('does not duplicate default bride and groom slots on repeated seed', async () => {
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     await seedTemplates();
     await seedTemplates();
     const couples = db.select().from(schema.couples).where(eq(schema.couples.invitationId, riska.id)).all();
@@ -141,7 +165,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
   });
 
   it('preserves existing populated couple row and adds only missing role', async () => {
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     db.delete(schema.couples).where(eq(schema.couples.invitationId, riska.id)).run();
     const bride = {
       id: 'custom-riska-bride',
@@ -174,7 +198,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
   });
 
   it.each(['true', 'false'])('preserves explicit yt_show_gallery=%s setting', async (value) => {
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     db.delete(schema.invitationTemplateFields).where(and(
       eq(schema.invitationTemplateFields.invitationId, riska.id),
       eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
@@ -195,7 +219,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
   });
 
   it('does not seed yt_show_gallery=false when gallery already has images', async () => {
-    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     db.delete(schema.invitationTemplateFields).where(and(
       eq(schema.invitationTemplateFields.invitationId, riska.id),
       eq(schema.invitationTemplateFields.fieldKey, 'yt_show_gallery'),
@@ -220,7 +244,7 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
 
   it('is idempotent: running seed repeatedly never overwrites, resets, or mutates populated fields (neither Anggi nor Riska)', async () => {
     // Modify Riska fields to simulate operator changes
-    const riskaBefore = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riskaBefore = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     db.update(schema.invitations)
       .set({
         title: 'Custom Riska & Rafli Title',
@@ -243,14 +267,14 @@ describe('Task 3: yt-wedding seed and draft isolation', () => {
       .run();
 
     const anggiSnapshot = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'anggi-ivan')).get()!;
-    const riskaSnapshot = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riskaSnapshot = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     const anggiGiftsSnapshot = db.select().from(schema.giftAccounts).where(eq(schema.giftAccounts.invitationId, anggiBefore.id)).all();
 
     // Run seed again
     await seedTemplates();
 
     const anggiAfter = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'anggi-ivan')).get()!;
-    const riskaAfter = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafli')).get()!;
+    const riskaAfter = db.select().from(schema.invitations).where(eq(schema.invitations.slug, 'riska-rafly')).get()!;
     const anggiGiftsAfter = db.select().from(schema.giftAccounts).where(eq(schema.giftAccounts.invitationId, anggiBefore.id)).all();
 
     // Riska must be unchanged

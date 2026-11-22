@@ -292,8 +292,16 @@ export async function seedTemplates() {
     console.log(`- Seeded invitation: ${anggiIvanSlug}`);
   }
 
-  // 1c. Riska & Rafli Client Invitation (yt-wedding template)
-  const riskaSlug = 'riska-rafli';
+  // Preserve stable ID and all related client data when correcting the public slug.
+  sqlite.transaction(() => {
+    const previous = sqlite.prepare("SELECT id FROM invitations WHERE id = 'inv-riska-rafli' AND slug = 'riska-rafli' AND template_key = 'yt-wedding'").get();
+    if (!previous) return;
+    if (sqlite.prepare("SELECT id FROM invitations WHERE slug = 'riska-rafly'").get()) {
+      throw new Error('Cannot rename Riska slug: riska-rafly already belongs to another invitation');
+    }
+    sqlite.prepare("UPDATE invitations SET slug = 'riska-rafly' WHERE id = 'inv-riska-rafli'").run();
+  })();
+  const riskaSlug = 'riska-rafly';
   let existingRiska = db.select().from(schema.invitations).where(eq(schema.invitations.slug, riskaSlug)).get();
   if (!existingRiska) {
     const superAdmin = db.select().from(schema.adminUsers).where(eq(schema.adminUsers.role, 'super_admin')).get();

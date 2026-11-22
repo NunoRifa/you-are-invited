@@ -80,7 +80,11 @@ export function invitationRoutePlugin(): Plugin {
 
         // Forward to API backend if available to preserve server-injected per-client social metadata in dev
         const backendUrl = process.env.VITE_API_URL || 'http://localhost:3000';
-        fetch(`${backendUrl}${req.url}`).then(async (apiRes) => {
+        fetch(`${backendUrl}${req.url}`, { redirect: 'manual' }).then(async (apiRes) => {
+          if (apiRes.status === 301 || apiRes.status === 308) {
+            res.writeHead(apiRes.status, { Location: apiRes.headers.get('location') || '/' });
+            return res.end();
+          }
           if (apiRes.status === 200) {
             res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'text/html; charset=utf-8');
             return res.end(await apiRes.text());
